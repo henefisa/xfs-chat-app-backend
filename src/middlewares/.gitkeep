@@ -1,0 +1,2 @@
+Purpose: Middleware that run between requests
+Naming convention: *.middleware.ts
