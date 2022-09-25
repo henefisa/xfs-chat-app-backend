@@ -5,8 +5,8 @@ const dataSource = new DataSource({
   host: "127.0.0.1",
   port: 5432,
   username: "postgres",
-  password: "gsignal",
-  database: "chat",
+  password: "01658205896",
+  database: "chatapp",
   entities: ["src/entities/*.entity.ts"],
   synchronize: true,
 });

@@ -44,7 +44,7 @@ dataSource
     console.log(`Failed to connect database`, error);
   });
 
-server.get("/", (_: Request, res: Response) => {
+server.get("/", (req: Request, res: Response) => {
   res.send("Express + TS server");
 });
 
