@@ -15,7 +15,7 @@ export const createUser = async (
 ) => {
   try {
     const user = new User();
-    user.email = req.body.email;
+    user.username = req.body.username;
     user.password = await hash(req.body.password, await genSalt());
     const saved = await userRepository.save(user);
 

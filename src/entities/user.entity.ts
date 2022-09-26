@@ -1,36 +1,31 @@
-import { Follow } from './follow.entity';
-import { Participans } from './participans.entity';
+import { Participans } from "./participans.entity";
 import { BaseEntity } from "../shares";
 import { Column, Entity, OneToMany } from "typeorm";
 import { Message } from "./message.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
-
   @Column()
-  userName: string; 
+  username: string;
 
   @Column()
   email: string;
 
   @Column()
   password: string;
-  
-  @Column()
-  fullName:string;
 
   @Column()
-  avatar:string;
+  fullName: string;
 
   @Column()
-  phone:string;
+  avatar: string;
 
-  @OneToMany(() => Message, (message) => message.user) 
+  @Column()
+  phone: string;
+
+  @OneToMany(() => Message, (message) => message.owner)
   messages: Message[];
 
-  @OneToMany(() => Participans, (participans) => participans.user) 
+  @OneToMany(() => Participans, (participans) => participans.owner)
   participans: Participans[];
-
-  @OneToMany(() => Follow, (follows) => follows.user) 
-  follows: Follow[];
 }
