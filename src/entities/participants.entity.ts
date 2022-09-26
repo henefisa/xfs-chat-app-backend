@@ -3,11 +3,11 @@ import { Column, Entity, ManyToOne } from "typeorm";
 import { Conversation } from "./conversation.entity";
 import { User } from "./user.entity";
 
-@Entity("participans")
-export class Participans extends BaseEntity {
-  @ManyToOne(() => Conversation, (conversations) => conversations.participans)
+@Entity("participants")
+export class Participants extends BaseEntity {
+  @ManyToOne(() => Conversation, (conversations) => conversations.participants)
   conversation: Conversation;
 
-  @ManyToOne(() => User, (users) => users.participans)
+  @ManyToOne(() => User, (users) => users.participants)
   owner: User;
 }

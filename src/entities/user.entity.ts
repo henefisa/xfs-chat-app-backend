@@ -1,4 +1,4 @@
-import { Participans } from "./participans.entity";
+import { Participants } from "./participants.entity";
 import { BaseEntity } from "../shares";
 import { Column, Entity, OneToMany } from "typeorm";
 import { Message } from "./message.entity";
@@ -26,6 +26,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Message, (messages) => messages.owner)
   messages: Message[];
 
-  @OneToMany(() => Participans, (participans) => participans.owner)
-  participans: Participans[];
+  @OneToMany(() => Participants, (participants) => participants.owner)
+  participants: Participants[];
 }
