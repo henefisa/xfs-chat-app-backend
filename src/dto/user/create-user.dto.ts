@@ -1,11 +1,10 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsString } from "class-validator";
 import { IsNotBlank } from "src/decorators";
 
 export class CreateUserDto {
-
   @IsString()
   @IsNotBlank()
-  username : string;
+  username: string;
 
   @IsString()
   @IsNotBlank()

@@ -11,9 +11,9 @@ export class Message extends BaseEntity {
   @Column()
   attachment: string;
 
-  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
+  @ManyToOne(() => Conversation, (conversations) => conversations.messages)
   conversation: Conversation;
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (users) => users.messages)
   owner: User;
 }

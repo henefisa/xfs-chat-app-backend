@@ -5,9 +5,9 @@ import { User } from "./user.entity";
 
 @Entity("participans")
 export class Participans extends BaseEntity {
-  @ManyToOne(() => Conversation, (conversation) => conversation.participans)
+  @ManyToOne(() => Conversation, (conversations) => conversations.participans)
   conversation: Conversation;
 
-  @ManyToOne(() => User, (user) => user.participans)
+  @ManyToOne(() => User, (users) => users.participans)
   owner: User;
 }

@@ -23,7 +23,7 @@ export class User extends BaseEntity {
   @Column()
   phone: string;
 
-  @OneToMany(() => Message, (message) => message.owner)
+  @OneToMany(() => Message, (messages) => messages.owner)
   messages: Message[];
 
   @OneToMany(() => Participans, (participans) => participans.owner)

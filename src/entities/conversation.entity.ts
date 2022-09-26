@@ -8,7 +8,7 @@ export class Conversation extends BaseEntity {
   @Column()
   tittle: string;
 
-  @OneToMany(() => Message, (message) => message.conversation)
+  @OneToMany(() => Message, (messages) => messages.conversation)
   messages: Message[];
 
   @OneToMany(() => Participans, (participans) => participans.conversation)
