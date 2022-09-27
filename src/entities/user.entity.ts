@@ -1,9 +1,9 @@
-import { Participants } from "./participants.entity";
-import { BaseEntity } from "../shares";
-import { Column, Entity, OneToMany } from "typeorm";
-import { Message } from "./message.entity";
+import { Participants } from './participants.entity';
+import { BaseEntity } from '../shares';
+import { Column, Entity, IsNull, OneToMany } from 'typeorm';
+import { Message } from './message.entity';
 
-@Entity("users")
+@Entity('users')
 export class User extends BaseEntity {
   @Column()
   username: string;
