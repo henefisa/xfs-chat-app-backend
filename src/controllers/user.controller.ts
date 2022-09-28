@@ -1,3 +1,4 @@
+import { message } from 'src/shares/message';
 import { NextFunction, Request, Response } from 'express';
 import { CreateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
@@ -24,7 +25,7 @@ export const createUser = async (
     user.phone = req.body.phone;
 
     if (!user) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, 'user_not_found');
+      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
     }
 
     const saved = await userRepository.save(user);
@@ -41,18 +42,18 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   try {
-    const userToUpdate = await userRepository.findOneBy({
+    const user = await userRepository.findOneBy({
       id: req.params.id,
     });
-    if (!userToUpdate) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, 'user_not_found');
+    if (!user) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
     }
-    userToUpdate.username = req.body.username;
-    userToUpdate.password = await hash(req.body.password, await genSalt());
-    userToUpdate.fullName = req.body.fullName;
-    userToUpdate.avatar = req.body.avatar;
-    userToUpdate.phone = req.body.phone;
-    const updated = await userRepository.save(userToUpdate);
+    user.username = req.body.username;
+    user.password = await hash(req.body.password, await genSalt());
+    user.fullName = req.body.fullName;
+    user.avatar = req.body.avatar;
+    user.phone = req.body.phone;
+    const updated = await userRepository.save(user);
 
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
@@ -66,14 +67,14 @@ export const deleteUser = async (
   next: NextFunction
 ) => {
   try {
-    const userToDelete = await userRepository.findOneBy({
-      id: req.params.id,
-    });
-    if (!userToDelete) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, 'user_not_found');
-    }
-    await userRepository.remove(userToDelete);
-    return res.status(StatusCodes.ACCEPTED);
+    await dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(User)
+      .where('id = :id', { id: req.params.id })
+      .execute();
+
+    return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
   }
@@ -89,7 +90,7 @@ export const getUserById = async (
       id: req.params.id,
     });
     if (!userToGet) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, 'user_not_found');
+      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
     }
     return res.status(StatusCodes.OK).json(userToGet);
   } catch (error) {
@@ -104,9 +105,6 @@ export const getAllUser = async (
 ) => {
   try {
     const userToGetAll = await userRepository.find();
-    if (!userToGetAll) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, 'user_not_found');
-    }
     return res.status(StatusCodes.OK).json(userToGetAll);
   } catch (error) {
     next(error);
