@@ -3,6 +3,7 @@ import { BaseEntity } from '../shares';
 import { Column, Entity, IsNull, OneToMany } from 'typeorm';
 import { Message } from './message.entity';
 
+
 @Entity('users')
 export class User extends BaseEntity {
   @Column()
