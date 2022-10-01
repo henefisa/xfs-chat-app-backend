@@ -1,12 +1,13 @@
-import { message } from 'src/shares/message';
+import { genSalt, hash } from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
-import { CreateUserDto } from 'src/dto/user';
-import { User } from 'src/entities/user.entity';
-import { RequestWithBody } from 'src/shares';
 import { StatusCodes } from 'http-status-codes';
-import { hash, genSalt } from 'bcrypt';
 import dataSource from 'src/configs/data-source';
-import { HttpException } from 'src/shares/http-exception';
+import { CreateUserDto } from 'src/dto/user';
+import { GetUserDto } from 'src/dto/user/get-user.dto';
+import { User } from 'src/entities/user.entity';
+import * as userService from 'src/services/user.service';
+import { RequestWithBody } from 'src/shares';
+import { UpdateUserDto } from './../dto/user/update-user.dto';
 
 const userRepository = dataSource.getRepository(User);
 
@@ -17,16 +18,8 @@ export const createUser = async (
 ) => {
   try {
     const user = new User();
-    user.username = req.body.username;
-    user.email = req.body.email;
+    Object.assign(user, req.body);
     user.password = await hash(req.body.password, await genSalt());
-    user.fullName = req.body.fullName;
-    user.avatar = req.body.avatar;
-    user.phone = req.body.phone;
-
-    if (!user) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
-    }
 
     const saved = await userRepository.save(user);
 
@@ -37,22 +30,17 @@ export const createUser = async (
 };
 
 export const updateUser = async (
-  req: Request,
+  req: RequestWithBody<UpdateUserDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const user = await userRepository.findOneBy({
-      id: req.params.id,
+    const user = await userService.getOneOrThrow({
+      where: { id: req.params.id },
     });
-    if (!user) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
-    }
-    user.username = req.body.username;
-    user.password = await hash(req.body.password, await genSalt());
-    user.fullName = req.body.fullName;
-    user.avatar = req.body.avatar;
-    user.phone = req.body.phone;
+
+    Object.assign(user, req.body);
+
     const updated = await userRepository.save(user);
 
     return res.status(StatusCodes.CREATED).json(updated);
@@ -67,12 +55,7 @@ export const deleteUser = async (
   next: NextFunction
 ) => {
   try {
-    await dataSource
-      .createQueryBuilder()
-      .delete()
-      .from(User)
-      .where('id = :id', { id: req.params.id })
-      .execute();
+    await userRepository.delete(req.params.id);
 
     return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
@@ -86,26 +69,26 @@ export const getUserById = async (
   next: NextFunction
 ) => {
   try {
-    const userToGet = await userRepository.findOneBy({
-      id: req.params.id,
-    });
-    if (!userToGet) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, message.User_not_found);
-    }
-    return res.status(StatusCodes.OK).json(userToGet);
+    const user = await userService.getOne({ where: { id: req.params.id } });
+
+    return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     next(error);
   }
 };
 
 export const getAllUser = async (
-  req: Request,
+  req: RequestWithBody<GetUserDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const userToGetAll = await userRepository.find();
-    return res.status(StatusCodes.OK).json(userToGetAll);
+    const { users, count } = await userService.getUsers('', req.body);
+
+    return res.status(StatusCodes.OK).json({
+      users,
+      count,
+    });
   } catch (error) {
     next(error);
   }

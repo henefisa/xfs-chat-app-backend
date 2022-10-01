@@ -7,6 +7,7 @@ import {
   getUserById,
 } from 'src/controllers/user.controller';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
+import { GetUserDto } from 'src/dto/user/get-user.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 
 const router: Router = Router();
@@ -15,6 +16,6 @@ router.post('/', validationMiddleware(CreateUserDto), createUser);
 router.put('/:id', validationMiddleware(UpdateUserDto), updateUser);
 router.delete('/:id', deleteUser);
 router.get('/:id', getUserById);
-router.get('/', getAllUser);
+router.get('/', validationMiddleware(GetUserDto), getAllUser);
 
 export const UserRoutes = router;

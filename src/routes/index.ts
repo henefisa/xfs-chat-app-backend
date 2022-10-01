@@ -1,10 +1,8 @@
-import { messageRoutes } from './message.route';
-import { Router } from "express";
-import { UserRoutes } from "./user.route";
+import { Router } from 'express';
+import { UserRoutes } from './user.route';
 
 const router: Router = Router();
 
-router.use("/users", UserRoutes);
-router.use("/messages",messageRoutes)
+router.use('/users', UserRoutes);
 
 export const MainRoutes = router;
