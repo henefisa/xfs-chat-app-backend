@@ -46,8 +46,8 @@ export const getUsers = async (
   }
 
   // TODO: handle status
-  if (dto?.status) {
-  }
+  // if (dto?.status) {
+  // }
 
   if (options?.id) {
     query.andWhere('u.id = :id', { id: options.id });

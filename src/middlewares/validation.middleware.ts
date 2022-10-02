@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
-import { validate, ValidationError } from "class-validator";
-import { HttpException } from "src/shares/http-exception";
-import { StatusCodes } from "http-status-codes";
+import { NextFunction, Request, Response } from 'express';
+import { validate, ValidationError } from 'class-validator';
+import { HttpException } from 'src/shares/http-exception';
+import { StatusCodes } from 'http-status-codes';
 
 type Class = { new (...args: any[]): any };
 
@@ -40,7 +40,7 @@ const validationMiddleware = (dto: Class) => {
       if (errors.length > 0) {
         throw new HttpException(
           StatusCodes.UNPROCESSABLE_ENTITY,
-          "Input data validation failed",
+          'Input data validation failed',
           buildError(errors, result)
         );
       }

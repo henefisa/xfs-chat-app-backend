@@ -1,9 +1,9 @@
-import { User } from "src/entities/user.entity";
-import { Conversation } from "./conversation.entity";
-import { BaseEntity } from "../shares";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { User } from 'src/entities/user.entity';
+import { Conversation } from './conversation.entity';
+import { BaseEntity } from '../shares';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
-@Entity("messages")
+@Entity('messages')
 export class Message extends BaseEntity {
   @Column()
   message: string;

@@ -2,15 +2,15 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
-import moment from "moment";
+} from 'typeorm';
+import moment from 'moment';
 
 export class BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @CreateDateColumn({
-    name: "created_at",
+    name: 'created_at',
     transformer: {
       from(value) {
         return moment(value);
@@ -23,7 +23,7 @@ export class BaseEntity {
   createdAt: moment.Moment;
 
   @UpdateDateColumn({
-    name: "updated_at",
+    name: 'updated_at',
     transformer: {
       from(value) {
         return moment(value);

@@ -14,4 +14,4 @@ export enum EUserRole {
   USER = 'USER',
 }
 
-export interface GetUserOptions extends GetOptions<User> {}
+export type GetUserOptions = GetOptions<User>;

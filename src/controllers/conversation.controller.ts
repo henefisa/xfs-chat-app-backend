@@ -1,6 +1,6 @@
-import dataSource from 'src/configs/data-source';
-import { Conversation } from 'src/entities/conversation.entity';
-import { Participants } from 'src/entities/participants.entity';
+// import dataSource from 'src/configs/data-source';
+// import { Conversation } from 'src/entities/conversation.entity';
+// import { Participants } from 'src/entities/participants.entity';
 
 // const conversationRepository = dataSource.getRepository(Conversation);
 // const participantsRepository = dataSource.getRepository(Participants);

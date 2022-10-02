@@ -1,4 +1,4 @@
-import { IValidationError } from "src/middlewares/validation.middleware";
+import { IValidationError } from 'src/middlewares/validation.middleware';
 
 export class HttpException extends Error {
   public status: number;
