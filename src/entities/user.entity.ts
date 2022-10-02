@@ -1,10 +1,11 @@
+
 import { EUserRole } from './../interfaces/user.interface';
 import { Participants } from './participants.entity';
 import { BaseEntity } from '../shares';
 import { Column, Entity, IsNull, OneToMany } from 'typeorm';
 import { Message } from './message.entity';
-import { EUserStatus } from 'src/interfaces/user.interface';
 
+import { EUserStatus } from 'src/interfaces/user.interface';
 @Entity('users')
 export class User extends BaseEntity {
   @Column()

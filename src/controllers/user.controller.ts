@@ -40,7 +40,6 @@ export const updateUser = async (
     });
 
     Object.assign(user, req.body);
-
     const updated = await userRepository.save(user);
 
     return res.status(StatusCodes.CREATED).json(updated);
@@ -56,7 +55,6 @@ export const deleteUser = async (
 ) => {
   try {
     await userRepository.delete(req.params.id);
-
     return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
