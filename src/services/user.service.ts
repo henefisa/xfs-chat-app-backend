@@ -1,5 +1,5 @@
 import { NotFoundException } from './../exceptions/not-found.exception';
-import { GetUserOptions } from './../interfaces/user.interface';
+import { GetUserOptions, EUserRole } from './../interfaces/user.interface';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
 import dataSource from 'src/configs/data-source';
 import { User } from 'src/entities/user.entity';
@@ -22,6 +22,26 @@ export const getOne = async (options: FindOneOptions<User>) => {
   return userRepository.findOne(options);
 };
 
+export const getWithUsername = async (username: string) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = query.addSelect('u.password').where({ username }).getOne();
+
+  return user;
+};
+
+export const getWithEmail = async (email: string) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = query.addSelect('u.password').where({ email }).getOne();
+
+  return user;
+};
+
+export const getWithRole = async (id: string, role: EUserRole) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = query.where({ id }).andWhere({ role }).getOne();
+
+  return user;
+};
 export const getUsers = async (
   userId: string,
   dto?: GetUserDto,

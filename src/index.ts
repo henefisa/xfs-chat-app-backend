@@ -1,9 +1,13 @@
-import express, { NextFunction, Request, Response } from "express";
-import dotenv from "dotenv";
-import dataSource from "src/configs/data-source";
-import "reflect-metadata";
-import { MainRoutes } from "./routes";
-import { HttpException } from "./shares/http-exception";
+import express, { NextFunction, Request, Response } from 'express';
+import dotenv from 'dotenv';
+import dataSource from 'src/configs/data-source';
+import 'reflect-metadata';
+import { MainRoutes } from './routes';
+import { HttpException } from './shares/http-exception';
+import passport from 'passport';
+import session from 'express-session';
+import { loginUser } from './stratiges/login.strategy';
+import { jwtUse } from './stratiges/jwt.strategy';
 
 dotenv.config();
 
@@ -29,8 +33,17 @@ const errorHandler = (
   next(error);
 };
 
+const passportUse = () => {
+  return [loginUser(), jwtUse()];
+};
+
+passportUse();
+server.use(session({ secret: 'anything' }));
+server.use(passport.initialize());
+server.use(passport.session());
+
 server.use(express.json());
-server.use("/api", MainRoutes);
+server.use('/api', MainRoutes);
 server.use(errorHandler);
 
 dataSource
@@ -44,8 +57,8 @@ dataSource
     console.log(`Failed to connect database`, error);
   });
 
-server.get("/", (req: Request, res: Response) => {
-  res.send("Express + TS server");
+server.get('/', (req: Request, res: Response) => {
+  res.send('Express + TS server');
 });
 
 server.listen(port, () => {
