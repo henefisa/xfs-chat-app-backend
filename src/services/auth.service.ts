@@ -3,6 +3,7 @@ import { getWithUsername, getWithEmail, getWithRole } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { PayloadToken } from 'src/interfaces/auth.interface';
+import { NotFoundException } from 'src/exceptions/not-found.exception';
 
 export const validateUser = async (username: string, password: string) => {
   const userWithUsername = await getWithUsername(username);
@@ -27,10 +28,13 @@ export const validateUser = async (username: string, password: string) => {
 
 export const generateJWT = async (user: User) => {
   const userConsult = await getWithRole(user.id, user.role);
+  if (!userConsult) {
+    throw new NotFoundException('user');
+  }
 
   const payload: PayloadToken = {
-    role: userConsult!.role,
-    sub: userConsult!.id,
+    role: userConsult.role,
+    sub: userConsult.id,
   };
 
   if (userConsult) {
