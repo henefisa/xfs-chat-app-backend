@@ -1,6 +1,6 @@
 import { EUserRole } from './../interfaces/user.interface';
 // import { Participants } from './participants.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { BaseEntity } from '../shares';
 // import { Message } from './message.entity';
 
