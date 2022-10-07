@@ -7,4 +7,5 @@ const router: Router = Router();
 
 router.post('/login', validationMiddleware(loginDto), login);
 
+
 export const authRoutes = router;

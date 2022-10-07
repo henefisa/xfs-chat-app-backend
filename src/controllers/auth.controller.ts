@@ -1,3 +1,4 @@
+
 import { createToken, validateUser } from 'src/services/auth.service';
 import { loginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
@@ -14,7 +15,7 @@ export const login = async (
     if (!req.body.username || !req.body.password) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ msg: 'Please. Send your email and password' });
+        .json({ msg: 'Please. Send your username and password' });
     }
 
     const userWithUsername = getOneOrThrow({

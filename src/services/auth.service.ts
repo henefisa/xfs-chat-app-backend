@@ -19,7 +19,6 @@ export const validateUser = async (username: string, password: string) => {
       return userWithUsername;
     }
   }
-
   return null;
 };
 
