@@ -24,21 +24,21 @@ export const getOne = async (options: FindOneOptions<User>) => {
 
 export const getWithUsername = async (username: string) => {
   const query = userRepository.createQueryBuilder('u');
-  const user = query.addSelect('u.password').where({ username }).getOne();
+  const user = await query.addSelect('u.password').where({ username }).getOne();
 
   return user;
 };
 
 export const getWithEmail = async (email: string) => {
   const query = userRepository.createQueryBuilder('u');
-  const user = query.addSelect('u.password').where({ email }).getOne();
+  const user = await query.addSelect('u.password').where({ email }).getOne();
 
   return user;
 };
 
 export const getWithRole = async (id: string, role: EUserRole) => {
   const query = userRepository.createQueryBuilder('u');
-  const user = query.where({ id }).andWhere({ role }).getOne();
+  const user = await query.where({ id }).andWhere({ role }).getOne();
 
   return user;
 };
@@ -47,9 +47,6 @@ export const getUsers = async (
   dto?: GetUserDto,
   options?: GetUserOptions
 ) => {
-  // TODO: future use;
-  // const user = getOneOrThrow({ where: { id: userId } });
-
   const { limit, offset } = getLimitAndOffset({
     limit: dto?.limit,
     offset: dto?.offset,
@@ -65,9 +62,9 @@ export const getUsers = async (
     query.andWhere('full_name ILIKE :q', { q: dto.q });
   }
 
-  // TODO: handle status
-  // if (dto?.status) {
-  // }
+  if (dto?.status) {
+    query.andWhere('status = :s', { s: dto.status });
+  }
 
   if (options?.id) {
     query.andWhere('u.id = :id', { id: options.id });

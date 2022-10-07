@@ -5,11 +5,14 @@ import 'reflect-metadata';
 import { MainRoutes } from './routes';
 import { HttpException } from './shares/http-exception';
 import passport from 'passport';
-import session from 'express-session';
-import { loginUser } from './stratiges/login.strategy';
-import { jwtUse } from './stratiges/jwt.strategy';
+import passportMiddleware from 'src/middlewares/passport';
 
-dotenv.config();
+dotenv.config({
+  path:
+    process.env.NODE_ENV !== undefined
+      ? `.${process.env.NODE_ENV.trim()}.env`
+      : '.env',
+});
 
 const server = express();
 const port = process.env.PORT || 8000;
@@ -32,16 +35,8 @@ const errorHandler = (
 
   next(error);
 };
-
-const passportUse = () => {
-  return [loginUser(), jwtUse()];
-};
-
-passportUse();
-server.use(session({ secret: 'anything' }));
+passport.use(passportMiddleware);
 server.use(passport.initialize());
-server.use(passport.session());
-
 server.use(express.json());
 server.use('/api', MainRoutes);
 server.use(errorHandler);

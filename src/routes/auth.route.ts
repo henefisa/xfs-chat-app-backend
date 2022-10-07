@@ -1,9 +1,10 @@
+import validationMiddleware from 'src/middlewares/validation.middleware';
 import { login } from 'src/controllers/auth.controller';
-import passport from 'passport';
 import { Router } from 'express';
+import { loginDto } from 'src/dto/auth';
 
 const router: Router = Router();
 
-router.post('/login', passport.authenticate('login'), login);
+router.post('/login', validationMiddleware(loginDto), login);
 
 export const authRoutes = router;

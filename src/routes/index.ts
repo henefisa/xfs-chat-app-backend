@@ -5,6 +5,6 @@ import { UserRoutes } from './user.route';
 const router: Router = Router();
 
 router.use('/users', UserRoutes);
-router.use('/auths', authRoutes);
+router.use('/auth', authRoutes);
 
 export const MainRoutes = router;

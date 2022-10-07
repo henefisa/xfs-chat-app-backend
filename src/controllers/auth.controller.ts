@@ -1,23 +1,41 @@
+import { createToken, validateUser } from 'src/services/auth.service';
+import { loginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
-import { User } from 'src/entities/user.entity';
-import { generateJWT } from 'src/services/auth.service';
-import { Response, Request, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { RequestWithBody } from 'src/shares';
+import { getOneOrThrow } from 'src/services/user.service';
+
 export const login = async (
-  req: Request,
+  req: RequestWithBody<loginDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const userEncode = req.user as User;
-    const encode = await generateJWT(userEncode);
-    if (!encode) {
-      return res.status(StatusCodes.UNAUTHORIZED);
+    if (!req.body.username || !req.body.password) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ msg: 'Please. Send your email and password' });
     }
 
-    res.header('Content-Type', 'application/json');
-    res.cookie('accessToken', encode.accessToken, { maxAge: 60000 * 60 });
-    res.write(JSON.stringify(encode));
-    res.end();
+    const userWithUsername = getOneOrThrow({
+      where: { username: req.body.username },
+    });
+    if (!userWithUsername) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ msg: 'The User does not exists' });
+    }
+
+    const user = validateUser(req.body.username, req.body.password);
+    if (await user) {
+      return res
+        .status(StatusCodes.OK)
+        .json({ token: createToken(await userWithUsername) });
+    }
+
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      msg: 'The username or password are incorrect',
+    });
   } catch (error) {
     next(error);
   }

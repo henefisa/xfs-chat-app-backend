@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 import {
   createUser,
   deleteUser,
@@ -13,9 +14,27 @@ import validationMiddleware from 'src/middlewares/validation.middleware';
 const router: Router = Router();
 
 router.post('/', validationMiddleware(CreateUserDto), createUser);
-router.put('/:id', validationMiddleware(UpdateUserDto), updateUser);
-router.delete('/:id', deleteUser);
-router.get('/:id', getUserById);
-router.get('/', validationMiddleware(GetUserDto), getAllUser);
+router.put(
+  '/:id',
+  validationMiddleware(UpdateUserDto),
+  passport.authenticate('jwt', { session: false }),
+  updateUser
+);
+router.delete(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  deleteUser
+);
+router.get(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  getUserById
+);
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  validationMiddleware(GetUserDto),
+  getAllUser
+);
 
 export const UserRoutes = router;
