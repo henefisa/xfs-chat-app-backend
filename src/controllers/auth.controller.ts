@@ -14,27 +14,27 @@ export const login = async (
     if (!req.body.username || !req.body.password) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ msg: 'Please. Send your email and password' });
+        .json({ message: 'Please. Send your email and password' });
     }
 
-    const userWithUsername = getOneOrThrow({
+    const userWithUsername = await getOneOrThrow({
       where: { username: req.body.username },
     });
     if (!userWithUsername) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ msg: 'The User does not exists' });
+        .json({ message: 'The User does not exists' });
     }
 
-    const user = validateUser(req.body.username, req.body.password);
-    if (await user) {
+    const user = await validateUser(req.body.username, req.body.password);
+    if (user) {
       return res
         .status(StatusCodes.OK)
-        .json({ token: createToken(await userWithUsername) });
+        .json({ token: createToken(userWithUsername) });
     }
 
     return res.status(StatusCodes.UNAUTHORIZED).json({
-      msg: 'The username or password are incorrect',
+      message: 'The username or password are incorrect',
     });
   } catch (error) {
     next(error);

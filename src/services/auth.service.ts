@@ -1,4 +1,4 @@
-import { getWithUsername } from './user.service';
+import { getByUsername } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
@@ -12,15 +12,12 @@ dotenv.config({
 });
 
 export const validateUser = async (username: string, password: string) => {
-  const userWithUsername = await getWithUsername(username);
-  if (userWithUsername) {
-    const isMatch = await bcrypt.compare(password, userWithUsername.password);
-    if (isMatch) {
-      return userWithUsername;
-    }
-  }
+  const userWithUsername = await getByUsername(username);
 
-  return null;
+  if (!userWithUsername) return;
+  const isMatch = await bcrypt.compare(password, userWithUsername.password);
+  if (!isMatch) return;
+  return userWithUsername;
 };
 
 export const createToken = (user: User) => {

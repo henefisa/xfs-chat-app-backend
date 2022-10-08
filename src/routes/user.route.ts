@@ -16,8 +16,8 @@ const router: Router = Router();
 router.post('/', validationMiddleware(CreateUserDto), createUser);
 router.put(
   '/:id',
-  validationMiddleware(UpdateUserDto),
   passport.authenticate('jwt', { session: false }),
+  validationMiddleware(UpdateUserDto),
   updateUser
 );
 router.delete(

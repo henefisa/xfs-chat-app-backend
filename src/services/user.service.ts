@@ -22,7 +22,7 @@ export const getOne = async (options: FindOneOptions<User>) => {
   return userRepository.findOne(options);
 };
 
-export const getWithUsername = async (username: string) => {
+export const getByUsername = async (username: string) => {
   const query = userRepository.createQueryBuilder('u');
   const user = await query.addSelect('u.password').where({ username }).getOne();
 
