@@ -14,9 +14,13 @@ dotenv.config({
 export const validateUser = async (username: string, password: string) => {
   const user = await getByUsername(username);
 
-  if (!user) return;
+  if (!user) {
+    return;
+  }
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return;
+  if (!isMatch) {
+    return;
+  }
   return user;
 };
 

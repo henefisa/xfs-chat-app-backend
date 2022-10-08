@@ -1,12 +1,12 @@
 import { createToken, validateUser } from 'src/services/auth.service';
-import { loginDto } from 'src/dto/auth';
+import { LoginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
 import { Response, NextFunction } from 'express';
 import { RequestWithBody } from 'src/shares';
 import { getOneOrThrow } from 'src/services/user.service';
 
 export const login = async (
-  req: RequestWithBody<loginDto>,
+  req: RequestWithBody<LoginDto>,
   res: Response,
   next: NextFunction
 ) => {
