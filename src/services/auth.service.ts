@@ -12,12 +12,12 @@ dotenv.config({
 });
 
 export const validateUser = async (username: string, password: string) => {
-  const userWithUsername = await getByUsername(username);
+  const user = await getByUsername(username);
 
-  if (!userWithUsername) return;
-  const isMatch = await bcrypt.compare(password, userWithUsername.password);
+  if (!user) return;
+  const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return;
-  return userWithUsername;
+  return user;
 };
 
 export const createToken = (user: User) => {

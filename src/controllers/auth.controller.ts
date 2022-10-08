@@ -17,10 +17,10 @@ export const login = async (
         .json({ message: 'Please. Send your email and password' });
     }
 
-    const userWithUsername = await getOneOrThrow({
+    const u = await getOneOrThrow({
       where: { username: req.body.username },
     });
-    if (!userWithUsername) {
+    if (!u) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: 'The User does not exists' });
@@ -28,9 +28,7 @@ export const login = async (
 
     const user = await validateUser(req.body.username, req.body.password);
     if (user) {
-      return res
-        .status(StatusCodes.OK)
-        .json({ token: createToken(userWithUsername) });
+      return res.status(StatusCodes.OK).json({ token: createToken(u) });
     }
 
     return res.status(StatusCodes.UNAUTHORIZED).json({
