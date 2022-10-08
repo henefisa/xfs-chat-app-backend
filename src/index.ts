@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import { MainRoutes } from './routes';
 import { HttpException } from './shares/http-exception';
 import passport from 'passport';
+
 import passportMiddleware from 'src/middlewares/passport';
 
 dotenv.config({
@@ -35,6 +36,7 @@ const errorHandler = (
 
   next(error);
 };
+
 passport.use(passportMiddleware);
 server.use(passport.initialize());
 server.use(express.json());
