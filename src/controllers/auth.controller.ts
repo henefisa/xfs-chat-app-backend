@@ -1,3 +1,4 @@
+import { UnauthorizedException } from './../exceptions/unauthorized.exception.ts';
 import { NotExistException } from './../exceptions/not-found.exception';
 import { createToken, validateUser } from 'src/services/auth.service';
 import { LoginDto } from 'src/dto/auth';
@@ -27,10 +28,7 @@ export const login = async (
     if (user) {
       return res.status(StatusCodes.OK).json({ token: createToken(u) });
     }
-
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      message: 'The username or password are incorrect',
-    });
+    throw new UnauthorizedException();
   } catch (error) {
     next(error);
   }
