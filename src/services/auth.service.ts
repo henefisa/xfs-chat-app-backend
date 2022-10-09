@@ -1,8 +1,10 @@
+import { NotFoundException } from 'src/exceptions/not-found.exception';
 import { getByUsername } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { User } from 'src/entities/user.entity';
+import { message } from 'src/shares';
 
 dotenv.config({
   path:
@@ -15,11 +17,11 @@ export const validateUser = async (username: string, password: string) => {
   const user = await getByUsername(username);
 
   if (!user) {
-    return;
+    throw new Error(message.User_not_exits);
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return;
+    throw new NotFoundException('user');
   }
   return user;
 };
