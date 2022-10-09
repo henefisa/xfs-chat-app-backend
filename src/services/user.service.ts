@@ -5,6 +5,7 @@ import dataSource from 'src/configs/data-source';
 import { User } from 'src/entities/user.entity';
 import { FindOneOptions } from 'typeorm';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
+import { ExistedException } from 'src/exceptions/existed.exception';
 
 const userRepository = dataSource.getRepository(User);
 
@@ -35,6 +36,28 @@ export const getWithEmail = async (email: string) => {
   const user = await query.addSelect('u.password').where({ email }).getOne();
 
   return user;
+};
+export const checkUserToUpdate = async (
+  username: string,
+  phone: string,
+  email: string
+) => {
+  const u = await getByUsername(username);
+  if (u) {
+    throw new ExistedException(username);
+  }
+  const up = await getOneOrThrow({
+    where: { phone: phone },
+  });
+  if (up) {
+    throw new ExistedException(phone);
+  }
+  const ue = await getOneOrThrow({
+    where: { email: email },
+  });
+  if (ue) {
+    throw new ExistedException(email);
+  }
 };
 
 export const getWithRole = async (id: string, role: EUserRole) => {

@@ -13,6 +13,10 @@ export class UpdateUserDto {
   @IsString()
   avatar: string;
 
+  @IsOptional()
+  @IsString()
+  email: string;
+
   @IsString()
   @IsNotBlank()
   phone: string;

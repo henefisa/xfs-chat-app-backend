@@ -1,3 +1,5 @@
+import { checkUserToUpdate } from './../services/user.service';
+import { ExistedException } from './../exceptions/existed.exception';
 import { genSalt, hash } from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -38,10 +40,9 @@ export const updateUser = async (
     const user = await userService.getOneOrThrow({
       where: { id: req.params.id },
     });
-
+    checkUserToUpdate(req.body.username, req.body.phone, req.body.email);
     Object.assign(user, req.body);
     const updated = await userRepository.save(user);
-
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);
