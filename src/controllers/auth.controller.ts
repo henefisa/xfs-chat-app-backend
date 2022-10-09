@@ -1,9 +1,11 @@
+import { NotExistException } from './../exceptions/not-found.exception';
 import { createToken, validateUser } from 'src/services/auth.service';
 import { LoginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
 import { Response, NextFunction } from 'express';
 import { RequestWithBody } from 'src/shares';
 import { getOneOrThrow } from 'src/services/user.service';
+import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 
 export const login = async (
   req: RequestWithBody<LoginDto>,
@@ -12,28 +14,21 @@ export const login = async (
 ) => {
   try {
     if (!req.body.username || !req.body.password) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Please. Send your email and password' });
+      throw new NotExistException('user');
     }
 
     const u = await getOneOrThrow({
       where: { username: req.body.username },
     });
     if (!u) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'The User does not exists' });
+      throw new NotExistException('user');
     }
 
     const user = await validateUser(req.body.username, req.body.password);
     if (user) {
       return res.status(StatusCodes.OK).json({ token: createToken(u) });
     }
-
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      message: 'The username or password are incorrect',
-    });
+    throw new UnauthorizedException();
   } catch (error) {
     next(error);
   }

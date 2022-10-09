@@ -1,3 +1,5 @@
+import { NotExistException } from './../exceptions/not-found.exception';
+import { NotFoundException } from 'src/exceptions/not-found.exception';
 import { getByUsername } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
@@ -15,11 +17,11 @@ export const validateUser = async (username: string, password: string) => {
   const user = await getByUsername(username);
 
   if (!user) {
-    return;
+    throw new NotExistException('user');
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return;
+    throw new NotFoundException('user');
   }
   return user;
 };

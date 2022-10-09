@@ -38,10 +38,13 @@ export const updateUser = async (
     const user = await userService.getOneOrThrow({
       where: { id: req.params.id },
     });
-
+    userService.checkUserToUpdate(
+      req.body.username,
+      req.body.phone,
+      req.body.email
+    );
     Object.assign(user, req.body);
     const updated = await userRepository.save(user);
-
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);
