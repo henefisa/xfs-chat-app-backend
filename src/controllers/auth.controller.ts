@@ -1,23 +1,34 @@
+import { UnauthorizedException } from './../exceptions/unauthorized.exception.ts';
+import { NotExistException } from './../exceptions/not-found.exception';
+import { createToken, validateUser } from 'src/services/auth.service';
+import { LoginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
-import { User } from 'src/entities/user.entity';
-import { generateJWT } from 'src/services/auth.service';
-import { Response, Request, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { RequestWithBody } from 'src/shares';
+import { getOneOrThrow } from 'src/services/user.service';
+
 export const login = async (
-  req: Request,
+  req: RequestWithBody<LoginDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const userEncode = req.user as User;
-    const encode = await generateJWT(userEncode);
-    if (!encode) {
-      return res.status(StatusCodes.UNAUTHORIZED);
+    if (!req.body.username || !req.body.password) {
+      throw new NotExistException('user');
     }
 
-    res.header('Content-Type', 'application/json');
-    res.cookie('accessToken', encode.accessToken, { maxAge: 60000 * 60 });
-    res.write(JSON.stringify(encode));
-    res.end();
+    const u = await getOneOrThrow({
+      where: { username: req.body.username },
+    });
+    if (!u) {
+      throw new NotExistException('user');
+    }
+
+    const user = await validateUser(req.body.username, req.body.password);
+    if (user) {
+      return res.status(StatusCodes.OK).json({ token: createToken(u) });
+    }
+    throw new UnauthorizedException();
   } catch (error) {
     next(error);
   }

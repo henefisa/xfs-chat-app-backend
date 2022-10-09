@@ -1,48 +1,37 @@
-import { User } from 'src/entities/user.entity';
-import { getWithUsername, getWithEmail, getWithRole } from './user.service';
+import { NotExistException } from './../exceptions/not-found.exception';
+import { NotFoundException } from 'src/exceptions/not-found.exception';
+import { getByUsername } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { PayloadToken } from 'src/interfaces/auth.interface';
-import { NotFoundException } from 'src/exceptions/not-found.exception';
+import dotenv from 'dotenv';
+import { User } from 'src/entities/user.entity';
+
+dotenv.config({
+  path:
+    process.env.NODE_ENV !== undefined
+      ? `.${process.env.NODE_ENV.trim()}.env`
+      : '.env',
+});
 
 export const validateUser = async (username: string, password: string) => {
-  const userWithUsername = await getWithUsername(username);
-  const userWithEmail = await getWithEmail(username);
+  const user = await getByUsername(username);
 
-  if (userWithUsername) {
-    const isMatch = await bcrypt.compare(password, userWithUsername.password);
-    if (isMatch) {
-      return userWithUsername;
-    }
+  if (!user) {
+    throw new NotExistException('user');
   }
-
-  if (userWithEmail) {
-    const isMatch = await bcrypt.compare(password, userWithEmail.password);
-    if (isMatch) {
-      return userWithEmail;
-    }
-  }
-
-  return null;
-};
-
-export const generateJWT = async (user: User) => {
-  const userConsult = await getWithRole(user.id, user.role);
-  if (!userConsult) {
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
     throw new NotFoundException('user');
   }
+  return user;
+};
 
-  const payload: PayloadToken = {
-    role: userConsult.role,
-    sub: userConsult.id,
-  };
-
-  if (userConsult) {
-    user.password = 'Not permission';
-  }
-
-  return {
-    accessToken: jwt.sign(payload, 'khang@2022', { expiresIn: '1h' }),
-    user,
-  };
+export const createToken = (user: User) => {
+  return jwt.sign(
+    { id: user.id, username: user.username },
+    process.env.SECRET || 'anything',
+    {
+      expiresIn: 86400,
+    }
+  );
 };
