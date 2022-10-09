@@ -1,8 +1,9 @@
+import { NotExistException } from './../exceptions/not-found.exception';
 import { createToken, validateUser } from 'src/services/auth.service';
 import { LoginDto } from 'src/dto/auth';
 import { StatusCodes } from 'http-status-codes';
 import { Response, NextFunction } from 'express';
-import { message, RequestWithBody } from 'src/shares';
+import { RequestWithBody } from 'src/shares';
 import { getOneOrThrow } from 'src/services/user.service';
 
 export const login = async (
@@ -12,14 +13,14 @@ export const login = async (
 ) => {
   try {
     if (!req.body.username || !req.body.password) {
-      throw new Error(message.Unauthorized);
+      throw new NotExistException('user');
     }
 
     const u = await getOneOrThrow({
       where: { username: req.body.username },
     });
     if (!u) {
-      throw new Error(message.User_not_exits);
+      throw new NotExistException('user');
     }
 
     const user = await validateUser(req.body.username, req.body.password);

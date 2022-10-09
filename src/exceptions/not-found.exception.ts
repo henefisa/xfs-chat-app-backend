@@ -6,3 +6,8 @@ export class NotFoundException extends HttpException {
     super(StatusCodes.BAD_REQUEST, `${target}_not_found`);
   }
 }
+export class NotExistException extends HttpException {
+  constructor(target: string) {
+    super(StatusCodes.BAD_REQUEST, `${target}_not_exist`);
+  }
+}
