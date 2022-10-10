@@ -1,11 +1,10 @@
-import { UnauthorizedException } from './../exceptions/unauthorized.exception.ts';
-import { NotExistException } from './../exceptions/not-found.exception';
-import { createToken, validateUser } from 'src/services/auth.service';
-import { LoginDto } from 'src/dto/auth';
+import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { Response, NextFunction } from 'express';
+import { LoginDto } from 'src/dto/auth';
+import { RegisterDto } from 'src/dto/auth/register.dto';
+import { createToken } from 'src/services/auth.service';
+import { comparePassword, createUser } from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
-import { getOneOrThrow } from 'src/services/user.service';
 
 export const login = async (
   req: RequestWithBody<LoginDto>,
@@ -13,22 +12,23 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.body.username || !req.body.password) {
-      throw new NotExistException('user');
-    }
+    const user = await comparePassword(req.body.username, req.body.password);
 
-    const u = await getOneOrThrow({
-      where: { username: req.body.username },
-    });
-    if (!u) {
-      throw new NotExistException('user');
-    }
+    return res.status(StatusCodes.OK).json({ token: createToken(user) });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const user = await validateUser(req.body.username, req.body.password);
-    if (user) {
-      return res.status(StatusCodes.OK).json({ token: createToken(u) });
-    }
-    throw new UnauthorizedException();
+export const register = async (
+  req: RequestWithBody<RegisterDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await createUser(req.body);
+
+    return res.status(StatusCodes.CREATED).json(user);
   } catch (error) {
     next(error);
   }
