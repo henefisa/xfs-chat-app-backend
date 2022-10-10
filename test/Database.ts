@@ -23,7 +23,6 @@ export default class Database {
       database: 'chat',
       entities: ['src/entities/*.entity.ts'],
       synchronize: true,
-      dropSchema: true,
     });
 
     await this.dataSource
