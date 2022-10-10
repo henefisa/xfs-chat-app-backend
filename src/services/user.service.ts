@@ -93,6 +93,7 @@ export const comparePassword = async (username: string, password: string) => {
 export const createUser = async (dto: CreateUserDto) => {
   const user = new User();
   Object.assign(user, dto);
+  user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
 
   return userRepository.save(user);
 };
