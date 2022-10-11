@@ -9,21 +9,15 @@ import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from './../dto/user/update-user.dto';
 
-const userRepository = dataSource.getRepository(User);
-
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const user = new User();
-    Object.assign(user, req.body);
-    user.password = await hash(req.body.password, await genSalt());
-
-    const saved = await userRepository.save(user);
-
-    return res.status(StatusCodes.CREATED).json(saved);
+    res.setHeader('Content-Type', 'application/json');
+    const user = await userService.createUser(req.body);
+    return res.status(StatusCodes.CREATED).json(user);
   } catch (error) {
     next(error);
   }
@@ -35,16 +29,14 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   try {
-    const user = await userService.getOneOrThrow({
-      where: { id: req.params.id },
-    });
-    userService.checkUserToUpdate(
+    res.setHeader('Content-Type', 'application/json');
+    const updated = await userService.updateUser(
+      req.body,
+      req.params.id,
       req.body.username,
       req.body.phone,
       req.body.email
     );
-    Object.assign(user, req.body);
-    const updated = await userRepository.save(user);
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);
@@ -57,7 +49,8 @@ export const deleteUser = async (
   next: NextFunction
 ) => {
   try {
-    await userRepository.delete(req.params.id);
+    res.setHeader('Content-Type', 'application/json');
+    await userService.deleteUser(req.params.id);
     return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
@@ -70,8 +63,8 @@ export const getUserById = async (
   next: NextFunction
 ) => {
   try {
+    res.setHeader('Content-Type', 'application/json');
     const user = await userService.getOne({ where: { id: req.params.id } });
-
     return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     next(error);
@@ -84,6 +77,7 @@ export const getAllUser = async (
   next: NextFunction
 ) => {
   try {
+    res.setHeader('Content-Type', 'application/json');
     const { users, count } = await userService.getUsers('', req.body);
 
     return res.status(StatusCodes.OK).json({

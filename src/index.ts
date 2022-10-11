@@ -5,8 +5,10 @@ import 'reflect-metadata';
 import { MainRoutes } from './routes';
 import { HttpException } from './shares/http-exception';
 import passport from 'passport';
-
 import passportMiddleware from 'src/middlewares/passport';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from '../swagger-output.json';
+import cors from 'cors';
 
 dotenv.config({
   path:
@@ -15,7 +17,7 @@ dotenv.config({
       : '.env',
 });
 
-const server = express();
+const app = express();
 const port = process.env.PORT || 8000;
 
 const errorHandler = (
@@ -38,26 +40,32 @@ const errorHandler = (
 };
 
 passport.use(passportMiddleware);
-server.use(passport.initialize());
-server.use(express.json());
-server.use('/api', MainRoutes);
-server.use(errorHandler);
+app.use(passport.initialize());
+app.use(express.json());
+app.use('/api', MainRoutes);
+app.use(errorHandler);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(cors());
 
-dataSource
-  .initialize()
-  .then(() => {
-    console.log(`Database connected`);
-  })
-  .catch((error) => {
-    console.log(error);
-
-    console.log(`Failed to connect database`, error);
-  });
-
-server.get('/', (req: Request, res: Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Express + TS server');
 });
 
-server.listen(port, () => {
-  console.log(`Server is listen on port ${port}`);
-});
+if (process.env.NODE_ENV !== 'TEST') {
+  dataSource
+    .initialize()
+    .then(() => {
+      console.log(`Database connected`);
+    })
+    .catch((error) => {
+      console.log(error);
+
+      console.log(`Failed to connect database`, error);
+    });
+
+  app.listen(port, () => {
+    console.log(`Server is listen on port ${port}`);
+  });
+}
+
+export default app;
