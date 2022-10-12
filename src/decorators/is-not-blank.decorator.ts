@@ -17,7 +17,7 @@ export function IsNotBlank(validationOptions?: ValidationOptions) {
   };
 }
 
-@ValidatorConstraint({ name: 'IsNotBlank' })
+@ValidatorConstraint({ name: 'isNotBlank' })
 export class IsNotBlankConstraint implements ValidatorConstraintInterface {
   validate(value: string) {
     return typeof value === 'string' && value.trim().length > 0;

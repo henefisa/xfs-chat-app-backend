@@ -1,5 +1,5 @@
 import { User } from 'src/entities/user.entity';
-import { GetOptions } from './../shares/get-options';
+import { GetOptions } from 'src/shares/get-options';
 
 export enum EUserStatus {
   Active = 'ACTIVE',
