@@ -6,7 +6,6 @@
   "scripts": {
     "postinstall": "husky install",
     "start": "nodemon -r tsconfig-paths/register src/index.ts",
-    "swagger-autogen": "ts-node ./swagger.ts",
     "typeorm": "typeorm-ts-node-esm",
     "migration": "ts-node migration.ts",
     "format": "prettier --check --write src/**/*.ts",
