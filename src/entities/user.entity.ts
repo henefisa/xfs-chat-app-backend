@@ -1,6 +1,6 @@
-import { EUserRole } from 'src/interfaces/user.interface';
+import { EUserRole } from './../interfaces/user.interface';
 import { Column, Entity } from 'typeorm';
-import { BaseEntity } from 'src/shares';
+import { BaseEntity } from '../shares';
 import { EUserStatus } from 'src/interfaces/user.interface';
 
 @Entity('users')

@@ -6,6 +6,7 @@ import { MainRoutes } from './routes';
 import { HttpException } from './shares/http-exception';
 import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
+import cors from 'cors';
 
 dotenv.config({
   path:
@@ -41,6 +42,7 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
+app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TS server');

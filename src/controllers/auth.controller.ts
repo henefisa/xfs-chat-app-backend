@@ -12,8 +12,8 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
+    res.setHeader('Content-Type', 'application/json');
     const user = await comparePassword(req.body.username, req.body.password);
-
     return res.status(StatusCodes.OK).json({ token: createToken(user) });
   } catch (error) {
     next(error);
@@ -26,8 +26,8 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
+    res.setHeader('Content-Type', 'application/json');
     const user = await createUser(req.body);
-
     return res.status(StatusCodes.CREATED).json(user);
   } catch (error) {
     next(error);

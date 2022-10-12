@@ -12,7 +12,6 @@ import { GetUserDto } from 'src/dto/user/get-user.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 
 const router: Router = Router();
-
 router.post('/', validationMiddleware(CreateUserDto), createUser);
 router.put(
   '/:id',

@@ -1,12 +1,15 @@
 import * as bcrypt from 'bcrypt';
 import dataSource from 'src/configs/data-source';
 import { FindOneOptions } from 'typeorm';
-import { CreateUserDto, GetUserDto } from 'src/dto/user';
+import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
-import { ExistsException, UnauthorizedException } from 'src/exceptions';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { NotFoundException } from 'src/exceptions/not-found.exception';
-import { GetUserOptions } from 'src/interfaces/user.interface';
+import { EUserRole, GetUserOptions } from 'src/interfaces/user.interface';
+import { ExistedException } from 'src/exceptions/existed.exception';
+import { ExistsException } from 'src/exceptions/exists.exception';
+import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
+
 
 const userRepository = dataSource.getRepository(User);
 
@@ -24,6 +27,51 @@ export const getOne = async (options: FindOneOptions<User>) => {
   return userRepository.findOne(options);
 };
 
+export const getByUsername = async (username: string) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = await query.addSelect('u.password').where({ username }).getOne();
+
+  return user;
+};
+
+export const getWithEmail = async (email: string) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = await query.addSelect('u.password').where({ email }).getOne();
+
+  return user;
+};
+
+export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
+  const query = userRepository.createQueryBuilder('u');
+  const u = await query
+    .where('u.username = :username', { username: dto.username })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
+  if (u) {
+    throw new ExistedException(dto.username);
+  }
+  const uphone = await query
+    .where('u.phone = :phone', { phone: dto.phone })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
+  if (uphone) {
+    throw new ExistedException(dto.phone);
+  }
+  const user = await query
+    .where('u.email = :email', { email: dto.email })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
+  if (user) {
+    throw new ExistedException(dto.username);
+  }
+};
+
+export const getWithRole = async (id: string, role: EUserRole) => {
+  const query = userRepository.createQueryBuilder('u');
+  const user = await query.where({ id }).andWhere({ role }).getOne();
+
+  return user;
+};
 export const getUsers = async (
   userId: string,
   dto?: GetUserDto,
@@ -96,4 +144,17 @@ export const createUser = async (dto: CreateUserDto) => {
   user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
 
   return userRepository.save(user);
+};
+
+export const updateUser = async (dto: UpdateUserDto, id: string) => {
+  const user = await getOneOrThrow({
+    where: { id: id },
+  });
+  checkUserToUpdate(id, dto);
+  Object.assign(user, dto);
+  return await userRepository.save(user);
+};
+
+export const deleteUser = async (id: string) => {
+  return await userRepository.delete(id);
 };

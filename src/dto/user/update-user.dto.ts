@@ -7,11 +7,15 @@ export class UpdateUserDto {
   username: string;
 
   @IsString()
-  fullName: string;
+  full_name: string;
 
   @IsOptional()
   @IsString()
   avatar: string;
+
+  @IsOptional()
+  @IsString()
+  email: string;
 
   @IsString()
   @IsNotBlank()
