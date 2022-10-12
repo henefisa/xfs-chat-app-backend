@@ -1,10 +1,7 @@
-import { genSalt, hash } from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import dataSource from 'src/configs/data-source';
 import { CreateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
-import { User } from 'src/entities/user.entity';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from './../dto/user/update-user.dto';
@@ -30,13 +27,7 @@ export const updateUser = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const updated = await userService.updateUser(
-      req.body,
-      req.params.id,
-      req.body.username,
-      req.body.phone,
-      req.body.email
-    );
+    const updated = await userService.updateUser(req.body, req.params.id);
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);

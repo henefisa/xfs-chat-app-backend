@@ -40,28 +40,28 @@ export const getWithEmail = async (email: string) => {
   return user;
 };
 
-export const checkUserToUpdate = async (
-  username: string,
-  phone: string,
-  email: string
-) => {
-  const u = await getOneOrThrow({
-    where: { username: username },
-  });
+export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
+  const query = userRepository.createQueryBuilder('u');
+  const u = await query
+    .where('u.username = :username', { username: dto.username })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
   if (u) {
-    throw new ExistedException(username);
+    throw new ExistedException(dto.username);
   }
-  const uphone = await getOneOrThrow({
-    where: { phone: phone },
-  });
+  const uphone = await query
+    .where('u.phone = :phone', { phone: dto.phone })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
   if (uphone) {
-    throw new ExistedException(phone);
+    throw new ExistedException(dto.phone);
   }
-  const user = await getOneOrThrow({
-    where: { email: email },
-  });
+  const user = await query
+    .where('u.email = :email', { email: dto.email })
+    .andWhere('u.id <> :id', { id: id })
+    .getOne();
   if (user) {
-    throw new ExistedException(email);
+    throw new ExistedException(dto.username);
   }
 };
 
@@ -145,17 +145,11 @@ export const createUser = async (dto: CreateUserDto) => {
   return userRepository.save(user);
 };
 
-export const updateUser = async (
-  dto: UpdateUserDto,
-  id: string,
-  username: string,
-  phone: string,
-  email: string
-) => {
+export const updateUser = async (dto: UpdateUserDto, id: string) => {
   const user = await getOneOrThrow({
     where: { id: id },
   });
-  checkUserToUpdate(username, phone, email);
+  checkUserToUpdate(id, dto);
   Object.assign(user, dto);
   return await userRepository.save(user);
 };
