@@ -39,7 +39,7 @@ const validationMiddleware = (dto: Class) => {
 
       if (errors.length > 0) {
         throw new HttpException(
-          StatusCodes.UNPROCESSABLE_ENTITY,
+          StatusCodes.BAD_REQUEST,
           'Input data validation failed',
           buildError(errors, result)
         );
