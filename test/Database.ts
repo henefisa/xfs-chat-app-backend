@@ -17,10 +17,10 @@ export default class Database {
     this.dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST,
-      port: 5432,
+      port: process.env.DB_PORT,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: 'chat',
+      database: process.env.DB_DATABASE,
       entities: ['src/entities/*.entity.ts'],
       synchronize: true,
     });
