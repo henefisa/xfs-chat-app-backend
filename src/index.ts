@@ -6,8 +6,6 @@ import { MainRoutes } from './routes';
 import { HttpException } from './shares/http-exception';
 import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
-import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from '../swagger-output.json';
 import cors from 'cors';
 
 dotenv.config({
@@ -44,7 +42,6 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
