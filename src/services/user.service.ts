@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import dataSource from 'src/configs/data-source';
+import Database from 'src/configs/Database';
 import { FindOneOptions } from 'typeorm';
 import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
@@ -10,8 +10,9 @@ import { ExistedException } from 'src/exceptions/existed.exception';
 import { ExistsException } from 'src/exceptions/exists.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 
-
-const userRepository = dataSource.getRepository(User);
+const userRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(User);
 
 export const getOneOrThrow = async (options: FindOneOptions<User>) => {
   const user = await userRepository.findOne(options);
@@ -47,9 +48,11 @@ export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
     .where('u.username = :username', { username: dto.username })
     .andWhere('u.id <> :id', { id: id })
     .getOne();
+
   if (u) {
     throw new ExistedException(dto.username);
   }
+
   const uphone = await query
     .where('u.phone = :phone', { phone: dto.phone })
     .andWhere('u.id <> :id', { id: id })
@@ -72,6 +75,7 @@ export const getWithRole = async (id: string, role: EUserRole) => {
 
   return user;
 };
+
 export const getUsers = async (
   userId: string,
   dto?: GetUserDto,

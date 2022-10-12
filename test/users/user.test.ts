@@ -1,6 +1,6 @@
-import Database from 'test/Database';
+import Database from 'src/configs/Database';
 import request from 'supertest';
-import server from 'src/index';
+import server from 'src/server';
 
 beforeAll(async () => {
   await Database.instance.initialize();

@@ -4,7 +4,7 @@ import { CreateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
-import { UpdateUserDto } from './../dto/user/update-user.dto';
+import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
