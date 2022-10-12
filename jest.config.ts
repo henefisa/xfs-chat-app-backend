@@ -3,6 +3,7 @@ import { compilerOptions } from './tsconfig.json';
 import type { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
+  maxWorkers: 12,
   preset: 'ts-jest',
   testEnvironment: 'node',
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),

@@ -1,8 +1,8 @@
 import { NotFoundException } from 'src/exceptions';
 import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
 
 export default class Database {
   private static _instance: Database;
@@ -42,6 +42,20 @@ export default class Database {
     });
 
     await Promise.all(initialDatabasePromises);
+  }
+
+  async cleanDatabases() {
+    const cleaningPromises = this.databases.map(async (database) => {
+      const entities = database.dataSource.entityMetadatas;
+
+      const tableNames = entities
+        .map((entity) => `"${entity.tableName}"`)
+        .join(', ');
+
+      await database.dataSource.query(`TRUNCATE TABLE ${tableNames} CASCADE;`);
+    });
+
+    await Promise.all(cleaningPromises);
   }
 
   async close() {

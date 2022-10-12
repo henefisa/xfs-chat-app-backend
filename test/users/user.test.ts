@@ -7,6 +7,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await Database.instance.cleanDatabases();
   await Database.instance.close();
 });
 
@@ -23,15 +24,52 @@ describe('Test connection', () => {
   });
 });
 
-describe('POST /api/auth/login', () => {
-  const path = '/api/auth/login';
+describe('POST /api/auth/register', () => {
+  const path = '/api/auth/register';
+  const testUser = {
+    username: 'testuser',
+    password: '123456',
+    email: 'sample@gmail.com',
+  };
 
   test('Register user', async () => {
-    const response = await request(server).post(path).send({
-      username: 'testuser',
-      password: '123456',
-    });
+    const response = await request(server).post(path).send(testUser);
 
     expect(response.status).toBe(201);
+    expect(response.body.username).toBe(testUser.username);
+    expect(typeof response.body.id).toBe('string');
+    return;
+  });
+
+  test('Register user without username', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(400);
+  });
+
+  test('Register user without password', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ username: testUser.username, email: testUser.email });
+
+    expect(response.status).toBe(400);
+  });
+
+  test('Register user without username', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ password: testUser.password, email: testUser.email });
+
+    expect(response.status).toBe(400);
+  });
+
+  test('Register user with empty body', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ password: testUser.password, email: testUser.email });
+
+    expect(response.status).toBe(400);
   });
 });

@@ -1,14 +1,14 @@
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
-import { FindOneOptions } from 'typeorm';
 import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
-import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import { NotFoundException } from 'src/exceptions/not-found.exception';
-import { EUserRole, GetUserOptions } from 'src/interfaces/user.interface';
 import { ExistedException } from 'src/exceptions/existed.exception';
 import { ExistsException } from 'src/exceptions/exists.exception';
+import { NotFoundException } from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
+import { GetUserOptions } from 'src/interfaces/user.interface';
+import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
+import { FindOneOptions, Not } from 'typeorm';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -26,20 +26,6 @@ export const getOneOrThrow = async (options: FindOneOptions<User>) => {
 
 export const getOne = async (options: FindOneOptions<User>) => {
   return userRepository.findOne(options);
-};
-
-export const getByUsername = async (username: string) => {
-  const query = userRepository.createQueryBuilder('u');
-  const user = await query.addSelect('u.password').where({ username }).getOne();
-
-  return user;
-};
-
-export const getWithEmail = async (email: string) => {
-  const query = userRepository.createQueryBuilder('u');
-  const user = await query.addSelect('u.password').where({ email }).getOne();
-
-  return user;
 };
 
 export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
@@ -67,13 +53,6 @@ export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
   if (user) {
     throw new ExistedException(dto.username);
   }
-};
-
-export const getWithRole = async (id: string, role: EUserRole) => {
-  const query = userRepository.createQueryBuilder('u');
-  const user = await query.where({ id }).andWhere({ role }).getOne();
-
-  return user;
 };
 
 export const getUsers = async (
@@ -112,8 +91,21 @@ export const getUsers = async (
   };
 };
 
-export const checkUsernameExists = async (username: string) => {
-  const user = await getOne({ where: { username } });
+export const checkUsernameExists = async (
+  username: string,
+  userId?: string
+) => {
+  const user = await getOne({ where: { username, id: userId && Not(userId) } });
+
+  if (user) {
+    throw new ExistsException('username');
+  }
+
+  return true;
+};
+
+export const checkEmailExists = async (email: string, userId?: string) => {
+  const user = await getOne({ where: { email, id: userId && Not(userId) } });
 
   if (user) {
     throw new ExistsException('username');
@@ -143,6 +135,9 @@ export const comparePassword = async (username: string, password: string) => {
 };
 
 export const createUser = async (dto: CreateUserDto) => {
+  await checkUsernameExists(dto.username);
+  await checkEmailExists(dto.email);
+
   const user = new User();
   Object.assign(user, dto);
   user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());

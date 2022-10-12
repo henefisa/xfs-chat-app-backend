@@ -1,9 +1,8 @@
 import Database from './configs/Database';
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
-import server from './server';
-dotenv.config();
 
+dotenv.config();
 const port = process.env.PORT || 8000;
 
 Database.instance
@@ -17,6 +16,7 @@ Database.instance
     console.log(`Failed to connect database`, error);
   });
 
+import server from './server';
 server.listen(port, () => {
   console.log(`Server is listen on port ${port}`);
 });
