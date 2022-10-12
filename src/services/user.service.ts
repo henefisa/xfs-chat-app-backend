@@ -2,7 +2,6 @@ import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
 import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
-import { ExistedException } from 'src/exceptions/existed.exception';
 import { ExistsException } from 'src/exceptions/exists.exception';
 import { NotFoundException } from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
@@ -26,33 +25,6 @@ export const getOneOrThrow = async (options: FindOneOptions<User>) => {
 
 export const getOne = async (options: FindOneOptions<User>) => {
   return userRepository.findOne(options);
-};
-
-export const checkUserToUpdate = async (id: string, dto: UpdateUserDto) => {
-  const query = userRepository.createQueryBuilder('u');
-  const u = await query
-    .where('u.username = :username', { username: dto.username })
-    .andWhere('u.id <> :id', { id: id })
-    .getOne();
-
-  if (u) {
-    throw new ExistedException(dto.username);
-  }
-
-  const uphone = await query
-    .where('u.phone = :phone', { phone: dto.phone })
-    .andWhere('u.id <> :id', { id: id })
-    .getOne();
-  if (uphone) {
-    throw new ExistedException(dto.phone);
-  }
-  const user = await query
-    .where('u.email = :email', { email: dto.email })
-    .andWhere('u.id <> :id', { id: id })
-    .getOne();
-  if (user) {
-    throw new ExistedException(dto.username);
-  }
 };
 
 export const getUsers = async (
@@ -101,17 +73,27 @@ export const checkUsernameExists = async (
     throw new ExistsException('username');
   }
 
-  return true;
+  return false;
 };
 
 export const checkEmailExists = async (email: string, userId?: string) => {
   const user = await getOne({ where: { email, id: userId && Not(userId) } });
 
   if (user) {
-    throw new ExistsException('username');
+    throw new ExistsException('email');
   }
 
-  return true;
+  return false;
+};
+
+export const checkPhoneExists = async (phone: string, userId?: string) => {
+  const user = await getOne({ where: { phone, id: userId && Not(userId) } });
+
+  if (user) {
+    throw new ExistsException('phone');
+  }
+
+  return false;
 };
 
 export const comparePassword = async (username: string, password: string) => {
@@ -149,9 +131,15 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
   const user = await getOneOrThrow({
     where: { id: id },
   });
-  checkUserToUpdate(id, dto);
+
+  await Promise.all([
+    checkEmailExists(dto.email, user.id),
+    checkUsernameExists(dto.username, user.id),
+    checkPhoneExists(dto.phone, user.id),
+  ]);
+
   Object.assign(user, dto);
-  return await userRepository.save(user);
+  return userRepository.save(user);
 };
 
 export const deleteUser = async (id: string) => {
