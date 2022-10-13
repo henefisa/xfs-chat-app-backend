@@ -2,6 +2,12 @@ import Database from 'src/configs/Database';
 import request from 'supertest';
 import server from 'src/server';
 
+const routes = {
+  register: '/api/auth/register',
+  login: '/api/auth/login',
+  profile: '/api/users/profile',
+};
+
 beforeAll(async () => {
   await Database.instance.initialize();
 });
@@ -30,11 +36,9 @@ const testUser = {
   email: 'sample@gmail.com',
 };
 
-describe('POST /api/auth/register', () => {
-  const path = '/api/auth/register';
-
+describe(`POST ${routes.register}`, () => {
   test('Register user', async () => {
-    const response = await request(server).post(path).send(testUser);
+    const response = await request(server).post(routes.register).send(testUser);
 
     expect(response.status).toBe(201);
     expect(response.body.username).toBe(testUser.username);
@@ -44,7 +48,7 @@ describe('POST /api/auth/register', () => {
 
   test('Register user without username', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.register)
       .send({ username: testUser.username, password: testUser.password });
 
     expect(response.status).toBe(400);
@@ -52,7 +56,7 @@ describe('POST /api/auth/register', () => {
 
   test('Register user without password', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.register)
       .send({ username: testUser.username, email: testUser.email });
 
     expect(response.status).toBe(400);
@@ -60,32 +64,30 @@ describe('POST /api/auth/register', () => {
 
   test('Register user without username', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.register)
       .send({ password: testUser.password, email: testUser.email });
 
     expect(response.status).toBe(400);
   });
 
   test('Register user with empty body', async () => {
-    const response = await request(server).post(path).send();
+    const response = await request(server).post(routes.register).send();
 
     expect(response.status).toBe(400);
   });
 
   test('Register same user', async () => {
-    const response = await request(server).post(path).send(testUser);
+    const response = await request(server).post(routes.register).send(testUser);
 
     expect(response.status).toBe(400);
     expect(typeof response.body.message).toBe('string');
   });
 });
 
-describe('POST api/auth/login', () => {
-  const path = '/api/auth/login';
-
+describe(`POST ${routes.login}`, () => {
   test('Login user', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.login)
       .send({ username: testUser.username, password: testUser.password });
 
     expect(response.status).toBe(200);
@@ -94,7 +96,7 @@ describe('POST api/auth/login', () => {
 
   test('Login user with wrong password', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.login)
       .send({ username: testUser.username, password: testUser.password + 1 });
 
     expect(response.status).toBe(401);
@@ -103,7 +105,7 @@ describe('POST api/auth/login', () => {
 
   test('Login user with wrong username', async () => {
     const response = await request(server)
-      .post(path)
+      .post(routes.login)
       .send({ username: testUser.username + 1, password: testUser.password });
 
     expect(response.status).toBe(401);
@@ -111,9 +113,43 @@ describe('POST api/auth/login', () => {
   });
 
   test('Login user with empty body', async () => {
-    const response = await request(server).post(path).send();
+    const response = await request(server).post(routes.login).send();
 
     expect(response.status).toBe(400);
     expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe(`GET ${routes.profile}`, () => {
+  let access_token = '';
+
+  test('Login user', async () => {
+    const response = await request(server)
+      .post(routes.login)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(200);
+    expect(typeof response.body.access_token).toBe('string');
+    access_token = response.body.access_token;
+  });
+
+  test('Get user profile', async () => {
+    const response = await request(server)
+      .get(routes.profile)
+      .set('Authorization', `Bearer ${access_token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.username).toBe(testUser.username);
+    expect(response.body.email).toBe(testUser.email);
+    expect(response.body.password).toBeUndefined();
+  });
+
+  test('Get user profile without access token', async () => {
+    const response = await request(server).get(routes.profile);
+
+    console.log(response.body);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('unauthorized');
   });
 });

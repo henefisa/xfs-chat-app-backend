@@ -143,5 +143,5 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
 };
 
 export const deleteUser = async (id: string) => {
-  return await userRepository.delete(id);
+  return userRepository.delete(id);
 };

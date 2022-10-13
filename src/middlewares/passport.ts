@@ -1,13 +1,6 @@
 import { Strategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
-import dotenv from 'dotenv';
+import { UnauthorizedException } from 'src/exceptions';
 import { getOne } from 'src/services/user.service';
-
-dotenv.config({
-  path:
-    process.env.NODE_ENV !== undefined
-      ? `.${process.env.NODE_ENV.trim()}.env`
-      : '.env',
-});
 
 const opts: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -16,12 +9,14 @@ const opts: StrategyOptions = {
 
 export default new Strategy(opts, async (payload, done) => {
   try {
-    const user = getOne({ where: { id: payload.id } });
+    const user = await getOne({ where: { id: payload.id } });
+
     if (user) {
       return done(null, user);
     }
-    return done(null, false);
+
+    return done(new UnauthorizedException(), false);
   } catch (error) {
-    console.log(error);
+    return done(error, false);
   }
 });

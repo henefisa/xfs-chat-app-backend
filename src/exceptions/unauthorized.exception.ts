@@ -3,6 +3,6 @@ import { HttpException } from 'src/shares/http-exception';
 
 export class UnauthorizedException extends HttpException {
   constructor() {
-    super(StatusCodes.UNAUTHORIZED, 'Unauthorized');
+    super(StatusCodes.UNAUTHORIZED, 'unauthorized');
   }
 }
