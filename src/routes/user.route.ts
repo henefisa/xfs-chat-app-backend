@@ -1,18 +1,18 @@
 import { Router } from 'express';
-import passport from 'passport';
 import {
   createUser,
   deleteUser,
   updateUser,
   getAllUser,
   getUserById,
+  getUserProfile,
 } from 'src/controllers/user.controller';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
+import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 
 const router: Router = Router();
-
 /**
  * @swagger
  * components:
@@ -155,7 +155,7 @@ router.post('/', validationMiddleware(CreateUserDto), createUser);
 
 router.put(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  requireAuthMiddleware,
   validationMiddleware(UpdateUserDto),
   updateUser
 );
@@ -241,7 +241,7 @@ router.get(
 
 router.get(
   '/',
-  passport.authenticate('jwt', { session: false }),
+  requireAuthMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
 );

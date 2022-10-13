@@ -1,8 +1,8 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import Database from './configs/Database';
 import 'reflect-metadata';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 const port = process.env.PORT || 8000;
 
 Database.instance

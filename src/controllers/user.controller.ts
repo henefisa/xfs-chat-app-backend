@@ -5,6 +5,7 @@ import { GetUserDto } from 'src/dto/user/get-user.dto';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { User } from 'src/entities/user.entity';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
@@ -75,6 +76,28 @@ export const getAllUser = async (
       users,
       count,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserProfile = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    return null;
+  }
+
+  const reqUser = req.user as User;
+
+  try {
+    const user = await userService.getOneOrThrow({
+      where: { id: reqUser.id },
+    });
+
+    return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     next(error);
   }
