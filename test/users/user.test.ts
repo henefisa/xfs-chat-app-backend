@@ -24,13 +24,14 @@ describe('Test connection', () => {
   });
 });
 
+const testUser = {
+  username: 'testuser',
+  password: '123456',
+  email: 'sample@gmail.com',
+};
+
 describe('POST /api/auth/register', () => {
   const path = '/api/auth/register';
-  const testUser = {
-    username: 'testuser',
-    password: '123456',
-    email: 'sample@gmail.com',
-  };
 
   test('Register user', async () => {
     const response = await request(server).post(path).send(testUser);
@@ -66,10 +67,53 @@ describe('POST /api/auth/register', () => {
   });
 
   test('Register user with empty body', async () => {
-    const response = await request(server)
-      .post(path)
-      .send({ password: testUser.password, email: testUser.email });
+    const response = await request(server).post(path).send();
 
     expect(response.status).toBe(400);
+  });
+
+  test('Register same user', async () => {
+    const response = await request(server).post(path).send(testUser);
+
+    expect(response.status).toBe(400);
+    expect(typeof response.body.message).toBe('string');
+  });
+});
+
+describe('POST api/auth/login', () => {
+  const path = '/api/auth/login';
+
+  test('Login user', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(200);
+    expect(typeof response.body.access_token).toBe('string');
+  });
+
+  test('Login user with wrong password', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ username: testUser.username, password: testUser.password + 1 });
+
+    expect(response.status).toBe(401);
+    expect(typeof response.body.message).toBe('string');
+  });
+
+  test('Login user with wrong username', async () => {
+    const response = await request(server)
+      .post(path)
+      .send({ username: testUser.username + 1, password: testUser.password });
+
+    expect(response.status).toBe(401);
+    expect(typeof response.body.message).toBe('string');
+  });
+
+  test('Login user with empty body', async () => {
+    const response = await request(server).post(path).send();
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
   });
 });
