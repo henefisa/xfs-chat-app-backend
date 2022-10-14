@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 import {
   createUser,
   deleteUser,
@@ -114,7 +115,7 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/createUser'
  *       500:
- *         description: Some server error
+ *         description: Internal server error
  */
 
 router.post('/', validationMiddleware(CreateUserDto), createUser);
@@ -147,10 +148,8 @@ router.post('/', validationMiddleware(CreateUserDto), createUser);
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/User'
- *      404:
- *        description: user was not found
  *      500:
- *        description: Some error happened
+ *        description: Internal server error
  */
 
 router.put(
@@ -177,9 +176,7 @@ router.put(
  *          - bearerAuth: []
  *     responses:
  *       204:
- *         description: user deleted
- *       404:
- *         description: user was not found
+ *         description: User deleted
  */
 
 router.delete(
@@ -187,6 +184,25 @@ router.delete(
   passport.authenticate('jwt', { session: false }),
   deleteUser
 );
+
+/**
+ * @swagger
+ * /api/users/profile:
+ *    get:
+ *      summary: returns the list of user
+ *      tags: [Users]
+ *      responses:
+ *          200:
+ *            content:
+ *                application/json:
+ *                   schema:
+ *                      type: array
+ *                      items:
+ *                          $ref: '#/components/schemas/User'
+ *      security:
+ *          - bearerAuth: []
+ */
+router.get('/profile', requireAuthMiddleware, getUserProfile);
 
 /**
  * @swagger
@@ -210,15 +226,8 @@ router.delete(
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
- *       404:
- *         description: The user was not found
  */
-
-router.get(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  getUserById
-);
+router.get('/:id', requireAuthMiddleware, getUserById);
 
 /**
  * @swagger

@@ -1,12 +1,19 @@
 name: Lint & Test
 
+env:
+  POSTGRES_HOST: 'localhost'
+  POSTGRES_PORT: 5432
+  POSTGRES_USERNAME: 'postgres'
+  POSTGRES_PASSWORD: 'password'
+  POSTGRES_DATABASE: 'postgres'
+
 on:
   push:
     branches:
       - dev
   pull_request:
     branches:
-      - '*'
+      - dev
 
 jobs:
   lint:
@@ -28,3 +35,31 @@ jobs:
         run: git log -1 --pretty=format:"%s" | npx commitlint
       - name: 'Lint code'
         run: yarn lint
+  test:
+    name: 'Testing'
+    services:
+      postgres:
+        image: postgres
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'yarn'
+      - name: Install yarn
+        run: npm install -g yarn
+      - name: 'Install dependencies'
+        run: yarn --prefer-offline
+      - name: 'Lint code'
+        run: yarn test
