@@ -39,7 +39,7 @@ jobs:
     name: 'Testing'
     services:
       postgres:
-        image: postgres
+        image: postgres:14
 
         options: >-
           --health-cmd pg_isready
