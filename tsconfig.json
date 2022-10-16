@@ -18,5 +18,6 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "outDir": "build"
-  }
+  },
+  "include": ["src"]
 }
