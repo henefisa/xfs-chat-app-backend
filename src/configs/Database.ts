@@ -26,7 +26,7 @@ export default class Database {
         username: process.env.POSTGRES_USERNAME,
         password: process.env.POSTGRES_PASSWORD,
         database: process.env.POSTGRES_DATABASE,
-        entities: [join(__dirname, '../entities.{ts,js}')],
+        entities: [join(__dirname, '../entities/*.entity.{ts,js}')],
         synchronize: true,
       }),
     },
