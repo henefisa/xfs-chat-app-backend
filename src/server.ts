@@ -5,6 +5,7 @@ import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import morgan from 'morgan';
 
 const options = {
   definition: {
@@ -25,13 +26,13 @@ const options = {
       },
     },
   },
-  apis: ['src/routes/*.ts'],
+  apis: ['./src/routes/*.ts', './routes/*.js'],
 };
 
 const specs = swaggerJSDoc(options);
 
 const app = express();
-
+app.use(morgan('tiny'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 const errorHandler = (
