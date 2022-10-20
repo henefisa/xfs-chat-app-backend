@@ -5,6 +5,11 @@ import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import cors from 'cors';
+import morgan from 'morgan';
+
+const port = process.env.PORT || 8000;
+const swaggerHost = process.env.SWAGGER_HOST || 'localhost';
 
 const options = {
   definition: {
@@ -14,7 +19,7 @@ const options = {
       version: '1.0.0',
       description: 'API',
     },
-    servers: [{ url: 'http://localhost:8000' }],
+    servers: [{ url: `http://${swaggerHost}:${port}` }],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -25,7 +30,7 @@ const options = {
       },
     },
   },
-  apis: ['src/routes/*.ts'],
+  apis: [`${__dirname}/routes/*.{ts,js}`],
 };
 
 const specs = swaggerJSDoc(options);
@@ -33,6 +38,7 @@ const specs = swaggerJSDoc(options);
 const app = express();
 app.disable('x-powered-by');
 
+app.use(morgan('tiny'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 const errorHandler = (
@@ -55,6 +61,7 @@ const errorHandler = (
 };
 
 passport.use(passportMiddleware);
+app.use(cors());
 app.use(passport.initialize());
 app.use(express.json());
 app.use('/api', MainRoutes);

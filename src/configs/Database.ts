@@ -1,6 +1,7 @@
 import { NotFoundException } from 'src/exceptions';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
+import { join } from 'path';
 
 config();
 
@@ -25,7 +26,7 @@ export default class Database {
         username: process.env.POSTGRES_USERNAME,
         password: process.env.POSTGRES_PASSWORD,
         database: process.env.POSTGRES_DATABASE,
-        entities: ['src/entities/*.entity.ts'],
+        entities: [join(__dirname, '../entities/*.entity.{ts,js}')],
         synchronize: true,
       }),
     },
