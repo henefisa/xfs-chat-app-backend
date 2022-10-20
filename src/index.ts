@@ -5,16 +5,7 @@ import Database from './configs/Database';
 import 'reflect-metadata';
 const port = process.env.PORT || 8000;
 
-Database.instance
-  .initialize()
-  .then(() => {
-    console.log(`Database connected`);
-  })
-  .catch((error) => {
-    console.log(error);
-
-    console.log(`Failed to connect database`, error);
-  });
+Database.instance.initialize();
 
 import server from './server';
 server.listen(port, () => {

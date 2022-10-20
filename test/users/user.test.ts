@@ -147,8 +147,6 @@ describe(`GET ${routes.profile}`, () => {
   test('Get user profile without access token', async () => {
     const response = await request(server).get(routes.profile);
 
-    console.log(response.body);
-
     expect(response.status).toBe(401);
     expect(response.body.message).toBe('unauthorized');
   });
