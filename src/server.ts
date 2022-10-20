@@ -5,6 +5,8 @@ import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const options = {
   definition: {
@@ -56,8 +58,15 @@ const errorHandler = (
 passport.use(passportMiddleware);
 app.use(passport.initialize());
 app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TS server');

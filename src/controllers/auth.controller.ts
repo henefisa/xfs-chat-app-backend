@@ -14,7 +14,8 @@ export const login = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const user = await comparePassword(req.body.username, req.body.password);
-    return res.status(StatusCodes.OK).json({ access_token: createToken(user) });
+    const token = createToken(user);
+    return res.status(StatusCodes.OK).json({ access_token: token });
   } catch (error) {
     next(error);
   }

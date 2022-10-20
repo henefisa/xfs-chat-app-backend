@@ -1,14 +1,15 @@
 import { Router } from 'express';
+import passport from 'passport';
 import {
   createUser,
   deleteUser,
   updateUser,
   getAllUser,
   getUserById,
-  getUserProfile,
 } from 'src/controllers/user.controller';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
+import verifyAdmin from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 
@@ -117,7 +118,13 @@ const router: Router = Router();
  *         description: Some server error
  */
 
-router.post('/', validationMiddleware(CreateUserDto), createUser);
+router.post(
+  '/',
+  requireAuthMiddleware,
+  verifyAdmin,
+  validationMiddleware(CreateUserDto),
+  createUser
+);
 
 /**
  * @swagger
