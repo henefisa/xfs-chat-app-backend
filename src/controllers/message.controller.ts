@@ -11,7 +11,6 @@ export const sendMessages = async (
   next: NextFunction
 ) => {
   try {
-    req.headers['set-cookie']?.values;
     res.setHeader('Content-Type', 'application/json');
     const saved = await messageService.createMessage(req.body);
     return res.status(StatusCodes.CREATED).json(saved);

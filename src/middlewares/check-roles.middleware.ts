@@ -10,12 +10,14 @@ import { message } from 'src/shares';
 config();
 
 export const verifyToken = (req: Request) => {
-  const token = <string>req.headers['auth'];
+  const token = <string>req.headers['authorization'];
+
   if (!token) {
     throw new UnauthorizedException();
   }
+  const str = token.slice(7);
   try {
-    return <IAuthentication>jwt.verify(token, process.env.SECRET || 'anything');
+    return <IAuthentication>jwt.verify(str, process.env.SECRET || 'anything');
   } catch (error) {
     throw new UnauthorizedException();
   }
@@ -32,5 +34,7 @@ export default async function roleAdminMiddleWare(
     throw new UnauthorizedException();
   }
   if (user.role === 'ADMIN') next();
-  return res.status(StatusCodes.NOT_ACCEPTABLE).json(message.Not_acceptable);
+  else {
+    return res.status(StatusCodes.NOT_ACCEPTABLE).json(message.Not_acceptable);
+  }
 }
