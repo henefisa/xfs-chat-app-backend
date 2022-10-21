@@ -1,3 +1,4 @@
+import { IAuthentication } from './../interfaces/auth.interface';
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -13,17 +14,14 @@ export const verifyToken = (req: Request) => {
   if (!token) {
     throw new UnauthorizedException();
   }
-  let jwtPayload;
   try {
-    return (jwtPayload = <any>(
-      jwt.verify(token, process.env.SECRET || 'anything')
-    ));
+    return <IAuthentication>jwt.verify(token, process.env.SECRET || 'anything');
   } catch (error) {
     throw new UnauthorizedException();
   }
 };
 
-export default async function verifyAdmin(
+export default async function roleAdminMiddleWare(
   req: Request,
   res: Response,
   next: NextFunction
@@ -34,7 +32,5 @@ export default async function verifyAdmin(
     throw new UnauthorizedException();
   }
   if (user.role === 'ADMIN') next();
-  else {
-    return res.status(StatusCodes.NOT_ACCEPTABLE).json(message.NOT_ACCEPTABLE);
-  }
+  return res.status(StatusCodes.NOT_ACCEPTABLE).json(message.Not_acceptable);
 }

@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import * as messageService from 'src/services/message.service';
 import { sendMessageDto } from 'src/dto/message/send-message.dto';
 
-export const sendMessage = async (
+export const sendMessages = async (
   req: RequestWithBody<sendMessageDto>,
   res: Response,
   next: NextFunction
@@ -20,7 +20,7 @@ export const sendMessage = async (
   }
 };
 
-export const getMessage = async (
+export const getMessages = async (
   req: RequestWithBody<GetMessageDto>,
   res: Response,
   next: NextFunction
@@ -40,7 +40,7 @@ export const getMessage = async (
   }
 };
 
-export const deleteMessage = async (
+export const deleteMessages = async (
   req: Request,
   res: Response,
   next: NextFunction
