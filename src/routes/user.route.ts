@@ -80,6 +80,20 @@ const router: Router = Router();
  *                type: string
  *             example:
  *              access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0OTFlOTQyLTdhNDMtNDE4YS1iYWRjLTk3ZTlkNjVlYjU3ZiIsInVzZXJuYW1lIjoia2hhbmdraGFuZyIsImlhdCI6MTY2NTY2MjAxMSwiZXhwIjoxNjY1NzQ4NDExfQ.AvboGm3j-_cX-3iT7XZhA1cIlwPNNWq88HQoImQaRd8
+ *       username:
+ *             type: object
+ *             properties:
+ *              username:
+ *                type: string
+ *             example:
+ *              username: khangkhang
+ *       email:
+ *             type: object
+ *             properties:
+ *              email:
+ *                type: string
+ *             example:
+ *              email: "khang@gmail.com"
  */
 
 /**
