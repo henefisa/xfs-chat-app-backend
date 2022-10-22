@@ -14,7 +14,6 @@ import {
   createUser,
 } from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
-import { anyId } from 'src/shares/any-id';
 
 export const login = async (
   req: RequestWithBody<LoginDto>,
@@ -51,7 +50,7 @@ export const checkUsernameExist = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const username = await checkUsernameExists(req.body.username, anyId.id);
+    const username = await checkUsernameExists(req.body.username);
     return res.status(StatusCodes.ACCEPTED).json(username);
   } catch (error) {
     next(error);
@@ -65,7 +64,7 @@ export const checkEmailExist = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const email = await checkEmailExists(req.body.email, anyId.id);
+    const email = await checkEmailExists(req.body.email);
     return res.status(StatusCodes.ACCEPTED).json(email);
   } catch (error) {
     next(error);
