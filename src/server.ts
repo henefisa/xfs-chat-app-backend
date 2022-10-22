@@ -6,7 +6,6 @@ import passportMiddleware from 'src/middlewares/passport';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 
@@ -72,7 +71,6 @@ app.use(
 app.use(bodyParser.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
-app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TS server');

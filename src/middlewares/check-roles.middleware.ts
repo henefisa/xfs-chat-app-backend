@@ -1,11 +1,9 @@
 import { IAuthentication } from './../interfaces/auth.interface';
-import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { UnauthorizedException } from 'src/exceptions';
+import { UnauthorizedException, NotAcceptableException } from 'src/exceptions';
 import { config } from 'dotenv';
 import { getOne } from 'src/services/user.service';
-import { message } from 'src/shares';
 
 config();
 
@@ -15,7 +13,7 @@ export const verifyToken = (req: Request) => {
   if (!token) {
     throw new UnauthorizedException();
   }
-  const str = token.slice(7);
+  const str = token.split(' ')[1];
   try {
     return <IAuthentication>jwt.verify(str, process.env.SECRET || 'anything');
   } catch (error) {
@@ -23,7 +21,7 @@ export const verifyToken = (req: Request) => {
   }
 };
 
-export default async function roleAdminMiddleWare(
+export default async function roleMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -33,8 +31,8 @@ export default async function roleAdminMiddleWare(
   if (!user) {
     throw new UnauthorizedException();
   }
-  if (user.role === 'ADMIN') next();
-  else {
-    return res.status(StatusCodes.NOT_ACCEPTABLE).json(message.Not_acceptable);
+  if (user.role !== 'ADMIN') {
+    throw new NotAcceptableException();
   }
+  return next();
 }
