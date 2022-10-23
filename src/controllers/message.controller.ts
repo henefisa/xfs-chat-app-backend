@@ -1,64 +1,54 @@
-// import { NextFunction, Request, Response } from 'express';
-// import { StatusCodes } from 'http-status-codes';
-// import dataSource from 'src/configs/data-source';
-// import { Message } from 'src/entities/message.entity';
-// import { Equal } from 'typeorm';
+import { GetMessageDto } from 'src/dto/message/get-message.dto';
+import { RequestWithBody } from 'src/shares';
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import * as messageService from 'src/services/message.service';
+import { sendMessageDto } from 'src/dto/message/send-message.dto';
 
-// const messageRepository = dataSource.getRepository(Message);
+export const sendMessages = async (
+  req: RequestWithBody<sendMessageDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const saved = await messageService.createMessage(req.body);
+    return res.status(StatusCodes.CREATED).json(saved);
+  } catch (error) {
+    next(error);
+  }
+};
 
-// export const createMessage = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const message = new Message();
-//     message.conversation = req.body.conversationid;
-//     message.owner = req.body.userid;
-//     message.message = req.body.message;
-//     message.attachment = req.body.attachment;
+export const getMessages = async (
+  req: RequestWithBody<GetMessageDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const { messages, count } = await messageService.getMessages(
+      req.params.conversationId,
+      req.body
+    );
+    return res.status(StatusCodes.OK).json({
+      messages,
+      count,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-//     const saved = await messageRepository.save(message);
-
-//     return res.status(StatusCodes.CREATED).json(saved);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const getMessage = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const message = await messageRepository.find({
-//       where: {
-//         conversation: Equal(req.params.conversationid),
-//       },
-//     });
-
-//     return res.status(StatusCodes.OK).json(message);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const deleteMessage = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     await dataSource
-//       .createQueryBuilder()
-//       .delete()
-//       .from(Message)
-//       .where('id = :id', { id: req.params.id })
-//       .execute();
-
-//     return res.status(StatusCodes.NO_CONTENT);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const deleteMessages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    await messageService.deleteMessage(req.params.id);
+    return res.status(StatusCodes.NO_CONTENT);
+  } catch (error) {
+    next(error);
+  }
+};

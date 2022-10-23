@@ -5,6 +5,7 @@ import passport from 'passport';
 import passportMiddleware from 'src/middlewares/passport';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 
@@ -64,6 +65,12 @@ passport.use(passportMiddleware);
 app.use(cors());
 app.use(passport.initialize());
 app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
 

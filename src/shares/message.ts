@@ -3,4 +3,5 @@ export enum message {
   Conversation_not_found = 'conversation_not_found',
   Unauthorized = 'unauthorized',
   User_not_exits = 'user not exits',
+  Not_acceptable = 'not_acceptable',
 }

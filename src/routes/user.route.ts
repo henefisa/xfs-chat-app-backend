@@ -10,6 +10,7 @@ import {
 } from 'src/controllers/user.controller';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
+import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 
@@ -132,7 +133,13 @@ const router: Router = Router();
  *         description: Internal server error
  */
 
-router.post('/', validationMiddleware(CreateUserDto), createUser);
+router.post(
+  '/',
+  requireAuthMiddleware,
+  roleMiddleware,
+  validationMiddleware(CreateUserDto),
+  createUser
+);
 
 /**
  * @swagger
