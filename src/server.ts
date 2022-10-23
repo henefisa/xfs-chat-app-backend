@@ -37,6 +37,8 @@ const options = {
 const specs = swaggerJSDoc(options);
 
 const app = express();
+app.disable('x-powered-by');
+
 app.use(morgan('tiny'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
