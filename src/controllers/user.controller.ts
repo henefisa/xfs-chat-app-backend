@@ -5,6 +5,7 @@ import { GetUserDto } from 'src/dto/user/get-user.dto';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { UpdateProfileUserDto } from 'src/dto/user/update-profile-user.dto';
 import { User } from 'src/entities/user.entity';
 
 export const createUser = async (
@@ -98,6 +99,23 @@ export const getUserProfile = async (
     });
 
     return res.status(StatusCodes.OK).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProfileUser = async (
+  req: RequestWithBody<UpdateProfileUserDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const updated = await userService.updateProfileUser(
+      req.body,
+      req.params.id
+    );
+    return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);
   }
