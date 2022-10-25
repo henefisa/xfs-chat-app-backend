@@ -95,6 +95,26 @@ const router: Router = Router();
  *                type: string
  *             example:
  *              email: "khang@gmail.com"
+ *       sendRequest:
+ *             type: object
+ *             properties:
+ *              users:
+ *                type: string
+ *                description: user send request
+ *              owner:
+ *                type: string
+ *                description: user was sent request
+ *             example:
+ *              users: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
+ *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
+ *       getFriendRequest:
+ *             type: object
+ *             properties:
+ *              owner:
+ *                type: string
+ *                description: id of owner
+ *             example:
+ *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
  */
 
 /**
@@ -103,6 +123,14 @@ const router: Router = Router();
  *    name: Users
  *    description: managing user API
  */
+
+/**
+ * @swagger
+ * tags:
+ *    name: Friends
+ *    description: managing user friend API
+ */
+
 /**
  * @swagger
  * tags:

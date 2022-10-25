@@ -56,7 +56,12 @@ export const getUserById = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const user = await userService.getOne({ where: { id: req.params.id } });
+    const user = await userService.getOne({
+      where: { id: req.params.id },
+      relations: {
+        friends: true,
+      },
+    });
     return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     next(error);
@@ -95,6 +100,9 @@ export const getUserProfile = async (
   try {
     const user = await userService.getOneOrThrow({
       where: { id: reqUser.id },
+      relations: {
+        friends: true,
+      },
     });
 
     return res.status(StatusCodes.OK).json(user);

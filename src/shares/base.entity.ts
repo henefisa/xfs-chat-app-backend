@@ -10,7 +10,7 @@ export class BaseEntity {
   id: string;
 
   @CreateDateColumn({
-    name: 'created_at',
+    name: 'createdAt',
     transformer: {
       from(value) {
         return moment(value);

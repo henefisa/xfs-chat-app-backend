@@ -1,3 +1,4 @@
+import { UserFriend } from 'src/entities/user-friend.entity';
 import { User } from 'src/entities/user.entity';
 import { GetOptions } from 'src/shares/get-options';
 
