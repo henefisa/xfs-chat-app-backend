@@ -71,7 +71,9 @@ export const checkUsernameExists = async (
   username: string,
   userId?: string
 ) => {
-  const user = await getOne({ where: { username, id: userId && Not(userId) } });
+  const user = await getOne({
+    where: { username, id: userId && Not(userId) },
+  });
 
   if (user) {
     throw new ExistsException('username');
@@ -98,6 +100,36 @@ export const checkPhoneExists = async (phone: string, userId?: string) => {
   }
 
   return false;
+};
+
+export const checkRegisterUsernameExists = async (username: string) => {
+  try {
+    const user = await getOne({
+      where: { username: username },
+    });
+
+    if (user) {
+      throw new ExistsException('username');
+    }
+
+    return false;
+  } catch (error) {
+    return true;
+  }
+};
+
+export const checkRegisterEmailExists = async (email: string) => {
+  try {
+    const user = await getOne({ where: { email: email } });
+
+    if (user) {
+      throw new ExistsException('email');
+    }
+
+    return false;
+  } catch (error) {
+    return true;
+  }
 };
 
 export const comparePassword = async (username: string, password: string) => {
