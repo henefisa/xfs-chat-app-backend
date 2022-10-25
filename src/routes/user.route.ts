@@ -4,12 +4,15 @@ import {
   createUser,
   deleteUser,
   updateUser,
+  updateProfileUser,
   getAllUser,
   getUserById,
   getUserProfile,
+  updatePasswordUser,
 } from 'src/controllers/user.controller';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
+import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
@@ -115,6 +118,13 @@ const router: Router = Router();
  *                description: id of owner
  *             example:
  *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
+ *       password:
+ *             type: object
+ *             properties:
+ *              password:
+ *                type: string
+ *             example:
+ *              password: "htl27062003"
  */
 
 /**
@@ -302,6 +312,119 @@ router.get(
   requireAuthMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
+);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *  put:
+ *    summary: Update user by the id
+ *    tags: [Users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/User'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user was updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateUser
+);
+
+/**
+ * @swagger
+ * /api/users/profile/{id}:
+ *  put:
+ *    summary: Update user profile by the id
+ *    tags: [Users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/User'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user profiles was updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateProfileUser
+);
+
+/**
+ * @swagger
+ * /api/users/profile/password/{id}:
+ *  put:
+ *    summary: Update user password by the id
+ *    tags: [Users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/password'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user password was updated
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile/password/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
 );
 
 export const UserRoutes = router;

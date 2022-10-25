@@ -8,8 +8,8 @@ import {
 import { RegisterDto } from 'src/dto/auth/register.dto';
 import { createToken } from 'src/services/auth.service';
 import {
-  checkEmailExists,
-  checkUsernameExists,
+  checkRegisterEmailExists,
+  checkRegisterUsernameExists,
   comparePassword,
   createUser,
 } from 'src/services/user.service';
@@ -51,7 +51,7 @@ export const checkUsernameExist = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const username = await checkUsernameExists(req.body.username);
+    const username = await checkRegisterUsernameExists(req.body.username);
     return res.status(StatusCodes.ACCEPTED).json(username);
   } catch (error) {
     next(error);
@@ -65,7 +65,7 @@ export const checkEmailExist = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const email = await checkEmailExists(req.body.email);
+    const email = await checkRegisterEmailExists(req.body.email);
     return res.status(StatusCodes.ACCEPTED).json(email);
   } catch (error) {
     next(error);
