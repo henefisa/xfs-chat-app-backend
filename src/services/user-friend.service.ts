@@ -36,7 +36,7 @@ export const getFriends = async (
     query.skip(offset).take(limit);
   }
 
-  query.leftJoinAndSelect('friends.users', 'users');
+  query.leftJoinAndSelect('friends.user', 'users');
 
   if (dto?.owner) {
     query.andWhere('friends.owner = :id', { id: dto?.owner });

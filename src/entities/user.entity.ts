@@ -34,6 +34,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Message, (messages) => messages.owner)
   messages: Message[];
 
-  @OneToMany(() => UserFriend, (UserFriends) => UserFriends.users)
+  @OneToMany(() => UserFriend, (UserFriends) => UserFriends.user)
   friends: UserFriend[];
 }

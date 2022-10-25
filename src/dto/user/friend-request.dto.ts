@@ -5,7 +5,7 @@ export class FriendRequestDto {
   @IsString()
   @IsNotBlank()
   @IsOptional()
-  users: string;
+  user: string;
 
   @IsString()
   @IsNotBlank()

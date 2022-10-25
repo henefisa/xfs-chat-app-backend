@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-  FriendRequestSend,
   getFriends,
   getFriendsRequest,
+  sendFriendRequest,
 } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/user';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
@@ -31,7 +31,7 @@ const router: Router = Router();
  *             schema:
  *                type: object
  *                properties:
- *                   users:
+ *                   user:
  *                      type: string
  *                      description: user send request
  *                   owner:
@@ -48,7 +48,7 @@ router.post(
   '/',
   requireAuthMiddleware,
   validationMiddleware(FriendRequestDto),
-  FriendRequestSend
+  sendFriendRequest
 );
 
 /**
@@ -73,7 +73,7 @@ router.post(
  *             schema:
  *                type: object
  *                properties:
- *                   users:
+ *                   user:
  *                      type: object
  *                      description: user send request
  *                   owner:
@@ -110,7 +110,7 @@ router.post('/requests', requireAuthMiddleware, getFriendsRequest);
  *             schema:
  *                type: object
  *                properties:
- *                   users:
+ *                   user:
  *                      type: object
  *                      description: user send request
  *                   owner:

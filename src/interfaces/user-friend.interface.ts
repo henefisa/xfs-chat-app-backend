@@ -1,7 +1,7 @@
 import { UserFriend } from 'src/entities/user-friend.entity';
 import { GetOptions } from 'src/shares/get-options';
 
-export enum EUserFriend {
+export enum EUserFriendRequestStatus {
   REQUESTED = 'REQUESTED',
   FRIEND = 'FRIEND',
   CANCEL = 'CANCEL',

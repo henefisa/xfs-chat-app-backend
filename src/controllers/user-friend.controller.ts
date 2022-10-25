@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { GetUserFriendDto, FriendRequestDto } from 'src/dto/user';
 import { RequestWithBody } from 'src/shares';
 import * as userFriendService from 'src/services/user-friend.service';
-import { EUserFriend } from 'src/interfaces/user-friend.interface';
+import { FriendRequestDto, GetUserFriendDto } from 'src/dto/user';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 
-export const FriendRequestSend = async (
+export const sendFriendRequest = async (
   req: RequestWithBody<FriendRequestDto>,
   res: Response,
   next: NextFunction
@@ -27,7 +27,7 @@ export const getFriendsRequest = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const { friends, count } = await userFriendService.getFriends(
-      EUserFriend.REQUESTED,
+      EUserFriendRequestStatus.REQUESTED,
       req.body
     );
     return res.status(StatusCodes.OK).json({
@@ -47,7 +47,7 @@ export const getFriends = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const { friends, count } = await userFriendService.getFriends(
-      EUserFriend.FRIEND,
+      EUserFriendRequestStatus.FRIEND,
       req.body
     );
     return res.status(StatusCodes.OK).json({

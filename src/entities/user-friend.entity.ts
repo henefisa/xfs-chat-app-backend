@@ -1,16 +1,19 @@
-import { EUserFriend } from 'src/interfaces/user-friend.interface';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity('userFriend')
+@Entity('user_friends')
 export class UserFriend extends BaseEntity {
   @Column()
   owner: string;
 
-  @Column({ enum: EUserFriend, default: EUserFriend.REQUESTED })
-  status: EUserFriend;
+  @Column({
+    enum: EUserFriendRequestStatus,
+    default: EUserFriendRequestStatus.REQUESTED,
+  })
+  status: EUserFriendRequestStatus;
 
   @ManyToOne(() => User, (users) => users.friends)
-  users: User;
+  user: User;
 }

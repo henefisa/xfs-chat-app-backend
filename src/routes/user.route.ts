@@ -98,14 +98,14 @@ const router: Router = Router();
  *       sendRequest:
  *             type: object
  *             properties:
- *              users:
+ *              user:
  *                type: string
  *                description: user send request
  *              owner:
  *                type: string
  *                description: user was sent request
  *             example:
- *              users: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
+ *              user: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
  *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
  *       getFriendRequest:
  *             type: object
