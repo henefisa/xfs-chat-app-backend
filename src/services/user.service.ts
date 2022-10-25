@@ -67,9 +67,41 @@ export const checkUsernameExists = async (
   username: string,
   userId?: string
 ) => {
+  const user = await getOne({
+    where: { username, id: userId && Not(userId) },
+  });
+
+  if (user) {
+    throw new ExistsException('username');
+  }
+
+  return false;
+};
+
+export const checkEmailExists = async (email: string, userId?: string) => {
+  const user = await getOne({ where: { email, id: userId && Not(userId) } });
+
+  if (user) {
+    throw new ExistsException('email');
+  }
+
+  return false;
+};
+
+export const checkPhoneExists = async (phone: string, userId?: string) => {
+  const user = await getOne({ where: { phone, id: userId && Not(userId) } });
+
+  if (user) {
+    throw new ExistsException('phone');
+  }
+
+  return false;
+};
+
+export const checkRegisterUsernameExists = async (username: string) => {
   try {
     const user = await getOne({
-      where: { username, id: userId && Not(userId) },
+      where: { username: username },
     });
 
     if (user) {
@@ -82,26 +114,12 @@ export const checkUsernameExists = async (
   }
 };
 
-export const checkEmailExists = async (email: string, userId?: string) => {
+export const checkRegisterEmailExists = async (email: string) => {
   try {
-    const user = await getOne({ where: { email, id: userId && Not(userId) } });
+    const user = await getOne({ where: { email: email } });
 
     if (user) {
       throw new ExistsException('email');
-    }
-
-    return false;
-  } catch (error) {
-    return true;
-  }
-};
-
-export const checkPhoneExists = async (phone: string, userId?: string) => {
-  try {
-    const user = await getOne({ where: { phone, id: userId && Not(userId) } });
-
-    if (user) {
-      throw new ExistsException('phone');
     }
 
     return false;

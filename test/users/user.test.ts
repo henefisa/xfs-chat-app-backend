@@ -79,7 +79,7 @@ describe(`POST ${routes.register}`, () => {
   test('Register same user', async () => {
     const response = await request(server).post(routes.register).send(testUser);
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
     expect(typeof response.body.message).toBe('string');
   });
 });
