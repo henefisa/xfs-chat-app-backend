@@ -4,4 +4,5 @@ export enum message {
   Unauthorized = 'unauthorized',
   User_not_exits = 'user not exits',
   Not_acceptable = 'not_acceptable',
+  Successfully = 'successfully',
 }

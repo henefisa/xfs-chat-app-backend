@@ -1,14 +1,13 @@
+import { UpdatePasswordUserDto } from './../dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
-import {
-  CreateUserDto,
-  GetUserDto,
-  UpdateProfileUserDto,
-  UpdateUserDto,
-} from 'src/dto/user';
+import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
 import { User } from 'src/entities/user.entity';
 import { ExistsException } from 'src/exceptions/exists.exception';
-import { NotFoundException } from 'src/exceptions/not-found.exception';
+import {
+  NotExistException,
+  NotFoundException,
+} from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 import { GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
@@ -91,17 +90,6 @@ export const checkEmailExists = async (email: string, userId?: string) => {
   return false;
 };
 
-export const checkPasswordExists = async (
-  newPassword: string,
-  currentPassword: string
-) => {
-  const isMatch = await bcrypt.compare(newPassword, currentPassword);
-  if (isMatch) {
-    throw new ExistsException('password');
-  }
-  return false;
-};
-
 export const checkPhoneExists = async (phone: string, userId?: string) => {
   const user = await getOne({ where: { phone, id: userId && Not(userId) } });
 
@@ -148,6 +136,10 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
     where: { id: id },
   });
 
+  if (!user) {
+    throw new NotExistException('user');
+  }
+
   await Promise.all([
     checkEmailExists(dto.email, user.id),
     checkUsernameExists(dto.username, user.id),
@@ -162,23 +154,38 @@ export const deleteUser = async (id: string) => {
   return userRepository.delete(id);
 };
 
-export const updateProfileUser = async (
-  dto: UpdateProfileUserDto,
-  id: string
-) => {
-  const user = await getOneOrThrow({ where: { id: id } });
+export const updateProfileUser = async (dto: UpdateUserDto, id: string) => {
+  const user = await getOneOrThrow({
+    where: { id: id },
+  });
 
-  if (user) {
-    await Promise.all([
-      checkEmailExists(dto.email, user.id),
-      checkUsernameExists(dto.username, user.id),
-      checkPhoneExists(dto.phone, user.id),
-    ]);
-
-    Object.assign(user, dto);
-    user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
-    return userRepository.save(user);
+  if (!user) {
+    throw new NotExistException('user');
   }
 
-  return false;
+  await Promise.all([
+    checkEmailExists(dto.email, user.id),
+    checkUsernameExists(dto.username, user.id),
+    checkPhoneExists(dto.phone, user.id),
+  ]);
+
+  Object.assign(user, dto);
+  return userRepository.save(user);
+};
+
+export const updatePasswordUser = async (
+  dto: UpdatePasswordUserDto,
+  id: string
+) => {
+  const user = await getOneOrThrow({
+    where: { id: id },
+  });
+
+  if (!user) {
+    throw new NotExistException('user');
+  }
+
+  user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
+
+  return userRepository.save(user);
 };

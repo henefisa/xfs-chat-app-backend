@@ -3,10 +3,10 @@ import { StatusCodes } from 'http-status-codes';
 import { CreateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
 import * as userService from 'src/services/user.service';
-import { RequestWithBody } from 'src/shares';
+import { message, RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
-import { UpdateProfileUserDto } from 'src/dto/user/update-profile-user.dto';
 import { User } from 'src/entities/user.entity';
+import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
@@ -105,7 +105,7 @@ export const getUserProfile = async (
 };
 
 export const updateProfileUser = async (
-  req: RequestWithBody<UpdateProfileUserDto>,
+  req: RequestWithBody<UpdateUserDto>,
   res: Response,
   next: NextFunction
 ) => {
@@ -116,6 +116,20 @@ export const updateProfileUser = async (
       req.params.id
     );
     return res.status(StatusCodes.CREATED).json(updated);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePasswordUser = async (
+  req: RequestWithBody<UpdatePasswordUserDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    await userService.updatePasswordUser(req.body, req.params.id);
+    return res.status(StatusCodes.OK).json(message.Successfully);
   } catch (error) {
     next(error);
   }

@@ -8,13 +8,11 @@ import {
   getAllUser,
   getUserById,
   getUserProfile,
+  updatePasswordUser,
 } from 'src/controllers/user.controller';
-import {
-  CreateUserDto,
-  UpdateProfileUserDto,
-  UpdateUserDto,
-} from 'src/dto/user';
+import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
+import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
@@ -100,36 +98,13 @@ const router: Router = Router();
  *                type: string
  *             example:
  *              email: "khang@gmail.com"
- *       ProfileUser:
+ *       password:
  *             type: object
- *             required:
- *               - username
- *               - full_name
- *               - avatar
- *               - email
- *               - phone
- *               - password
  *             properties:
- *                username:
- *                  type: string
- *                full_name:
- *                  type: string
- *                avatar:
- *                  type: string
- *                email:
- *                  type: string
- *                phone:
- *                  type: string
- *                password:
- *                  type: string
+ *              password:
+ *                type: string
  *             example:
- *                 username: luantrum27
- *                 full_name: Hoàng Thế Luân
- *                 avatar: not
- *                 email: hoangtheluan2016@gmail.com
- *                 phone: 0379124695
- *                 password: 123456
- *
+ *              password: "htl27062003"
  */
 
 /**
@@ -368,7 +343,7 @@ router.put(
  *      content:
  *        application/json:
  *          schema:
- *            $ref: '#/components/schemas/ProfileUser'
+ *            $ref: '#/components/schemas/User'
  *    security:
  *          - bearerAuth: []
  *    responses:
@@ -377,7 +352,7 @@ router.put(
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/ProfileUser'
+ *              $ref: '#/components/schemas/User'
  *      500:
  *        description: Internal server error
  */
@@ -385,8 +360,43 @@ router.put(
 router.put(
   '/profile/:id',
   requireAuthMiddleware,
-  validationMiddleware(UpdateProfileUserDto),
+  validationMiddleware(UpdateUserDto),
   updateProfileUser
+);
+
+/**
+ * @swagger
+ * /api/users/profile/password/{id}:
+ *  put:
+ *    summary: Update user password by the id
+ *    tags: [Users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/password'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user password was updated
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile/password/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
 );
 
 export const UserRoutes = router;
