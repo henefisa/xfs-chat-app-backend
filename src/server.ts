@@ -13,25 +13,25 @@ const port = process.env.PORT || 8000;
 const swaggerHost = process.env.SWAGGER_HOST || 'localhost';
 
 const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Library API',
-      version: '1.0.0',
-      description: 'API',
-    },
-    servers: [{ url: `http://${swaggerHost}:${port}` }],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
-    },
-  },
-  apis: [`${__dirname}/routes/*.{ts,js}`],
+	definition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'Library API',
+			version: '1.0.0',
+			description: 'API',
+		},
+		servers: [{ url: `http://${swaggerHost}:${port}` }],
+		components: {
+			securitySchemes: {
+				bearerAuth: {
+					type: 'http',
+					scheme: 'bearer',
+					bearerFormat: 'JWT',
+				},
+			},
+		},
+	},
+	apis: [`${__dirname}/routes/*.{ts,js}`],
 };
 
 const specs = swaggerJSDoc(options);
@@ -43,22 +43,22 @@ app.use(morgan('tiny'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 const errorHandler = (
-  error: any,
-  request: Request,
-  response: Response,
-  next: NextFunction
+	error: any,
+	request: Request,
+	response: Response,
+	next: NextFunction
 ) => {
-  if (error instanceof HttpException) {
-    return response.status(error.status).json({
-      statusCode: error.status || 400,
-      message: error.message,
-      timestamp: Date.now(),
-      path: request.path,
-      errors: error.errors,
-    });
-  }
+	if (error instanceof HttpException) {
+		return response.status(error.status).json({
+			statusCode: error.status || 400,
+			message: error.message,
+			timestamp: Date.now(),
+			path: request.path,
+			errors: error.errors,
+		});
+	}
 
-  next(error);
+	next(error);
 };
 
 passport.use(passportMiddleware);
@@ -66,16 +66,16 @@ app.use(cors());
 app.use(passport.initialize());
 app.use(express.json());
 app.use(
-  express.urlencoded({
-    extended: true,
-  })
+	express.urlencoded({
+		extended: true,
+	})
 );
 app.use(bodyParser.json());
 app.use('/api', MainRoutes);
 app.use(errorHandler);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TS server');
+	res.send('Express + TS server');
 });
 
 export default app;

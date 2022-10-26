@@ -1,15 +1,18 @@
 import { Router } from 'express';
 import passport from 'passport';
 import {
-  createUser,
-  deleteUser,
-  updateUser,
-  updateProfileUser,
-  getAllUser,
-  getUserById,
-  getUserProfile,
-  updatePasswordUser,
+	createUser,
+	deleteUser,
+	updateUser,
+	updateProfileUser,
+	getAllUser,
+	getUserById,
+	getUserProfile,
+	updatePasswordUser,
+	checkUsernameExist,
+	checkEmailExist,
 } from 'src/controllers/user.controller';
+import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
@@ -172,11 +175,11 @@ const router: Router = Router();
  */
 
 router.post(
-  '/',
-  requireAuthMiddleware,
-  roleMiddleware,
-  validationMiddleware(CreateUserDto),
-  createUser
+	'/',
+	requireAuthMiddleware,
+	roleMiddleware,
+	validationMiddleware(CreateUserDto),
+	createUser
 );
 
 /**
@@ -212,10 +215,10 @@ router.post(
  */
 
 router.put(
-  '/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateUser
+	'/:id',
+	requireAuthMiddleware,
+	validationMiddleware(UpdateUserDto),
+	updateUser
 );
 
 /**
@@ -239,9 +242,9 @@ router.put(
  */
 
 router.delete(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  deleteUser
+	'/:id',
+	passport.authenticate('jwt', { session: false }),
+	deleteUser
 );
 
 /**
@@ -308,10 +311,10 @@ router.get('/:id', requireAuthMiddleware, getUserById);
  */
 
 router.get(
-  '/',
-  requireAuthMiddleware,
-  validationMiddleware(GetUserDto),
-  getAllUser
+	'/',
+	requireAuthMiddleware,
+	validationMiddleware(GetUserDto),
+	getAllUser
 );
 
 /**
@@ -347,10 +350,10 @@ router.get(
  */
 
 router.put(
-  '/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateUser
+	'/:id',
+	requireAuthMiddleware,
+	validationMiddleware(UpdateUserDto),
+	updateUser
 );
 
 /**
@@ -386,10 +389,10 @@ router.put(
  */
 
 router.put(
-  '/profile/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateProfileUser
+	'/profile/:id',
+	requireAuthMiddleware,
+	validationMiddleware(UpdateUserDto),
+	updateProfileUser
 );
 
 /**
@@ -421,10 +424,59 @@ router.put(
  */
 
 router.put(
-  '/profile/password/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdatePasswordUserDto),
-  updatePasswordUser
+	'/profile/password/:id',
+	requireAuthMiddleware,
+	validationMiddleware(UpdatePasswordUserDto),
+	updatePasswordUser
+);
+
+/**
+ * @swagger
+ * /api/users/checkUsernameExists:
+ *   post:
+ *     summary: check username exists
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/username'
+ *     responses:
+ *       202:
+ *         description: 'false'
+ *       500:
+ *         description: Some server error
+ */
+
+router.post(
+	'/checkUsernameExists',
+	validationMiddleware(CheckUsernameExistsDto),
+	checkUsernameExist
+);
+
+/**
+ * @swagger
+ * /api/users/checkEmailExists:
+ *   post:
+ *     summary: check Email exists
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/email'
+ *     responses:
+ *       202:
+ *         description: 'false'
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+	'/checkEmailExists',
+	validationMiddleware(CheckEmailExistsDto),
+	checkEmailExist
 );
 
 export const UserRoutes = router;
