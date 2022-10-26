@@ -12,7 +12,6 @@ export const sendFriendRequest = async (
 ) => {
 	try {
 		res.setHeader('Content-Type', 'application/json');
-
 		if (!req.user) {
 			return null;
 		}
