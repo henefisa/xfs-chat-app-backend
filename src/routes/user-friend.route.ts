@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-  getFriends,
-  getFriendsRequest,
-  sendFriendRequest,
+	getFriends,
+	getFriendsRequest,
+	sendFriendRequest,
 } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/user';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
@@ -45,10 +45,10 @@ const router: Router = Router();
  */
 
 router.post(
-  '/',
-  requireAuthMiddleware,
-  validationMiddleware(FriendRequestDto),
-  sendFriendRequest
+	'/',
+	requireAuthMiddleware,
+	validationMiddleware(FriendRequestDto),
+	sendFriendRequest
 );
 
 /**

@@ -1,4 +1,4 @@
 export interface IAuthentication {
-  id: string;
-  username: string;
+	id: string;
+	username: string;
 }
