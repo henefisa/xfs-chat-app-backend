@@ -9,5 +9,5 @@ Database.instance.initialize();
 
 import server from './server';
 server.listen(port, () => {
-  console.log(`Server is listen on port ${port}`);
+	console.log(`Server is listen on port ${port}`);
 });

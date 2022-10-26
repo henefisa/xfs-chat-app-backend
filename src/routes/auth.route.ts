@@ -1,10 +1,10 @@
 import { CheckUsernameExistsDto } from './../dto/auth/check-username-exists.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
-  checkEmailExist,
-  checkUsernameExist,
-  login,
-  register,
+	checkEmailExist,
+	checkUsernameExist,
+	login,
+	register,
 } from 'src/controllers/auth.controller';
 import { Router } from 'express';
 import { CheckEmailExistsDto, LoginDto } from 'src/dto/auth';
@@ -81,9 +81,9 @@ router.post('/register', validationMiddleware(RegisterDto), register);
  */
 
 router.post(
-  '/checkUsernameExists',
-  validationMiddleware(CheckUsernameExistsDto),
-  checkUsernameExist
+	'/checkUsernameExists',
+	validationMiddleware(CheckUsernameExistsDto),
+	checkUsernameExist
 );
 
 /**
@@ -105,9 +105,9 @@ router.post(
  *         description: Some server error
  */
 router.post(
-  '/checkEmailExists',
-  validationMiddleware(CheckEmailExistsDto),
-  checkEmailExist
+	'/checkEmailExists',
+	validationMiddleware(CheckEmailExistsDto),
+	checkEmailExist
 );
 
 export const authRoutes = router;
