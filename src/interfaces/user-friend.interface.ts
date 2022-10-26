@@ -3,8 +3,8 @@ import { GetOptions } from 'src/shares/get-options';
 
 export enum EUserFriendRequestStatus {
 	REQUESTED = 'REQUESTED',
-	FRIEND = 'FRIEND',
-	CANCEL = 'CANCEL',
+	ACCEPTED = 'ACCEPTED',
+	REJECTED = 'REJECTED',
 }
 
 export type GetUserFriendsOptions = GetOptions<UserFriend>;

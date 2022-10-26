@@ -6,7 +6,7 @@ import { Message } from './message.entity';
 @Entity('conversations')
 export class Conversation extends BaseEntity {
 	@Column()
-	tittle: string;
+	title: string;
 
 	@OneToMany(() => Message, (messages) => messages.conversation)
 	messages: Message[];

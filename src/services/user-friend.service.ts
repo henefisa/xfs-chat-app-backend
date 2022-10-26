@@ -1,18 +1,21 @@
 import { FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
-import { FriendRequestDto } from 'src/dto/user/friend-request.dto';
 import { UserFriend } from 'src/entities/user-friend.entity';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import { GetUserFriendDto } from 'src/dto/user';
 import { GetUserFriendsOptions } from 'src/interfaces/user-friend.interface';
+import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 
 const userFriendRepository = Database.instance
 	.getDataSource('default')
 	.getRepository(UserFriend);
 
-export const friendRequest = async (dto: FriendRequestDto) => {
+export const friendRequest = async (id: string, dto: FriendRequestDto) => {
 	const friend = new UserFriend();
-	Object.assign(friend, dto);
+	const request = {
+		userTarget: dto.userTarget,
+		owner: id,
+	};
+	Object.assign(friend, request);
 	return userFriendRepository.save(friend);
 };
 
@@ -21,7 +24,7 @@ export const getOne = async (option: FindOneOptions<UserFriend>) => {
 };
 
 export const getFriends = async (
-	status?: string,
+	id: string,
 	dto?: GetUserFriendDto,
 	options?: GetUserFriendsOptions
 ) => {
@@ -36,13 +39,13 @@ export const getFriends = async (
 		query.skip(offset).take(limit);
 	}
 
-	query.leftJoinAndSelect('friends.user', 'users');
+	query.leftJoinAndSelect('friends.owner', 'users');
 
-	if (dto?.owner) {
-		query.andWhere('friends.owner = :id', { id: dto?.owner });
+	query.andWhere('friends.userTarget = :id', { id: id });
+
+	if (dto?.status) {
+		query.andWhere('friends.status = :s', { s: dto?.status });
 	}
-
-	query.andWhere('friends.status = :s', { s: status });
 
 	if (options?.id) {
 		query.andWhere('friends.id = :id', { id: options.id });

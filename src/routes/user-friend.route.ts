@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import {
-	getFriends,
 	getFriendsRequest,
 	sendFriendRequest,
 } from 'src/controllers/user-friend.controller';
-import { FriendRequestDto } from 'src/dto/user';
+import { FriendRequestDto } from 'src/dto/friend';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 const router: Router = Router();
@@ -54,7 +53,7 @@ router.post(
 /**
  * @swagger
  * /api/friends/requests:
- *   post:
+ *   get:
  *     summary: list request of user
  *     tags: [Friends]
  *     requestBody:
@@ -86,43 +85,6 @@ router.post(
  *         description: Internal server error
  */
 
-router.post('/requests', requireAuthMiddleware, getFriendsRequest);
-
-/**
- * @swagger
- * /api/friends/listFriend:
- *   post:
- *     summary: list friend of user
- *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *              $ref: '#/components/schemas/getFriendRequest'
- *     security:
- *         - bearerAuth: []
- *     responses:
- *       200:
- *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
- *       500:
- *         description: Internal server error
- */
-
-router.post('/listFriend', requireAuthMiddleware, getFriends);
+router.get('/requests', requireAuthMiddleware, getFriendsRequest);
 
 export const UserFriendRoutes = router;

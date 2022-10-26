@@ -1,10 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 
 export class GetUserFriendDto {
-	@IsString()
+	@IsEnum(EUserFriendRequestStatus)
 	@IsOptional()
-	owner: string;
+	status: string;
 
 	@IsNumber()
 	@IsOptional()

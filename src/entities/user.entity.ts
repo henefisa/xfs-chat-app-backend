@@ -16,8 +16,8 @@ export class User extends BaseEntity {
 	@Column({ select: false })
 	password: string;
 
-	@Column({ nullable: true })
-	full_name: string;
+	@Column({ nullable: true, name: 'full_name' })
+	fullName: string;
 
 	@Column({ nullable: true })
 	avatar: string;
@@ -34,6 +34,6 @@ export class User extends BaseEntity {
 	@OneToMany(() => Message, (messages) => messages.owner)
 	messages: Message[];
 
-	@OneToMany(() => UserFriend, (UserFriends) => UserFriends.user)
+	@OneToMany(() => UserFriend, (UserFriends) => UserFriends.owner)
 	friends: UserFriend[];
 }
