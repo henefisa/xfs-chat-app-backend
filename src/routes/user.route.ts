@@ -401,13 +401,6 @@ router.put(
  *  put:
  *    summary: Update user password by the id
  *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
  *    requestBody:
  *      required: true
  *      content:

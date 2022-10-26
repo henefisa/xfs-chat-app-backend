@@ -209,7 +209,7 @@ export const updatePasswordUser = async (
 	dto: UpdatePasswordUserDto,
 	id: string
 ) => {
-	const user = await getOneOrThrow({
+	const user = await getOne({
 		where: { id: id },
 	});
 

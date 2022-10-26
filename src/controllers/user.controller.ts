@@ -8,6 +8,7 @@ import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
+import { verifyToken } from 'src/middlewares/check-roles.middleware';
 
 export const createUser = async (
 	req: RequestWithBody<CreateUserDto>,
@@ -137,7 +138,8 @@ export const updatePasswordUser = async (
 ) => {
 	try {
 		res.setHeader('Content-Type', 'application/json');
-		await userService.updatePasswordUser(req.body, req.params.id);
+		const payload = verifyToken(req);
+		await userService.updatePasswordUser(req.body, payload.id);
 		return res.status(StatusCodes.OK).json(messages.Successfully);
 	} catch (error) {
 		next(error);
