@@ -2,15 +2,15 @@ import { IsEmail, IsString } from 'class-validator';
 import { IsNotBlank } from 'src/decorators';
 
 export class RegisterDto {
-  @IsString()
-  @IsEmail()
-  email: string;
+	@IsString()
+	@IsEmail()
+	email: string;
 
-  @IsString()
-  @IsNotBlank()
-  username: string;
+	@IsString()
+	@IsNotBlank()
+	username: string;
 
-  @IsString()
-  @IsNotBlank()
-  password: string;
+	@IsString()
+	@IsNotBlank()
+	password: string;
 }
