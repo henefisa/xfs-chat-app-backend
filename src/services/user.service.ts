@@ -213,10 +213,6 @@ export const updatePasswordUser = async (
     where: { id: id },
   });
 
-  if (!user) {
-    throw new NotExistException('user');
-  }
-
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
   return userRepository.save(user);
