@@ -5,15 +5,15 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('messages')
 export class Message extends BaseEntity {
-	@Column()
-	message: string;
+  @Column()
+  message: string;
 
-	@Column()
-	attachment: string;
+  @Column()
+  attachment: string;
 
-	@ManyToOne(() => Conversation, (conversations) => conversations.messages)
-	conversation: Conversation;
+  @ManyToOne(() => Conversation, (conversations) => conversations.messages)
+  conversation: Conversation;
 
-	@ManyToOne(() => User, (users) => users.messages)
-	owner: User;
+  @ManyToOne(() => User, (users) => users.messages)
+  owner: User;
 }

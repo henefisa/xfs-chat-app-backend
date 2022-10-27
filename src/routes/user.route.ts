@@ -2,16 +2,16 @@ import { Router } from 'express';
 import passport from 'passport';
 import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
-	createUser,
-	deleteUser,
-	updateUser,
-	updateProfileUser,
-	getAllUser,
-	getUserById,
-	getUserProfile,
-	updatePasswordUser,
-	checkUsernameExist,
-	checkEmailExist,
+  createUser,
+  deleteUser,
+  updateUser,
+  updateProfileUser,
+  getAllUser,
+  getUserById,
+  getUserProfile,
+  updatePasswordUser,
+  checkUsernameExist,
+  checkEmailExist,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -180,11 +180,11 @@ const router: Router = Router();
  */
 
 router.post(
-	'/',
-	requireAuthMiddleware,
-	roleMiddleware,
-	validationMiddleware(CreateUserDto),
-	createUser
+  '/',
+  requireAuthMiddleware,
+  roleMiddleware,
+  validationMiddleware(CreateUserDto),
+  createUser
 );
 
 /**
@@ -220,10 +220,10 @@ router.post(
  */
 
 router.put(
-	'/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateUser
+  '/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateUser
 );
 
 /**
@@ -247,9 +247,9 @@ router.put(
  */
 
 router.delete(
-	'/:id',
-	passport.authenticate('jwt', { session: false }),
-	deleteUser
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  deleteUser
 );
 
 /**
@@ -316,10 +316,10 @@ router.get('/:id', requireAuthMiddleware, getUserById);
  */
 
 router.get(
-	'/',
-	requireAuthMiddleware,
-	validationMiddleware(GetUserDto),
-	getAllUser
+  '/',
+  requireAuthMiddleware,
+  validationMiddleware(GetUserDto),
+  getAllUser
 );
 
 /**
@@ -355,10 +355,10 @@ router.get(
  */
 
 router.put(
-	'/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateUser
+  '/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateUser
 );
 
 /**
@@ -394,10 +394,10 @@ router.put(
  */
 
 router.put(
-	'/profile/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateProfileUser
+  '/profile/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateProfileUser
 );
 
 /**
@@ -429,10 +429,10 @@ router.put(
  */
 
 router.put(
-	'/profile/password/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdatePasswordUserDto),
-	updatePasswordUser
+  '/profile/password/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
 );
 
 /**
@@ -455,9 +455,9 @@ router.put(
  */
 
 router.post(
-	'/check-username-exists',
-	validationMiddleware(CheckUsernameExistsDto),
-	checkUsernameExist
+  '/check-username-exists',
+  validationMiddleware(CheckUsernameExistsDto),
+  checkUsernameExist
 );
 
 /**
@@ -479,9 +479,9 @@ router.post(
  *         description: Some server error
  */
 router.post(
-	'/check-email-exists',
-	validationMiddleware(CheckEmailExistsDto),
-	checkEmailExist
+  '/check-email-exists',
+  validationMiddleware(CheckEmailExistsDto),
+  checkEmailExist
 );
 
 /**
