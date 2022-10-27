@@ -263,8 +263,6 @@ router.delete(
  *            content:
  *                application/json:
  *                   schema:
- *                      type: array
- *                      items:
  *                          $ref: '#/components/schemas/User'
  *      security:
  *          - bearerAuth: []
