@@ -5,12 +5,12 @@ import { Message } from './message.entity';
 
 @Entity('conversations')
 export class Conversation extends BaseEntity {
-	@Column()
-	tittle: string;
+  @Column()
+  title: string;
 
-	@OneToMany(() => Message, (messages) => messages.conversation)
-	messages: Message[];
+  @OneToMany(() => Message, (messages) => messages.conversation)
+  messages: Message[];
 
-	// @OneToMany(() => Participants, (participants) => participants.conversation)
-	// participants: Participants[];
+  // @OneToMany(() => Participants, (participants) => participants.conversation)
+  // participants: Participants[];
 }
