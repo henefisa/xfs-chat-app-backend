@@ -1,16 +1,17 @@
 import { Router } from 'express';
 import passport from 'passport';
+import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
-	createUser,
-	deleteUser,
-	updateUser,
-	updateProfileUser,
-	getAllUser,
-	getUserById,
-	getUserProfile,
-	updatePasswordUser,
-	checkUsernameExist,
-	checkEmailExist,
+  createUser,
+  deleteUser,
+  updateUser,
+  updateProfileUser,
+  getAllUser,
+  getUserById,
+  getUserProfile,
+  updatePasswordUser,
+  checkUsernameExist,
+  checkEmailExist,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -104,23 +105,27 @@ const router: Router = Router();
  *       sendRequest:
  *             type: object
  *             properties:
- *              user:
- *                type: string
- *                description: user send request
- *              owner:
+ *              userTarget:
  *                type: string
  *                description: user was sent request
  *             example:
- *              user: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
- *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
+ *              userTarget: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
  *       getFriendRequest:
  *             type: object
  *             properties:
- *              owner:
+ *              status:
  *                type: string
- *                description: id of owner
+ *                description: status for get
  *             example:
- *              owner: 78097c71-9937-4b68-8c51-e64bc88830c8
+ *              status: REQUESTED
+ *       getFriends:
+ *             type: object
+ *             properties:
+ *              status:
+ *                type: string
+ *                description: status for get
+ *             example:
+ *              status: ACCEPTED
  *       password:
  *             type: object
  *             properties:
@@ -175,11 +180,11 @@ const router: Router = Router();
  */
 
 router.post(
-	'/',
-	requireAuthMiddleware,
-	roleMiddleware,
-	validationMiddleware(CreateUserDto),
-	createUser
+  '/',
+  requireAuthMiddleware,
+  roleMiddleware,
+  validationMiddleware(CreateUserDto),
+  createUser
 );
 
 /**
@@ -215,10 +220,10 @@ router.post(
  */
 
 router.put(
-	'/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateUser
+  '/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateUser
 );
 
 /**
@@ -242,9 +247,9 @@ router.put(
  */
 
 router.delete(
-	'/:id',
-	passport.authenticate('jwt', { session: false }),
-	deleteUser
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  deleteUser
 );
 
 /**
@@ -311,10 +316,10 @@ router.get('/:id', requireAuthMiddleware, getUserById);
  */
 
 router.get(
-	'/',
-	requireAuthMiddleware,
-	validationMiddleware(GetUserDto),
-	getAllUser
+  '/',
+  requireAuthMiddleware,
+  validationMiddleware(GetUserDto),
+  getAllUser
 );
 
 /**
@@ -350,10 +355,10 @@ router.get(
  */
 
 router.put(
-	'/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateUser
+  '/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateUser
 );
 
 /**
@@ -389,10 +394,10 @@ router.put(
  */
 
 router.put(
-	'/profile/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdateUserDto),
-	updateProfileUser
+  '/profile/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateProfileUser
 );
 
 /**
@@ -424,15 +429,15 @@ router.put(
  */
 
 router.put(
-	'/profile/password/:id',
-	requireAuthMiddleware,
-	validationMiddleware(UpdatePasswordUserDto),
-	updatePasswordUser
+  '/profile/password/:id',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
 );
 
 /**
  * @swagger
- * /api/users/checkUsernameExists:
+ * /api/users/check-username-exists:
  *   post:
  *     summary: check username exists
  *     tags: [Users]
@@ -450,14 +455,14 @@ router.put(
  */
 
 router.post(
-	'/checkUsernameExists',
-	validationMiddleware(CheckUsernameExistsDto),
-	checkUsernameExist
+  '/check-username-exists',
+  validationMiddleware(CheckUsernameExistsDto),
+  checkUsernameExist
 );
 
 /**
  * @swagger
- * /api/users/checkEmailExists:
+ * /api/users/check-email-exists:
  *   post:
  *     summary: check Email exists
  *     tags: [Users]
@@ -474,9 +479,46 @@ router.post(
  *         description: Some server error
  */
 router.post(
-	'/checkEmailExists',
-	validationMiddleware(CheckEmailExistsDto),
-	checkEmailExist
+  '/check-email-exists',
+  validationMiddleware(CheckEmailExistsDto),
+  checkEmailExist
 );
+
+/**
+ * @swagger
+ * /api/friends:
+ *   get:
+ *     summary: list friend of user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/getFriends'
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                   user:
+ *                      type: object
+ *                      description: user send request
+ *                   owner:
+ *                      type: string
+ *                      description: user was sent request
+ *                   status:
+ *                      type: string
+ *                      description: status
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/friends', requireAuthMiddleware, getFriendsRequest);
 
 export const UserRoutes = router;
