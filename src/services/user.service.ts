@@ -209,13 +209,9 @@ export const updatePasswordUser = async (
 	dto: UpdatePasswordUserDto,
 	id: string
 ) => {
-	const user = await getOne({
+	const user = await getOneOrThrow({
 		where: { id: id },
 	});
-
-	if (!user) {
-		throw new NotExistException('user');
-	}
 
 	user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 

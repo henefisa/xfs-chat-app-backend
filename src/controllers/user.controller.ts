@@ -138,8 +138,11 @@ export const updatePasswordUser = async (
 ) => {
 	try {
 		res.setHeader('Content-Type', 'application/json');
-		const payload = verifyToken(req);
-		await userService.updatePasswordUser(req.body, payload.id);
+		if (!req.user) {
+			return null;
+		}
+		const reqUser = req.user as User;
+		await userService.updatePasswordUser(req.body, reqUser.id);
 		return res.status(StatusCodes.OK).json(messages.Successfully);
 	} catch (error) {
 		next(error);
