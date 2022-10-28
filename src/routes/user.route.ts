@@ -30,14 +30,14 @@ const router: Router = Router();
  *          type: object
  *          required:
  *            - username
- *            - full_name
+ *            - fullName
  *            - avatar
  *            - email
  *            - phone
  *          properties:
  *              username:
  *                type: string
- *              full_name:
+ *              fullName:
  *                type: string
  *              avatar:
  *                type: string
@@ -45,12 +45,18 @@ const router: Router = Router();
  *                type: string
  *              phone:
  *                type: string
+ *              description:
+ *                type: string
+ *              location:
+ *                type: string
  *          example:
  *              username: khangkhang
- *              full_name: tran van khang
+ *              fullName: tran van khang
  *              avatar: not
  *              email: khangpro@gmail.com
  *              phone: 012345678
+ *              description: khang
+ *              location: VietNam
  *       createUser:
  *            type: object
  *            required:
@@ -256,7 +262,7 @@ router.delete(
  * @swagger
  * /api/users/profile:
  *    get:
- *      summary: returns the list of user
+ *      summary: returns profile of user
  *      tags: [Users]
  *      responses:
  *          200:
