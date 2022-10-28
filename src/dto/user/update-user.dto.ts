@@ -6,14 +6,14 @@ export class UpdateUserDto {
   @IsNotBlank()
   username: string;
 
-	@IsString()
-	fullName: string;
+  @IsString()
+  fullName: string;
 
-	@IsString()
-	description: string;
+  @IsString()
+  description: string;
 
-	@IsString()
-	location: string;
+  @IsString()
+  location: string;
 
   @IsOptional()
   @IsString()
