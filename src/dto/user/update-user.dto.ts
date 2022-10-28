@@ -9,6 +9,12 @@ export class UpdateUserDto {
 	@IsString()
 	fullName: string;
 
+	@IsString()
+	description: string;
+
+	@IsString()
+	location: string;
+
 	@IsOptional()
 	@IsString()
 	avatar: string;
