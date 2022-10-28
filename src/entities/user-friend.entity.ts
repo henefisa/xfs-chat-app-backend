@@ -5,15 +5,15 @@ import { User } from './user.entity';
 
 @Entity('user_friends')
 export class UserFriend extends BaseEntity {
-	@Column({
-		enum: EUserFriendRequestStatus,
-		default: EUserFriendRequestStatus.REQUESTED,
-	})
-	status: EUserFriendRequestStatus;
+  @Column({
+    enum: EUserFriendRequestStatus,
+    default: EUserFriendRequestStatus.REQUESTED,
+  })
+  status: EUserFriendRequestStatus;
 
-	@ManyToOne(() => User)
-	userTarget: User;
+  @ManyToOne(() => User)
+  userTarget: User;
 
-	@ManyToOne(() => User, (users) => users.friends)
-	owner: User;
+  @ManyToOne(() => User, (users) => users.friends)
+  owner: User;
 }

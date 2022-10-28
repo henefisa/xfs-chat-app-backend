@@ -1,37 +1,37 @@
 import {
-	PrimaryGeneratedColumn,
-	CreateDateColumn,
-	UpdateDateColumn,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import moment from 'moment';
 
 export class BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-	@CreateDateColumn({
-		name: 'created_at',
-		transformer: {
-			from(value) {
-				return moment(value);
-			},
-			to(value) {
-				return value;
-			},
-		},
-	})
-	createdAt: moment.Moment;
+  @CreateDateColumn({
+    name: 'created_at',
+    transformer: {
+      from(value) {
+        return moment(value);
+      },
+      to(value) {
+        return value;
+      },
+    },
+  })
+  createdAt: moment.Moment;
 
-	@UpdateDateColumn({
-		name: 'updated_at',
-		transformer: {
-			from(value) {
-				return moment(value);
-			},
-			to(value) {
-				return value;
-			},
-		},
-	})
-	updatedAt: moment.Moment;
+  @UpdateDateColumn({
+    name: 'updated_at',
+    transformer: {
+      from(value) {
+        return moment(value);
+      },
+      to(value) {
+        return value;
+      },
+    },
+  })
+  updatedAt: moment.Moment;
 }

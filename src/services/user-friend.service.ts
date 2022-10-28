@@ -6,57 +6,57 @@ import { GetUserFriendsOptions } from 'src/interfaces/user-friend.interface';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 
 const userFriendRepository = Database.instance
-	.getDataSource('default')
-	.getRepository(UserFriend);
+  .getDataSource('default')
+  .getRepository(UserFriend);
 
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
-	const friend = new UserFriend();
-	const request = {
-		userTarget: dto.userTarget,
-		owner: id,
-	};
-	Object.assign(friend, request);
-	return userFriendRepository.save(friend);
+  const friend = new UserFriend();
+  const request = {
+    userTarget: dto.userTarget,
+    owner: id,
+  };
+  Object.assign(friend, request);
+  return userFriendRepository.save(friend);
 };
 
 export const getOne = async (option: FindOneOptions<UserFriend>) => {
-	return userFriendRepository.findOne(option);
+  return userFriendRepository.findOne(option);
 };
 
 export const getFriends = async (
-	id: string,
-	dto?: GetUserFriendDto,
-	options?: GetUserFriendsOptions
+  id: string,
+  dto?: GetUserFriendDto,
+  options?: GetUserFriendsOptions
 ) => {
-	const { limit, offset } = getLimitAndOffset({
-		limit: dto?.limit,
-		offset: dto?.offset,
-	});
+  const { limit, offset } = getLimitAndOffset({
+    limit: dto?.limit,
+    offset: dto?.offset,
+  });
 
-	const query = userFriendRepository.createQueryBuilder('friends');
+  const query = userFriendRepository.createQueryBuilder('friends');
 
-	if (!options?.unlimited) {
-		query.skip(offset).take(limit);
-	}
+  if (!options?.unlimited) {
+    query.skip(offset).take(limit);
+  }
 
-	query.leftJoinAndSelect('friends.owner', 'users');
+  query.leftJoinAndSelect('friends.owner', 'users');
 
-	query.andWhere('friends.userTarget = :id', { id: id });
+  query.andWhere('friends.userTarget = :id', { id: id });
 
-	if (dto?.status) {
-		query.andWhere('friends.status = :s', { s: dto?.status });
-	}
+  if (dto?.status) {
+    query.andWhere('friends.status = :s', { s: dto?.status });
+  }
 
-	if (options?.id) {
-		query.andWhere('friends.id = :id', { id: options.id });
-	}
+  if (options?.id) {
+    query.andWhere('friends.id = :id', { id: options.id });
+  }
 
-	query.orderBy('friends.createdAt', 'DESC');
+  query.orderBy('friends.createdAt', 'DESC');
 
-	const [friends, count] = await query.getManyAndCount();
+  const [friends, count] = await query.getManyAndCount();
 
-	return {
-		friends,
-		count,
-	};
+  return {
+    friends,
+    count,
+  };
 };
