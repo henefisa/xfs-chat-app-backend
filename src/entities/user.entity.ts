@@ -25,14 +25,14 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   phone: string;
 
-	@Column({ nullable: true })
-	description: string;
+  @Column({ nullable: true })
+  description: string;
 
-	@Column({ nullable: true })
-	location: string;
+  @Column({ nullable: true })
+  location: string;
 
-	@Column({ enum: EUserStatus, default: EUserStatus.Inactive })
-	status: EUserStatus;
+  @Column({ enum: EUserStatus, default: EUserStatus.Inactive })
+  status: EUserStatus;
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
   role: EUserRole;
