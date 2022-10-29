@@ -1,11 +1,14 @@
-import { approveFriendRequest } from './../controllers/user-friend.controller';
+import {
+  friendApproveRequest,
+  friendCancelRequest,
+} from './../controllers/user-friend.controller';
 import { Router } from 'express';
 import {
   getFriendsRequest,
   sendFriendRequest,
 } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/friend';
-import { FriendRequestApproveDto } from 'src/dto/friend/friend-request-approve.dto';
+import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 const router: Router = Router();
@@ -89,11 +92,60 @@ router.post(
 
 router.get('/requests', requireAuthMiddleware, getFriendsRequest);
 
+/**
+ * @swagger
+ * /api/friends/approve:
+ *   post:
+ *     summary: send friend approve request
+ *     tags: [Friends]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/actionRequest'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Accepted as a friend
+ *       500:
+ *         description: Internal server error
+ */
+
 router.post(
   '/approve',
   requireAuthMiddleware,
-  validationMiddleware(FriendRequestApproveDto),
-  approveFriendRequest
+  validationMiddleware(FriendActionDto),
+  friendApproveRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/cancel:
+ *   post:
+ *     summary: send friend cancel request
+ *     tags: [Friends]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/actionRequest'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *        description: Cancelled as a friend
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  '/cancel',
+  requireAuthMiddleware,
+  validationMiddleware(FriendActionDto),
+  friendCancelRequest
 );
 
 export const UserFriendRoutes = router;
