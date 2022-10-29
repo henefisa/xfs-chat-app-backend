@@ -1,5 +1,5 @@
 import { EUserRole } from 'src/interfaces/user.interface';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/shares';
 import { EUserStatus } from 'src/interfaces/user.interface';
 import { Message } from './message.entity';

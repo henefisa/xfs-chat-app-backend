@@ -1,13 +1,36 @@
+import { User } from './../entities/user.entity';
 import { FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
 import { UserFriend } from 'src/entities/user-friend.entity';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { GetUserFriendsOptions } from 'src/interfaces/user-friend.interface';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
+import { FriendRequestApproveDto } from 'src/dto/friend/friend-request-approve.dto';
 
 const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
+
+export const approveFriendRequest = async (
+  dto: FriendRequestApproveDto,
+  id: string
+) => {
+  const query = await userFriendRepository.createQueryBuilder('f');
+  query.innerJoinAndSelect('f.owner', 'users');
+  query.where('f.userTargetId = :id', { id: id });
+  query.andWhere('f.ownerId = :id', { id: dto.userTarget });
+  const relationship = await query.getOne();
+  console.log(
+    'relationship: ',
+    relationship,
+    ' userTargetId: ',
+    id,
+    ' ownerId: ',
+    dto.userTarget
+  );
+
+  return relationship;
+};
 
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
   const friend = new UserFriend();

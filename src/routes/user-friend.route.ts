@@ -1,9 +1,11 @@
+import { approveFriendRequest } from './../controllers/user-friend.controller';
 import { Router } from 'express';
 import {
   getFriendsRequest,
   sendFriendRequest,
 } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/friend';
+import { FriendRequestApproveDto } from 'src/dto/friend/friend-request-approve.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 const router: Router = Router();
@@ -86,5 +88,12 @@ router.post(
  */
 
 router.get('/requests', requireAuthMiddleware, getFriendsRequest);
+
+router.post(
+  '/approve',
+  requireAuthMiddleware,
+  validationMiddleware(FriendRequestApproveDto),
+  approveFriendRequest
+);
 
 export const UserFriendRoutes = router;

@@ -4,6 +4,7 @@ import { RequestWithBody } from 'src/shares';
 import * as userFriendService from 'src/services/user-friend.service';
 import { User } from 'src/entities/user.entity';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
+import { FriendRequestApproveDto } from 'src/dto/friend/friend-request-approve.dto';
 
 export const sendFriendRequest = async (
   req: RequestWithBody<FriendRequestDto>,
@@ -47,6 +48,29 @@ export const getFriendsRequest = async (
       friends,
       count,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const approveFriendRequest = async (
+  req: RequestWithBody<FriendRequestApproveDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    if (!req.user) {
+      return null;
+    }
+
+    const reqUser = req.user as User;
+    const user = await userFriendService.approveFriendRequest(
+      req.body,
+      reqUser.id
+    );
+
+    return res.status(StatusCodes.OK).json({ user: user });
   } catch (error) {
     next(error);
   }
