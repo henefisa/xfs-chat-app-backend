@@ -14,7 +14,7 @@ const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
 
-export const getOneRelationship = async (
+export const getRelationship = async (
   userTargetId: string,
   ownerId: string
 ) => {
@@ -24,6 +24,11 @@ export const getOneRelationship = async (
       owner: Equal(ownerId),
     },
   });
+
+  if (!relationship) {
+    throw new NotExistException('relationship');
+  }
+
   return relationship;
 };
 
@@ -31,24 +36,14 @@ export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
-  const relationship = await getOneRelationship(id, dto.userRequest);
-
-  if (!relationship) {
-    throw new NotExistException('relationship');
-  }
+  const relationship = await getRelationship(id, dto.userRequest);
 
   relationship.status = EUserFriendRequestStatus.ACCEPTED;
-  await userFriendRepository.save(relationship);
-  return relationship;
+  return userFriendRepository.save(relationship);
 };
 
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
-  const relationship = await getOneRelationship(id, dto.userRequest);
-
-  if (!relationship) {
-    throw new NotExistException('relationship');
-  }
-
+  const relationship = await getRelationship(id, dto.userRequest);
   return userFriendRepository.remove(relationship);
 };
 
