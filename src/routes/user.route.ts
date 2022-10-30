@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
 import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
   createUser,
@@ -12,6 +11,7 @@ import {
   updatePasswordUser,
   checkUsernameExist,
   checkEmailExist,
+  selfDeleteUser,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -228,6 +228,7 @@ router.post(
 router.put(
   '/:id',
   requireAuthMiddleware,
+  roleMiddleware,
   validationMiddleware(UpdateUserDto),
   updateUser
 );
@@ -252,11 +253,7 @@ router.put(
  *         description: User deleted
  */
 
-router.delete(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  deleteUser
-);
+router.delete('/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
 
 /**
  * @swagger
@@ -517,5 +514,20 @@ router.post(
  */
 
 router.get('/friends', requireAuthMiddleware, getFriendsRequest);
+
+/**
+ * @swagger
+ * /api/users/self-delete:
+ *   delete:
+ *     summary: Self-delete user
+ *     tags: [Users]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: User deleted
+ */
+
+router.delete('/self-delete', requireAuthMiddleware, selfDeleteUser);
 
 export const UserRoutes = router;

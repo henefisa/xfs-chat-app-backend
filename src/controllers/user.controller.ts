@@ -51,6 +51,21 @@ export const deleteUser = async (
   }
 };
 
+export const selfDeleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    await userService.deleteUser(user.id);
+
+    return res.status(StatusCodes.NO_CONTENT);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserById = async (
   req: Request,
   res: Response,
