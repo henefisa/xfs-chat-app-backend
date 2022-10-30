@@ -114,10 +114,8 @@ export const updateProfileUser = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const updated = await userService.updateProfileUser(
-      req.body,
-      req.params.id
-    );
+    const reqUser = req.user as User;
+    const updated = await userService.updateProfileUser(req.body, reqUser.id);
     return res.status(StatusCodes.CREATED).json(updated);
   } catch (error) {
     next(error);

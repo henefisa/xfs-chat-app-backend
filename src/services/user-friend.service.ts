@@ -14,37 +14,40 @@ const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
 
-export const getRelationship = async (
+export const getFriendRequest = async (
   userTargetId: string,
   ownerId: string
 ) => {
-  const relationship = await getOne({
+  const friendRequest = await getOne({
     where: {
       userTarget: Equal(userTargetId),
       owner: Equal(ownerId),
     },
   });
 
-  if (!relationship) {
-    throw new NotExistException('relationship');
+  if (!friendRequest) {
+    throw new NotExistException('friendRequest');
   }
 
-  return relationship;
+  return friendRequest;
 };
 
 export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
-  const relationship = await getRelationship(id, dto.userRequest);
+  const friendRequest = await getFriendRequest(id, dto.userRequest);
 
-  relationship.status = EUserFriendRequestStatus.ACCEPTED;
-  return userFriendRepository.save(relationship);
+  friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
+  return userFriendRepository.save(friendRequest);
 };
 
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
-  const relationship = await getRelationship(id, dto.userRequest);
-  return userFriendRepository.remove(relationship);
+  await getFriendRequest(id, dto.userRequest);
+  return userFriendRepository.delete({
+    userTarget: Equal(id),
+    owner: Equal(dto.userRequest),
+  });
 };
 
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {

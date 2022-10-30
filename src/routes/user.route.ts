@@ -121,7 +121,7 @@ const router: Router = Router();
  *             properties:
  *              userRequest:
  *                type: string
- *                description: user was sent request
+ *                description: user sent the request
  *             example:
  *              userRequest: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
  *       getFriendRequest:
@@ -236,6 +236,7 @@ router.post(
 router.put(
   '/:id',
   requireAuthMiddleware,
+  roleMiddleware,
   validationMiddleware(UpdateUserDto),
   updateUser
 );
@@ -262,6 +263,7 @@ router.put(
 
 router.delete(
   '/:id',
+  roleMiddleware,
   passport.authenticate('jwt', { session: false }),
   deleteUser
 );
@@ -306,7 +308,7 @@ router.get('/profile', requireAuthMiddleware, getUserProfile);
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.get('/:id', requireAuthMiddleware, getUserById);
+router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
 
 /**
  * @swagger
@@ -369,23 +371,17 @@ router.get(
 router.put(
   '/:id',
   requireAuthMiddleware,
+  roleMiddleware,
   validationMiddleware(UpdateUserDto),
   updateUser
 );
 
 /**
  * @swagger
- * /api/users/profile/{id}:
+ * /api/users/profile:
  *  put:
- *    summary: Update user profile by the id
+ *    summary: Update user profile
  *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
  *    requestBody:
  *      required: true
  *      content:
@@ -406,7 +402,7 @@ router.put(
  */
 
 router.put(
-  '/profile/:id',
+  '/profile',
   requireAuthMiddleware,
   validationMiddleware(UpdateUserDto),
   updateProfileUser
@@ -414,9 +410,9 @@ router.put(
 
 /**
  * @swagger
- * /api/users/profile/password/{id}:
+ * /api/users/profile/password:
  *  put:
- *    summary: Update user password by the id
+ *    summary: Update user password
  *    tags: [Users]
  *    requestBody:
  *      required: true
@@ -434,7 +430,7 @@ router.put(
  */
 
 router.put(
-  '/profile/password/:id',
+  '/profile/password',
   requireAuthMiddleware,
   validationMiddleware(UpdatePasswordUserDto),
   updatePasswordUser
