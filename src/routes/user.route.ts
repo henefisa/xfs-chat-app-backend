@@ -119,11 +119,11 @@ const router: Router = Router();
  *       actionRequest:
  *             type: object
  *             properties:
- *              userTarget:
+ *              userRequest:
  *                type: string
  *                description: user was sent request
  *             example:
- *              userTarget: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
+ *              userRequest: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
  *       getFriendRequest:
  *             type: object
  *             properties:

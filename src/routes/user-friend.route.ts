@@ -1,6 +1,6 @@
 import {
-  friendApproveRequest,
-  friendCancelRequest,
+  approveFriendRequest,
+  cancelFriendRequest,
 } from './../controllers/user-friend.controller';
 import { Router } from 'express';
 import {
@@ -117,7 +117,7 @@ router.post(
   '/approve',
   requireAuthMiddleware,
   validationMiddleware(FriendActionDto),
-  friendApproveRequest
+  approveFriendRequest
 );
 
 /**
@@ -145,7 +145,7 @@ router.post(
   '/cancel',
   requireAuthMiddleware,
   validationMiddleware(FriendActionDto),
-  friendCancelRequest
+  cancelFriendRequest
 );
 
 export const UserFriendRoutes = router;

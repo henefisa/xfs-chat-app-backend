@@ -53,7 +53,7 @@ export const getFriendsRequest = async (
   }
 };
 
-export const friendApproveRequest = async (
+export const approveFriendRequest = async (
   req: RequestWithBody<FriendActionDto>,
   res: Response,
   next: NextFunction
@@ -66,7 +66,7 @@ export const friendApproveRequest = async (
 
     const reqUser = req.user as User;
 
-    await userFriendService.friendApproveRequest(req.body, reqUser.id);
+    await userFriendService.approveFriendRequest(req.body, reqUser.id);
 
     return res.status(StatusCodes.OK).json(messages.Accepted);
   } catch (error) {
@@ -74,7 +74,7 @@ export const friendApproveRequest = async (
   }
 };
 
-export const friendCancelRequest = async (
+export const cancelFriendRequest = async (
   req: RequestWithBody<FriendActionDto>,
   res: Response,
   next: NextFunction
@@ -88,7 +88,7 @@ export const friendCancelRequest = async (
 
     const reqUser = req.user as User;
 
-    await userFriendService.friendCancelRequest(req.body, reqUser.id);
+    await userFriendService.cancelFriendRequest(req.body, reqUser.id);
 
     return res.status(StatusCodes.OK).json(messages.Cancelled);
   } catch (error) {

@@ -5,5 +5,5 @@ export class FriendActionDto {
   @IsUUID()
   @IsNotBlank()
   @IsOptional()
-  userTarget: string;
+  userRequest: string;
 }

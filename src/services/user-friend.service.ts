@@ -23,19 +23,15 @@ export const getOneRelationship = async (
       userTarget: Equal(userTargetId),
       owner: Equal(ownerId),
     },
-    relations: {
-      userTarget: true,
-      owner: true,
-    },
   });
   return relationship;
 };
 
-export const friendApproveRequest = async (
+export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
-  const relationship = await getOneRelationship(id, dto.userTarget);
+  const relationship = await getOneRelationship(id, dto.userRequest);
 
   if (!relationship) {
     throw new NotExistException('relationship');
@@ -46,8 +42,8 @@ export const friendApproveRequest = async (
   return relationship;
 };
 
-export const friendCancelRequest = async (dto: FriendActionDto, id: string) => {
-  const relationship = await getOneRelationship(id, dto.userTarget);
+export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
+  const relationship = await getOneRelationship(id, dto.userRequest);
 
   if (!relationship) {
     throw new NotExistException('relationship');
