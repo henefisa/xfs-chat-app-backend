@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { UnauthorizedException, NotAcceptableException } from 'src/exceptions';
 import { config } from 'dotenv';
 import { getOne } from 'src/services/user.service';
+import { EUserRole } from 'src/interfaces/user.interface';
 
 config();
 
@@ -26,13 +27,18 @@ export default async function roleMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const Payload = verifyToken(req);
-  const user = await getOne({ where: { id: Payload.id } });
-  if (!user) {
-    throw new UnauthorizedException();
+  try {
+    const payload = verifyToken(req);
+    const user = await getOne({ where: { id: payload.id } });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    if (user.role !== EUserRole.ADMIN) {
+      throw new NotAcceptableException();
+    }
+
+    return next();
+  } catch (error) {
+    return next(error);
   }
-  if (user.role !== 'ADMIN') {
-    throw new NotAcceptableException();
-  }
-  return next();
 }
