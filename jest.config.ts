@@ -9,6 +9,7 @@ const jestConfig: JestConfigWithTsJest = {
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
   moduleDirectories: ['node_modules', __dirname],
   setupFiles: ['dotenv/config'],
+  roots: ['test'],
 };
 
 export default jestConfig;
