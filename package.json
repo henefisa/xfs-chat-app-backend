@@ -11,7 +11,8 @@
     "migration": "ts-node migration.ts",
     "format": "prettier --check --write src/**/*.ts",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "NODE_ENV=TEST jest"
+    "test": "NODE_ENV=TEST jest --coverage",
+    "test:win": "SET NODE_ENV=TEST && jest --coverage"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
