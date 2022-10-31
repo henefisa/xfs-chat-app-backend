@@ -51,6 +51,21 @@ export const deleteUser = async (
   }
 };
 
+export const selfDeleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    await userService.deleteUser(user.id);
+
+    return res.status(StatusCodes.NO_CONTENT);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserById = async (
   req: Request,
   res: Response,
@@ -114,9 +129,11 @@ export const updateProfileUser = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const reqUser = req.user as User;
-    const updated = await userService.updateProfileUser(req.body, reqUser.id);
-    return res.status(StatusCodes.CREATED).json(updated);
+
+    const user = req.user as User;
+
+    const updated = await userService.updateProfileUser(req.body, user.id);
+    return res.status(StatusCodes.OK).json(updated);
   } catch (error) {
     next(error);
   }
@@ -150,7 +167,7 @@ export const checkUsernameExist = async (
     const username = await userService.checkRegisterUsernameExists(
       req.body.username
     );
-    return res.status(StatusCodes.ACCEPTED).json(username);
+    return res.status(StatusCodes.OK).json(username);
   } catch (error) {
     next(error);
   }
@@ -164,7 +181,7 @@ export const checkEmailExist = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const email = await userService.checkRegisterEmailExists(req.body.email);
-    return res.status(StatusCodes.ACCEPTED).json(email);
+    return res.status(StatusCodes.OK).json(email);
   } catch (error) {
     next(error);
   }
