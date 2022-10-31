@@ -1,3 +1,4 @@
+import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from './../dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
@@ -132,18 +133,30 @@ export const checkRegisterEmailExists = async (email: string) => {
   }
 };
 
-export const comparePassword = async (username: string, password: string) => {
-  const user = await userRepository
-    .createQueryBuilder('u')
-    .where('username = :username', { username })
-    .addSelect('u.password')
-    .getOne();
+export const comparePassword = async (dto: LoginDto) => {
+  let user;
+
+  if (dto.email) {
+    user = await userRepository
+      .createQueryBuilder('u')
+      .where('email = :email', { email: dto.email })
+      .addSelect('u.password')
+      .getOne();
+  }
+
+  if (dto.username) {
+    user = await userRepository
+      .createQueryBuilder('u')
+      .where('username = :username', { username: dto.username })
+      .addSelect('u.password')
+      .getOne();
+  }
 
   if (!user) {
     throw new UnauthorizedException();
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(dto.password, user.password);
 
   if (!isMatch) {
     throw new UnauthorizedException();

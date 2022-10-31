@@ -1,18 +1,20 @@
 import { IsOptional, IsString } from 'class-validator';
-import { IsNotBlank } from 'src/decorators';
 
 export class UpdateUserDto {
   @IsString()
-  @IsNotBlank()
+  @IsOptional()
   username: string;
 
   @IsString()
+  @IsOptional()
   fullName: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @IsString()
+  @IsOptional()
   location: string;
 
   @IsOptional()
@@ -24,6 +26,6 @@ export class UpdateUserDto {
   email: string;
 
   @IsString()
-  @IsNotBlank()
+  @IsOptional()
   phone: string;
 }

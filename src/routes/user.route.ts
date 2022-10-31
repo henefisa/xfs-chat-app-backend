@@ -195,6 +195,65 @@ router.post(
 
 /**
  * @swagger
+ * /api/users/profile/password:
+ *  put:
+ *    summary: Update user password by the id
+ *    tags: [Users]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/password'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user password was updated
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile/password',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
+);
+
+/**
+ * @swagger
+ * /api/users/profile:
+ *  put:
+ *    summary: Update user profile by the id
+ *    tags: [Users]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/User'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user profiles was updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateProfileUser
+);
+/**
+ * @swagger
  * /api/users/{id}:
  *  put:
  *    summary: Update user by the id
@@ -321,112 +380,6 @@ router.get(
   requireAuthMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
-);
-
-/**
- * @swagger
- * /api/users/{id}:
- *  put:
- *    summary: Update user by the id
- *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/User'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateUser
-);
-
-/**
- * @swagger
- * /api/users/profile/{id}:
- *  put:
- *    summary: Update user profile by the id
- *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/User'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user profiles was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/profile/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateProfileUser
-);
-
-/**
- * @swagger
- * /api/users/profile/password/{id}:
- *  put:
- *    summary: Update user password by the id
- *    tags: [Users]
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/password'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user password was updated
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/profile/password/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdatePasswordUserDto),
-  updatePasswordUser
 );
 
 /**
