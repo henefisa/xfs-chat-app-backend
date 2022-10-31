@@ -11,8 +11,9 @@
     "migration": "ts-node migration.ts",
     "format": "prettier --check --write src/**/*.ts",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "NODE_ENV=TEST jest --coverage",
-    "test:win": "SET NODE_ENV=TEST && jest --coverage"
+    "test": "NODE_ENV=TEST jest --detectOpenHandles",
+    "test:win": "SET NODE_ENV=TEST && jest --coverage",
+    "test:coverage": "NODE_ENV=TEST jest --coverage"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
@@ -63,7 +64,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.24.0",
     "husky": "^8.0.1",
-    "jest": "^29.1.2",
+    "jest": "^29.2.2",
     "lint-staged": "^13.0.3",
     "nodemon": "^2.0.20",
     "supertest": "^6.3.0",
