@@ -195,7 +195,7 @@ router.post(
 
 /**
  * @swagger
- * /api/users/profile/password:
+ * /api/users/password:
  *  put:
  *    summary: Update user password by the id
  *    tags: [Users]
@@ -215,7 +215,7 @@ router.post(
  */
 
 router.put(
-  '/profile/password',
+  '/password',
   requireAuthMiddleware,
   validationMiddleware(UpdatePasswordUserDto),
   updatePasswordUser

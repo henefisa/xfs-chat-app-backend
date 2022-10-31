@@ -151,7 +151,7 @@ export const updatePasswordUser = async (
     }
     const reqUser = req.user as User;
     await userService.updatePasswordUser(req.body, reqUser.id);
-    return res.status(200).json(messages.Successfully);
+    return res.status(StatusCodes.OK).json(messages.Successfully);
   } catch (error) {
     next(error);
   }

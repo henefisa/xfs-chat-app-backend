@@ -186,13 +186,13 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
   }
 
   if (dto.email) {
-    checkEmailExists(dto.email, user.id);
+    await checkEmailExists(dto.email, user.id);
   }
   if (dto.username) {
-    checkUsernameExists(dto.username, user.id);
+    await checkUsernameExists(dto.username, user.id);
   }
   if (dto.phone) {
-    checkPhoneExists(dto.phone, user.id);
+    await checkPhoneExists(dto.phone, user.id);
   }
 
   Object.assign(user, dto);
@@ -213,13 +213,13 @@ export const updateProfileUser = async (dto: UpdateUserDto, id: string) => {
   }
 
   if (dto.email) {
-    checkEmailExists(dto.email, user.id);
+    await checkEmailExists(dto.email, user.id);
   }
   if (dto.username) {
-    checkUsernameExists(dto.username, user.id);
+    await checkUsernameExists(dto.username, user.id);
   }
   if (dto.phone) {
-    checkPhoneExists(dto.phone, user.id);
+    await checkPhoneExists(dto.phone, user.id);
   }
 
   Object.assign(user, dto);
@@ -236,5 +236,5 @@ export const updatePasswordUser = async (
 
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
-  return userRepository.save(user);
+  return userRepository.save({ ...user, password: undefined });
 };
