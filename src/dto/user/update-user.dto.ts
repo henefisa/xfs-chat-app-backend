@@ -1,29 +1,31 @@
 import { IsOptional, IsString } from 'class-validator';
-import { IsNotBlank } from 'src/decorators';
 
 export class UpdateUserDto {
   @IsString()
-  @IsNotBlank()
-  username: string;
+  @IsOptional()
+  username?: string;
 
   @IsString()
-  fullName: string;
+  @IsOptional()
+  fullName?: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @IsString()
-  location: string;
+  @IsOptional()
+  location?: string;
 
   @IsOptional()
   @IsString()
-  avatar: string;
+  avatar?: string;
 
   @IsOptional()
   @IsString()
-  email: string;
+  email?: string;
 
   @IsString()
-  @IsNotBlank()
-  phone: string;
+  @IsOptional()
+  phone?: string;
 }

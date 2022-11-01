@@ -1,3 +1,5 @@
+import { RefreshTokenDto } from './../dto/auth/refresh-token.dto';
+import { createRefreshToken, refreshToken } from './../services/auth.service';
 import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { LoginDto } from 'src/dto/auth';
@@ -15,7 +17,10 @@ export const login = async (
     res.setHeader('Content-Type', 'application/json');
     const user = await comparePassword(req.body.username, req.body.password);
     const token = createToken(user);
-    return res.status(StatusCodes.OK).json({ access_token: token });
+    const refreshToken = createRefreshToken(user);
+    return res
+      .status(StatusCodes.OK)
+      .json({ access_token: token, refresh_token: refreshToken });
   } catch (error) {
     next(error);
   }
@@ -30,6 +35,20 @@ export const register = async (
     res.setHeader('Content-Type', 'application/json');
     const user = await createUser(req.body);
     return res.status(StatusCodes.CREATED).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRefreshToken = async (
+  req: RequestWithBody<RefreshTokenDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const token = await refreshToken(req.body);
+    return res.status(StatusCodes.CREATED).json(token);
   } catch (error) {
     next(error);
   }

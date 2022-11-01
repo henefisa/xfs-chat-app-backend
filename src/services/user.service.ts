@@ -172,11 +172,15 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
     throw new NotExistException('user');
   }
 
-  await Promise.all([
-    checkEmailExists(dto.email, user.id),
-    checkUsernameExists(dto.username, user.id),
-    checkPhoneExists(dto.phone, user.id),
-  ]);
+  if (dto.email) {
+    await checkEmailExists(dto.email, user.id);
+  }
+  if (dto.username) {
+    await checkUsernameExists(dto.username, user.id);
+  }
+  if (dto.phone) {
+    await checkPhoneExists(dto.phone, user.id);
+  }
 
   Object.assign(user, dto);
   return userRepository.save(user);
@@ -195,11 +199,15 @@ export const updateProfileUser = async (dto: UpdateUserDto, id: string) => {
     throw new NotExistException('user');
   }
 
-  await Promise.all([
-    checkEmailExists(dto.email, user.id),
-    checkUsernameExists(dto.username, user.id),
-    checkPhoneExists(dto.phone, user.id),
-  ]);
+  if (dto.email) {
+    await checkEmailExists(dto.email, user.id);
+  }
+  if (dto.username) {
+    await checkUsernameExists(dto.username, user.id);
+  }
+  if (dto.phone) {
+    await checkPhoneExists(dto.phone, user.id);
+  }
 
   Object.assign(user, dto);
   return userRepository.save(user);
