@@ -13,7 +13,6 @@ import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 import { GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
-import { isEmail } from 'class-validator';
 
 const userRepository = Database.instance
   .getDataSource('default')
