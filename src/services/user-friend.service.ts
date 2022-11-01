@@ -1,13 +1,54 @@
-import { FindOneOptions } from 'typeorm';
+import { Equal, FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
 import { UserFriend } from 'src/entities/user-friend.entity';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import { GetUserFriendsOptions } from 'src/interfaces/user-friend.interface';
+import {
+  EUserFriendRequestStatus,
+  GetUserFriendsOptions,
+} from 'src/interfaces/user-friend.interface';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
+import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
+import { NotExistException } from 'src/exceptions';
 
 const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
+
+export const getFriendRequest = async (
+  userTargetId: string,
+  ownerId: string
+) => {
+  const friendRequest = await getOne({
+    where: {
+      userTarget: Equal(userTargetId),
+      owner: Equal(ownerId),
+    },
+  });
+
+  if (!friendRequest) {
+    throw new NotExistException('friend_request');
+  }
+
+  return friendRequest;
+};
+
+export const approveFriendRequest = async (
+  dto: FriendActionDto,
+  id: string
+) => {
+  const friendRequest = await getFriendRequest(id, dto.userRequest);
+
+  friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
+  return userFriendRepository.save(friendRequest);
+};
+
+export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
+  await getFriendRequest(id, dto.userRequest);
+  return userFriendRepository.delete({
+    userTarget: Equal(id),
+    owner: Equal(dto.userRequest),
+  });
+};
 
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
   const friend = new UserFriend();

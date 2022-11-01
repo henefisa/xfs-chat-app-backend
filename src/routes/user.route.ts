@@ -116,6 +116,14 @@ const router: Router = Router();
  *                description: user was sent request
  *             example:
  *              userTarget: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
+ *       actionRequest:
+ *             type: object
+ *             properties:
+ *              userRequest:
+ *                type: string
+ *                description: user sent the request
+ *             example:
+ *              userRequest: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
  *       getFriendRequest:
  *             type: object
  *             properties:
@@ -354,7 +362,7 @@ router.get('/profile', requireAuthMiddleware, getUserProfile);
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.get('/:id', requireAuthMiddleware, getUserById);
+router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
 
 /**
  * @swagger
