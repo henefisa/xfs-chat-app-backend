@@ -1,3 +1,4 @@
+import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from './../dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
@@ -132,10 +133,11 @@ export const checkRegisterEmailExists = async (email: string) => {
   }
 };
 
-export const comparePassword = async (username: string, password: string) => {
+export const comparePassword = async (dto: LoginDto) => {
   const user = await userRepository
     .createQueryBuilder('u')
-    .where('username = :username', { username })
+    .where('username = :username', { username: dto.username })
+    .orWhere('email = :email ', { email: dto.username })
     .addSelect('u.password')
     .getOne();
 
@@ -143,7 +145,7 @@ export const comparePassword = async (username: string, password: string) => {
     throw new UnauthorizedException();
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(dto.password, user.password);
 
   if (!isMatch) {
     throw new UnauthorizedException();
@@ -223,5 +225,5 @@ export const updatePasswordUser = async (
 
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
-  return userRepository.save(user);
+  return userRepository.save({ ...user, password: undefined });
 };

@@ -15,7 +15,7 @@ export const login = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const user = await comparePassword(req.body.username, req.body.password);
+    const user = await comparePassword(req.body);
     const token = createToken(user);
     const refreshToken = createRefreshToken(user);
     return res
@@ -34,7 +34,9 @@ export const register = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const user = await createUser(req.body);
-    return res.status(StatusCodes.CREATED).json(user);
+    return res
+      .status(StatusCodes.CREATED)
+      .json({ ...user, password: undefined });
   } catch (error) {
     next(error);
   }

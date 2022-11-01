@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
 import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
   createUser,
@@ -12,6 +11,7 @@ import {
   updatePasswordUser,
   checkUsernameExist,
   checkEmailExist,
+  selfDeleteUser,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -195,6 +195,65 @@ router.post(
 
 /**
  * @swagger
+ * /api/users/password:
+ *  put:
+ *    summary: Update user password by the id
+ *    tags: [Users]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/password'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user password was updated
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/password',
+  requireAuthMiddleware,
+  validationMiddleware(UpdatePasswordUserDto),
+  updatePasswordUser
+);
+
+/**
+ * @swagger
+ * /api/users/profile:
+ *  put:
+ *    summary: Update user profile by the id
+ *    tags: [Users]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/User'
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user profiles was updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *      500:
+ *        description: Internal server error
+ */
+
+router.put(
+  '/profile',
+  requireAuthMiddleware,
+  validationMiddleware(UpdateUserDto),
+  updateProfileUser
+);
+/**
+ * @swagger
  * /api/users/{id}:
  *  put:
  *    summary: Update user by the id
@@ -228,6 +287,7 @@ router.post(
 router.put(
   '/:id',
   requireAuthMiddleware,
+  roleMiddleware,
   validationMiddleware(UpdateUserDto),
   updateUser
 );
@@ -252,11 +312,7 @@ router.put(
  *         description: User deleted
  */
 
-router.delete(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  deleteUser
-);
+router.delete('/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
 
 /**
  * @swagger
@@ -324,112 +380,6 @@ router.get(
   requireAuthMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
-);
-
-/**
- * @swagger
- * /api/users/{id}:
- *  put:
- *    summary: Update user by the id
- *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/User'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateUser
-);
-
-/**
- * @swagger
- * /api/users/profile/{id}:
- *  put:
- *    summary: Update user profile by the id
- *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/User'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user profiles was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/profile/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdateUserDto),
-  updateProfileUser
-);
-
-/**
- * @swagger
- * /api/users/profile/password/{id}:
- *  put:
- *    summary: Update user password by the id
- *    tags: [Users]
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/password'
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user password was updated
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/profile/password/:id',
-  requireAuthMiddleware,
-  validationMiddleware(UpdatePasswordUserDto),
-  updatePasswordUser
 );
 
 /**
@@ -517,5 +467,20 @@ router.post(
  */
 
 router.get('/friends', requireAuthMiddleware, getFriendsRequest);
+
+/**
+ * @swagger
+ * /api/users/self-delete:
+ *   delete:
+ *     summary: Self-delete user
+ *     tags: [Users]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: User deleted
+ */
+
+router.delete('/self-delete', requireAuthMiddleware, selfDeleteUser);
 
 export const UserRoutes = router;
