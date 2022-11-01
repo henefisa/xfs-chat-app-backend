@@ -580,4 +580,19 @@ router.post(
   activateById
 );
 
+/**
+ * @swagger
+ * /api/users/self-delete:
+ *   delete:
+ *     summary: Self-delete user
+ *     tags: [Users]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: User deleted
+ */
+
+router.delete('/self-delete', requireAuthMiddleware, selfDeleteUser);
+
 export const UserRoutes = router;
