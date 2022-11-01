@@ -18,18 +18,18 @@ export const getFriendRequest = async (
   userTargetId: string,
   ownerId: string
 ) => {
-  const friendRequest = await getOne({
+  const friend_request = await getOne({
     where: {
       userTarget: Equal(userTargetId),
       owner: Equal(ownerId),
     },
   });
 
-  if (!friendRequest) {
-    throw new NotExistException('friendRequest');
+  if (!friend_request) {
+    throw new NotExistException('friend_request');
   }
 
-  return friendRequest;
+  return friend_request;
 };
 
 export const approveFriendRequest = async (
