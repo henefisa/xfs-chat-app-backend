@@ -1,5 +1,5 @@
-import { GetMessageDto } from './../dto/message/get-message.dto';
-import { sendMessageDto } from './../dto/message/send-message.dto';
+import { GetMessageDto } from 'src/dto/message/get-message.dto';
+import { sendMessageDto } from 'src/dto/message/send-message.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { Router } from 'express';

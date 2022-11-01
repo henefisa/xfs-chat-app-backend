@@ -226,7 +226,7 @@ export const updatePasswordUser = async (
 
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
-  return userRepository.save(user);
+  return userRepository.save({ ...user, password: undefined });
 };
 
 export const activate = async (dto: ActivateDto, id: string) => {
