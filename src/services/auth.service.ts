@@ -1,4 +1,4 @@
-import { RefreshTokenDto } from './../dto/auth/refresh-token.dto';
+import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import * as jwt from 'jsonwebtoken';
 import { User } from 'src/entities/user.entity';
 import { IAuthentication } from 'src/interfaces/auth.interface';

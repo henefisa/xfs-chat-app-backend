@@ -1,4 +1,4 @@
-import { RefreshTokenDto } from './../dto/auth/refresh-token.dto';
+import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
   getRefreshToken,

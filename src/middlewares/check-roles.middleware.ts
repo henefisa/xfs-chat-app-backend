@@ -1,7 +1,7 @@
-import { IAuthentication } from './../interfaces/auth.interface';
+import { IAuthentication } from 'src/interfaces/auth.interface';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { UnauthorizedException, NotAcceptableException } from 'src/exceptions';
+import { UnauthorizedException, forbiddenException } from 'src/exceptions';
 import { config } from 'dotenv';
 import { getOne } from 'src/services/user.service';
 import { EUserRole } from 'src/interfaces/user.interface';
@@ -34,7 +34,7 @@ export default async function roleMiddleware(
       throw new UnauthorizedException();
     }
     if (user.role !== EUserRole.ADMIN) {
-      throw new NotAcceptableException();
+      throw new forbiddenException();
     }
 
     return next();

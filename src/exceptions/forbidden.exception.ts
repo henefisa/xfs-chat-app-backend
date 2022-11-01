@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { HttpException } from 'src/shares/http-exception';
 
-export class UnauthorizedException extends HttpException {
+export class forbiddenException extends HttpException {
   constructor() {
-    super(StatusCodes.UNAUTHORIZED, 'unauthorized');
+    super(StatusCodes.FORBIDDEN, 'forbidden');
   }
 }
