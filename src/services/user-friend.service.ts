@@ -36,10 +36,10 @@ export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
-  const friendRequest = await getFriendRequest(id, dto.userRequest);
+  const friend_request = await getFriendRequest(id, dto.userRequest);
 
-  friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
-  return userFriendRepository.save(friendRequest);
+  friend_request.status = EUserFriendRequestStatus.ACCEPTED;
+  return userFriendRepository.save(friend_request);
 };
 
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
