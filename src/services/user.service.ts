@@ -13,6 +13,7 @@ import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 import { GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
+import { isEmail } from 'class-validator';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -134,23 +135,12 @@ export const checkRegisterEmailExists = async (email: string) => {
 };
 
 export const comparePassword = async (dto: LoginDto) => {
-  let user;
-
-  if (dto.email) {
-    user = await userRepository
-      .createQueryBuilder('u')
-      .where('email = :email', { email: dto.email })
-      .addSelect('u.password')
-      .getOne();
-  }
-
-  if (dto.username) {
-    user = await userRepository
-      .createQueryBuilder('u')
-      .where('username = :username', { username: dto.username })
-      .addSelect('u.password')
-      .getOne();
-  }
+  const user = await userRepository
+    .createQueryBuilder('u')
+    .where('username = :username', { username: dto.username })
+    .orWhere('email = :email ', { email: dto.username })
+    .addSelect('u.password')
+    .getOne();
 
   if (!user) {
     throw new UnauthorizedException();
