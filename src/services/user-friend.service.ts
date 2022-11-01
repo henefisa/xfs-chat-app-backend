@@ -18,28 +18,28 @@ export const getFriendRequest = async (
   userTargetId: string,
   ownerId: string
 ) => {
-  const friend_request = await getOne({
+  const friendRequest = await getOne({
     where: {
       userTarget: Equal(userTargetId),
       owner: Equal(ownerId),
     },
   });
 
-  if (!friend_request) {
+  if (!friendRequest) {
     throw new NotExistException('friend_request');
   }
 
-  return friend_request;
+  return friendRequest;
 };
 
 export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
-  const friend_request = await getFriendRequest(id, dto.userRequest);
+  const friendRequest = await getFriendRequest(id, dto.userRequest);
 
-  friend_request.status = EUserFriendRequestStatus.ACCEPTED;
-  return userFriendRepository.save(friend_request);
+  friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
+  return userFriendRepository.save(friendRequest);
 };
 
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
