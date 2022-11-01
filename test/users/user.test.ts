@@ -258,7 +258,7 @@ describe(`PUT ${routes.profile}`, () => {
       .send({ email });
 
     expect(response.status).toBe(200);
-    expect(response.body.phone).toBe(email);
+    expect(response.body.email).toBe(email);
   });
 
   test('Update exist email', async () => {

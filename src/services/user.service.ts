@@ -134,23 +134,12 @@ export const checkRegisterEmailExists = async (email: string) => {
 };
 
 export const comparePassword = async (dto: LoginDto) => {
-  let user;
-
-  if (dto.email) {
-    user = await userRepository
-      .createQueryBuilder('u')
-      .where('email = :email', { email: dto.email })
-      .addSelect('u.password')
-      .getOne();
-  }
-
-  if (dto.username) {
-    user = await userRepository
-      .createQueryBuilder('u')
-      .where('username = :username', { username: dto.username })
-      .addSelect('u.password')
-      .getOne();
-  }
+  const user = await userRepository
+    .createQueryBuilder('u')
+    .where('username = :username', { username: dto.username })
+    .orWhere('email = :email ', { email: dto.username })
+    .addSelect('u.password')
+    .getOne();
 
   if (!user) {
     throw new UnauthorizedException();
@@ -186,13 +175,13 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
   }
 
   if (dto.email) {
-    checkEmailExists(dto.email, user.id);
+    await checkEmailExists(dto.email, user.id);
   }
   if (dto.username) {
-    checkUsernameExists(dto.username, user.id);
+    await checkUsernameExists(dto.username, user.id);
   }
   if (dto.phone) {
-    checkPhoneExists(dto.phone, user.id);
+    await checkPhoneExists(dto.phone, user.id);
   }
 
   Object.assign(user, dto);
@@ -213,13 +202,13 @@ export const updateProfileUser = async (dto: UpdateUserDto, id: string) => {
   }
 
   if (dto.email) {
-    checkEmailExists(dto.email, user.id);
+    await checkEmailExists(dto.email, user.id);
   }
   if (dto.username) {
-    checkUsernameExists(dto.username, user.id);
+    await checkUsernameExists(dto.username, user.id);
   }
   if (dto.phone) {
-    checkPhoneExists(dto.phone, user.id);
+    await checkPhoneExists(dto.phone, user.id);
   }
 
   Object.assign(user, dto);
@@ -236,5 +225,5 @@ export const updatePasswordUser = async (
 
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
-  return userRepository.save(user);
+  return userRepository.save({ ...user, password: undefined });
 };

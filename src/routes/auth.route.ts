@@ -1,5 +1,10 @@
+import { RefreshTokenDto } from './../dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
-import { login, register } from 'src/controllers/auth.controller';
+import {
+  getRefreshToken,
+  login,
+  register,
+} from 'src/controllers/auth.controller';
 import { Router } from 'express';
 import { LoginDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
@@ -54,5 +59,45 @@ router.post('/login', validationMiddleware(LoginDto), login);
  */
 
 router.post('/register', validationMiddleware(RegisterDto), register);
+
+/**
+ * @swagger
+ * /api/auth/refresh-token:
+ *   post:
+ *     summary: get refresh token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   refreshToken:
+ *                      type: string
+ *                      description: refreshToken
+ *     responses:
+ *       200:
+ *         description: user was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                   refresh_token:
+ *                      type: string
+ *                      description: refresh token
+ *                   access_token:
+ *                      type: string
+ *                      description: access token
+ *       500:
+ *         description: Some server error
+ */
+
+router.post(
+  '/refresh-token',
+  validationMiddleware(RefreshTokenDto),
+  getRefreshToken
+);
 
 export const authRoutes = router;
