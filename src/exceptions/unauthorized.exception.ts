@@ -8,6 +8,6 @@ export class UnauthorizedException extends HttpException {
 }
 export class NotAcceptableException extends HttpException {
   constructor() {
-    super(StatusCodes.ACCEPTED, 'Not_acceptable');
+    super(StatusCodes.ACCEPTED, 'not_acceptable');
   }
 }

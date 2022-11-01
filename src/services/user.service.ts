@@ -1,3 +1,4 @@
+import { ActivateDto } from './../dto/user/activate.dto';
 import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from './../dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -225,5 +226,15 @@ export const updatePasswordUser = async (
 
   user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt());
 
-  return userRepository.save({ ...user, password: undefined });
+  return userRepository.save(user);
+};
+
+export const activate = async (dto: ActivateDto, id: string) => {
+  const user = await getOneOrThrow({
+    where: { id: id },
+  });
+
+  user.status = dto.status;
+
+  return userRepository.save(user);
 };
