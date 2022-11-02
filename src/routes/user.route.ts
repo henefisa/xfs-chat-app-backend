@@ -1,3 +1,5 @@
+import { selfActivate, activateById } from 'src/controllers/user.controller';
+import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
 import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
@@ -20,6 +22,7 @@ import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
+import activateMiddleware from 'src/middlewares/activate.middleware';
 
 const router: Router = Router();
 /**
@@ -225,6 +228,7 @@ router.post(
 router.put(
   '/password',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(UpdatePasswordUserDto),
   updatePasswordUser
 );
@@ -257,6 +261,7 @@ router.put(
 router.put(
   '/profile',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(UpdateUserDto),
   updateProfileUser
 );
@@ -302,6 +307,26 @@ router.put(
 
 /**
  * @swagger
+ * /api/users/self-delete:
+ *   delete:
+ *     summary: Self-delete user
+ *     tags: [Users]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: User deleted
+ */
+
+router.delete(
+  '/self-delete',
+  requireAuthMiddleware,
+  activateMiddleware,
+  selfDeleteUser
+);
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   delete:
  *     summary: Delete user by id
@@ -337,7 +362,12 @@ router.delete('/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
  *      security:
  *          - bearerAuth: []
  */
-router.get('/profile', requireAuthMiddleware, getUserProfile);
+router.get(
+  '/profile',
+  requireAuthMiddleware,
+  activateMiddleware,
+  getUserProfile
+);
 
 /**
  * @swagger
@@ -386,6 +416,7 @@ router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
 router.get(
   '/',
   requireAuthMiddleware,
+  roleMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
 );
@@ -474,7 +505,88 @@ router.post(
  *         description: Internal server error
  */
 
-router.get('/friends', requireAuthMiddleware, getFriendsRequest);
+router.get(
+  '/friends',
+  requireAuthMiddleware,
+  activateMiddleware,
+  getFriendsRequest
+);
+
+/**
+ * @swagger
+ * /api/users/self-deactivate:
+ *   post:
+ *     summary: self-deactivate or reactivate
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   status:
+ *                      type: string
+ *                      description: status for deactivate or activate
+ *           example:
+ *                status: DEACTIVATE
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: user was successfully created
+ *       500:
+ *         description: Some server error
+ */
+
+router.post(
+  '/self-deactivate',
+  requireAuthMiddleware,
+  validationMiddleware(ActivateDto),
+  selfActivate
+);
+
+/**
+ * @swagger
+ * /api/users/activate:
+ *   post:
+ *     summary: deactivate or reactivate
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   status:
+ *                      type: string
+ *                      description: status for deactivate or activate
+ *           example:
+ *                status: DEACTIVATE
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: user was successfully created
+ *       500:
+ *         description: Some server error
+ */
+
+router.post(
+  '/activate/:id',
+  requireAuthMiddleware,
+  roleMiddleware,
+  validationMiddleware(ActivateDto),
+  activateById
+);
 
 /**
  * @swagger

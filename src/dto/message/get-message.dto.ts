@@ -1,4 +1,4 @@
-import { EMessageStatus } from './../../interfaces/message.interface';
+import { EMessageStatus } from 'src/interfaces/message.interface';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 

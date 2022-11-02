@@ -1,7 +1,7 @@
 import {
   approveFriendRequest,
   cancelFriendRequest,
-} from './../controllers/user-friend.controller';
+} from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
 import {
   getFriendsRequest,
