@@ -2,6 +2,18 @@ import Database from 'src/configs/Database';
 import request from 'supertest';
 import server from 'src/server';
 
+const testUser = {
+  username: 'testuser',
+  password: '123456',
+  email: 'sample@gmail.com',
+};
+
+const testUser2 = {
+  username: 'testuser2',
+  password: '123456',
+  email: 'sample2@gmail.com',
+};
+
 const routes = {
   register: '/api/auth/register',
   login: '/api/auth/login',
@@ -16,7 +28,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await Database.instance.cleanDatabases();
   await Database.instance.close();
 });
 
@@ -33,113 +44,15 @@ describe('Test connection', () => {
   });
 });
 
-const testUser = {
-  username: 'testuser',
-  password: '123456',
-  email: 'sample@gmail.com',
-};
-
-const testUser2 = {
-  username: 'testuser2',
-  password: '123456',
-  email: 'sample2@gmail.com',
-};
-
-describe(`POST ${routes.register}`, () => {
-  test('Register user', async () => {
-    const response = await request(server).post(routes.register).send(testUser);
-
-    expect(response.status).toBe(201);
-    expect(response.body.username).toBe(testUser.username);
-    expect(response.body.password).toBeUndefined();
-    expect(typeof response.body.id).toBe('string');
-    return;
-  });
-
-  test('Register user without username', async () => {
-    const response = await request(server)
-      .post(routes.register)
-      .send({ username: testUser.username, password: testUser.password });
-
-    expect(response.status).toBe(400);
-  });
-
-  test('Register user without password', async () => {
-    const response = await request(server)
-      .post(routes.register)
-      .send({ username: testUser.username, email: testUser.email });
-
-    expect(response.status).toBe(400);
-  });
-
-  test('Register user without username', async () => {
-    const response = await request(server)
-      .post(routes.register)
-      .send({ password: testUser.password, email: testUser.email });
-
-    expect(response.status).toBe(400);
-  });
-
-  test('Register user with empty body', async () => {
-    const response = await request(server).post(routes.register).send();
-
-    expect(response.status).toBe(400);
-  });
-
-  test('Register same user', async () => {
-    const response = await request(server).post(routes.register).send(testUser);
-
-    expect(response.status).toBe(400);
-    expect(typeof response.body.message).toBe('string');
-  });
-});
-
-describe(`POST ${routes.login}`, () => {
-  test('Login user', async () => {
-    const response = await request(server)
-      .post(routes.login)
-      .send({ username: testUser.username, password: testUser.password });
-
-    expect(response.status).toBe(200);
-    expect(typeof response.body.access_token).toBe('string');
-  });
-
-  test('Login user with wrong password', async () => {
-    const response = await request(server)
-      .post(routes.login)
-      .send({ username: testUser.username, password: testUser.password + 1 });
-
-    expect(response.status).toBe(401);
-    expect(typeof response.body.message).toBe('string');
-  });
-
-  test('Login user with wrong username', async () => {
-    const response = await request(server)
-      .post(routes.login)
-      .send({ username: testUser.username + 1, password: testUser.password });
-
-    expect(response.status).toBe(401);
-    expect(typeof response.body.message).toBe('string');
-  });
-
-  test('Login user with empty body', async () => {
-    const response = await request(server).post(routes.login).send();
-
-    expect(response.status).toBe(400);
-    expect(response.body.errors).toBeDefined();
-  });
-
-  test('Login using email', async () => {
-    const response = await request(server)
-      .post(routes.login)
-      .send({ email: testUser.email, password: testUser.password });
-
-    expect(response.status).toBe(200);
-    expect(typeof response.body.access_token).toBe('string');
-  });
-});
-
 describe(`GET ${routes.profile}`, () => {
+  beforeAll(async () => {
+    await request(server).post(routes.register).send(testUser);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   let access_token = '';
 
   test('Login user', async () => {
@@ -172,6 +85,14 @@ describe(`GET ${routes.profile}`, () => {
 });
 
 describe(`PUT ${routes.profile}`, () => {
+  beforeAll(async () => {
+    await request(server).post(routes.register).send(testUser);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   let access_token = '';
 
   test('Login user', async () => {
@@ -283,6 +204,14 @@ describe(`PUT ${routes.profile}`, () => {
 });
 
 describe(`PUT ${routes.password}`, () => {
+  beforeAll(async () => {
+    await request(server).post(routes.register).send(testUser);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   let access_token = '';
   const newPassword = '123123';
 
@@ -312,7 +241,7 @@ describe(`PUT ${routes.password}`, () => {
       .send({ password: newPassword });
 
     expect(response.status).toBe(200);
-    expect(typeof response.body.password).toBeUndefined();
+    expect(response.body.password).toBeUndefined();
   });
 
   test('Login user using old password', async () => {
@@ -341,7 +270,7 @@ describe(`PUT ${routes.password}`, () => {
       .send({ password: testUser.password });
 
     expect(response.status).toBe(200);
-    expect(typeof response.body.password).toBeUndefined();
+    expect(response.body.password).toBeUndefined();
   });
 
   test('Test login old password when change back', async () => {
@@ -356,6 +285,14 @@ describe(`PUT ${routes.password}`, () => {
 });
 
 describe(`POST ${routes.username}`, () => {
+  beforeAll(async () => {
+    await request(server).post(routes.register).send(testUser);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   test('Check exist username', async () => {
     const response = await request(server)
       .post(routes.username)
@@ -376,6 +313,14 @@ describe(`POST ${routes.username}`, () => {
 });
 
 describe(`POST ${routes.email}`, () => {
+  beforeAll(async () => {
+    await request(server).post(routes.register).send(testUser);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   test('Check exist email', async () => {
     const response = await request(server)
       .post(routes.email)
