@@ -1,5 +1,5 @@
-import { checkOtp } from './../services/ses.service';
-import { sendEmail } from 'src/services/ses.service';
+import { checkOtp } from '../services/otp.service';
+import { sendEmail } from 'src/services/otp.service';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import { createRefreshToken, refreshToken } from 'src/services/auth.service';
 import { NextFunction, Response } from 'express';

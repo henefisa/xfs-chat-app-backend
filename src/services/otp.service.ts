@@ -8,26 +8,25 @@ import { User } from 'src/entities/user.entity';
 
 config();
 
-let otp: string;
-let emailAddress: string;
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+});
+
+const map = new Map<string, string>();
 
 const userRepository = Database.instance
   .getDataSource('default')
   .getRepository(User);
 
 export const sendEmail = async (email: string) => {
-  otp = otpGenerator.generate(6, {
+  const otp = otpGenerator.generate(6, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
     specialChars: false,
-  });
-
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD,
-    },
   });
 
   const mainOptions = {
@@ -39,15 +38,20 @@ export const sendEmail = async (email: string) => {
   };
 
   transporter.sendMail(mainOptions);
-  emailAddress = email;
+
+  map.set(otp, email);
 };
 
 export const checkOtp = async (code: string) => {
-  if (code !== otp) {
+  if (!map.has(code)) {
     return false;
   }
 
-  const user = await getOneOrThrow({ where: { email: emailAddress } });
+  const email = map.get(code);
+
+  map.delete(code);
+
+  const user = await getOneOrThrow({ where: { email: email } });
 
   user.status = EUserStatus.Inactive;
 

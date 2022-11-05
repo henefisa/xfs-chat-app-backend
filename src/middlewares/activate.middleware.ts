@@ -15,10 +15,7 @@ export default async function activateMiddleware(
     if (!user) {
       throw new UnauthorizedException();
     }
-    if (
-      user.status === EUserStatus.Deactivate ||
-      user.status === EUserStatus.Pending
-    ) {
+    if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(user.status)) {
       throw new ForbiddenException();
     }
 
