@@ -66,7 +66,7 @@ export const checkOtpRegister = async (
   next: NextFunction
 ) => {
   try {
-    const check = await checkOtp(req.body.otp);
+    const check = await checkOtp(req.body);
     return res.status(StatusCodes.OK).json(check);
   } catch (error) {
     next(error);

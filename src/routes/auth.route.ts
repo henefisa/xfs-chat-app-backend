@@ -117,6 +117,9 @@ router.post(
  *                   otp:
  *                      type: string
  *                      description: otp
+ *                   email:
+ *                      type: string
+ *                      description: email
  *     responses:
  *       200:
  *         description: successfully

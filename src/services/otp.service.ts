@@ -1,3 +1,4 @@
+import { OtpDto } from 'src/dto/auth/otp.dto';
 import { getOneOrThrow } from './user.service';
 import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
@@ -42,16 +43,14 @@ export const sendEmail = async (email: string) => {
   map.set(otp, email);
 };
 
-export const checkOtp = async (code: string) => {
-  if (!map.has(code)) {
+export const checkOtp = async (dto: OtpDto) => {
+  if (map.get(dto.otp) !== dto.email) {
     return false;
   }
 
-  const email = map.get(code);
+  map.delete(dto.otp);
 
-  map.delete(code);
-
-  const user = await getOneOrThrow({ where: { email: email } });
+  const user = await getOneOrThrow({ where: { email: dto.email } });
 
   user.status = EUserStatus.Inactive;
 
