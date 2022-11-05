@@ -1,12 +1,13 @@
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
+  checkOtpRegister,
   getRefreshToken,
   login,
   register,
 } from 'src/controllers/auth.controller';
 import { Router } from 'express';
-import { LoginDto } from 'src/dto/auth';
+import { LoginDto, OtpDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
 
 const router: Router = Router();
@@ -99,5 +100,30 @@ router.post(
   validationMiddleware(RefreshTokenDto),
   getRefreshToken
 );
+
+/**
+ * @swagger
+ * /api/auth/check-otp:
+ *   post:
+ *     summary: send otp to check
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   otp:
+ *                      type: string
+ *                      description: otp
+ *     responses:
+ *       200:
+ *         description: successfully
+ *       500:
+ *         description: Some server error
+ */
+
+router.post('/check-otp', validationMiddleware(OtpDto), checkOtpRegister);
 
 export const authRoutes = router;

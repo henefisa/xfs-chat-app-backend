@@ -1,3 +1,5 @@
+import { checkOtp } from './../services/ses.service';
+import { sendEmail } from 'src/services/ses.service';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import { createRefreshToken, refreshToken } from 'src/services/auth.service';
 import { NextFunction, Response } from 'express';
@@ -7,6 +9,7 @@ import { RegisterDto } from 'src/dto/auth/register.dto';
 import { createToken } from 'src/services/auth.service';
 import { comparePassword, createUser } from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
+import { OtpDto } from 'src/dto/auth/otp.dto';
 
 export const login = async (
   req: RequestWithBody<LoginDto>,
@@ -33,6 +36,7 @@ export const register = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
+    await sendEmail(req.body.email);
     const user = await createUser(req.body);
     return res
       .status(StatusCodes.CREATED)
@@ -51,6 +55,19 @@ export const getRefreshToken = async (
     res.setHeader('Content-Type', 'application/json');
     const token = await refreshToken(req.body);
     return res.status(StatusCodes.CREATED).json(token);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkOtpRegister = async (
+  req: RequestWithBody<OtpDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const check = await checkOtp(req.body.otp);
+    return res.status(StatusCodes.OK).json(check);
   } catch (error) {
     next(error);
   }
