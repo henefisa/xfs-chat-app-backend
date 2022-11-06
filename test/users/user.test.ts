@@ -1,6 +1,7 @@
 import Database from 'src/configs/Database';
 import request from 'supertest';
 import server from 'src/server';
+import redis from 'src/configs/Redis';
 
 const testUser = {
   username: 'testuser',
@@ -29,6 +30,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await Database.instance.close();
+  redis.quit();
 });
 
 test('adds 1 + 2 to equal 3', () => {
@@ -46,7 +48,7 @@ describe('Test connection', () => {
 
 describe(`GET ${routes.profile}`, () => {
   beforeAll(async () => {
-    await request(server).post(routes.register).send(testUser);
+    await Database.instance.seedUsers([testUser]);
   });
 
   afterAll(async () => {
@@ -86,7 +88,7 @@ describe(`GET ${routes.profile}`, () => {
 
 describe(`PUT ${routes.profile}`, () => {
   beforeAll(async () => {
-    await request(server).post(routes.register).send(testUser);
+    await Database.instance.seedUsers([testUser]);
   });
 
   afterAll(async () => {
@@ -205,7 +207,7 @@ describe(`PUT ${routes.profile}`, () => {
 
 describe(`PUT ${routes.password}`, () => {
   beforeAll(async () => {
-    await request(server).post(routes.register).send(testUser);
+    await Database.instance.seedUsers([testUser]);
   });
 
   afterAll(async () => {
@@ -286,7 +288,7 @@ describe(`PUT ${routes.password}`, () => {
 
 describe(`POST ${routes.username}`, () => {
   beforeAll(async () => {
-    await request(server).post(routes.register).send(testUser);
+    await Database.instance.seedUsers([testUser]);
   });
 
   afterAll(async () => {
@@ -314,7 +316,7 @@ describe(`POST ${routes.username}`, () => {
 
 describe(`POST ${routes.email}`, () => {
   beforeAll(async () => {
-    await request(server).post(routes.register).send(testUser);
+    await Database.instance.seedUsers([testUser]);
   });
 
   afterAll(async () => {
