@@ -119,7 +119,7 @@ describe(`POST ${routes.login}`, () => {
   test('Login using email', async () => {
     const response = await request(server)
       .post(routes.login)
-      .send({ email: testUser.email, password: testUser.password });
+      .send({ username: testUser.email, password: testUser.password });
 
     expect(response.status).toBe(200);
     expect(typeof response.body.access_token).toBe('string');
