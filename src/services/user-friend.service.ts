@@ -9,6 +9,7 @@ import {
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import { NotExistException } from 'src/exceptions';
+import { SearchFriendDto } from 'src/dto/friend/search-friends.dto';
 
 const userFriendRepository = Database.instance
   .getDataSource('default')
@@ -93,6 +94,25 @@ export const getFriends = async (
   }
 
   query.orderBy('friends.createdAt', 'DESC');
+
+  const [friends, count] = await query.getManyAndCount();
+
+  return {
+    friends,
+    count,
+  };
+};
+
+export const searchFriends = async (id: string, dto: SearchFriendDto) => {
+  const query = userFriendRepository.createQueryBuilder('friends');
+
+  query.leftJoinAndSelect('friends.owner', 'users');
+
+  query.where('username LIKE :username', { username: `%${dto.name}%` });
+
+  query.orWhere('full_name LIKE :fullName', { fullName: `%${dto.name}%` });
+
+  query.andWhere('friends.userTarget = :id', { id: id });
 
   const [friends, count] = await query.getManyAndCount();
 

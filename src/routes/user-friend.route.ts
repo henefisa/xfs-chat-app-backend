@@ -1,6 +1,8 @@
+import { SearchFriendDto } from './../dto/friend/search-friends.dto';
 import {
   approveFriendRequest,
   cancelFriendRequest,
+  searchFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
 import {
@@ -11,6 +13,7 @@ import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
+import activateMiddleware from 'src/middlewares/activate.middleware';
 const router: Router = Router();
 
 /**
@@ -51,6 +54,7 @@ const router: Router = Router();
 router.post(
   '/',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendRequestDto),
   sendFriendRequest
 );
@@ -90,7 +94,12 @@ router.post(
  *         description: Internal server error
  */
 
-router.get('/requests', requireAuthMiddleware, getFriendsRequest);
+router.get(
+  '/requests',
+  requireAuthMiddleware,
+  activateMiddleware,
+  getFriendsRequest
+);
 
 /**
  * @swagger
@@ -116,6 +125,7 @@ router.get('/requests', requireAuthMiddleware, getFriendsRequest);
 router.post(
   '/approve',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   approveFriendRequest
 );
@@ -144,8 +154,44 @@ router.post(
 router.post(
   '/cancel',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/search-friends:
+ *   post:
+ *     summary: search friends by username or full name
+ *     tags: [Friends]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   name:
+ *                      type: string
+ *                      description: username or full name
+ *           example:
+ *                name: khang
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: user was successfully created
+ *       500:
+ *         description: Some server error
+ */
+
+router.post(
+  '/search-friends',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationMiddleware(SearchFriendDto),
+  searchFriends
 );
 
 export const UserFriendRoutes = router;

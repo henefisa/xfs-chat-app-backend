@@ -307,7 +307,7 @@ router.put(
 
 /**
  * @swagger
- * /api/users/self-delete:
+ * /api/users/delete:
  *   delete:
  *     summary: Self-delete user
  *     tags: [Users]
@@ -319,7 +319,7 @@ router.put(
  */
 
 router.delete(
-  '/self-delete',
+  '/delete',
   requireAuthMiddleware,
   activateMiddleware,
   selfDeleteUser
@@ -514,7 +514,7 @@ router.get(
 
 /**
  * @swagger
- * /api/users/self-deactivate:
+ * /api/users/deactivate:
  *   post:
  *     summary: self-deactivate or reactivate
  *     tags: [Users]
@@ -540,7 +540,7 @@ router.get(
  */
 
 router.post(
-  '/self-deactivate',
+  '/deactivate',
   requireAuthMiddleware,
   validationMiddleware(ActivateDto),
   selfActivate
@@ -587,20 +587,5 @@ router.post(
   validationMiddleware(ActivateDto),
   activateById
 );
-
-/**
- * @swagger
- * /api/users/self-delete:
- *   delete:
- *     summary: Self-delete user
- *     tags: [Users]
- *     security:
- *          - bearerAuth: []
- *     responses:
- *       204:
- *         description: User deleted
- */
-
-router.delete('/self-delete', requireAuthMiddleware, selfDeleteUser);
 
 export const UserRoutes = router;
