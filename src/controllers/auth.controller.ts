@@ -1,5 +1,5 @@
-import { RefreshTokenDto } from './../dto/auth/refresh-token.dto';
-import { createRefreshToken, refreshToken } from './../services/auth.service';
+import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
+import { createRefreshToken, refreshToken } from 'src/services/auth.service';
 import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { LoginDto } from 'src/dto/auth';

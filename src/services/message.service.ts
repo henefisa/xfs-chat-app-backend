@@ -1,5 +1,5 @@
-import { GetMessageOptions } from './../interfaces/message.interface';
-import { sendMessageDto } from './../dto/message/send-message.dto';
+import { GetMessageOptions } from 'src/interfaces/message.interface';
+import { sendMessageDto } from 'src/dto/message/send-message.dto';
 import Database from 'src/configs/Database';
 import { Message } from 'src/entities/message.entity';
 import { GetMessageDto } from 'src/dto/message/get-message.dto';

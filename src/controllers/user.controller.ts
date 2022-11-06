@@ -8,6 +8,7 @@ import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
+import { ActivateDto } from 'src/dto/user/activate.dto';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
@@ -132,8 +133,9 @@ export const updateProfileUser = async (
 
     const user = req.user as User;
 
-    const updated = await userService.updateProfileUser(req.body, user.id);
-    return res.status(StatusCodes.OK).json(updated);
+    await userService.updateProfileUser(req.body, user.id);
+
+    return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
   }
@@ -151,7 +153,7 @@ export const updatePasswordUser = async (
     }
     const reqUser = req.user as User;
     await userService.updatePasswordUser(req.body, reqUser.id);
-    return res.status(StatusCodes.OK).json(messages.Successfully);
+    return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
   }
@@ -182,6 +184,33 @@ export const checkEmailExist = async (
     res.setHeader('Content-Type', 'application/json');
     const email = await userService.checkRegisterEmailExists(req.body.email);
     return res.status(StatusCodes.OK).json(email);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const selfActivate = async (
+  req: RequestWithBody<ActivateDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    await userService.activate(req.body, user.id);
+    return res.status(StatusCodes.OK).json(messages.Successfully);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const activateById = async (
+  req: RequestWithBody<ActivateDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await userService.activate(req.body, req.params.id);
+    return res.status(StatusCodes.OK).json(messages.Successfully);
   } catch (error) {
     next(error);
   }
