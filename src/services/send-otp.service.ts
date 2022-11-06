@@ -1,5 +1,4 @@
 import redis from 'src/configs/Redis';
-import { OtpDto } from 'src/dto/auth/otp.dto';
 import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
 import nodemailer from 'nodemailer';
@@ -22,7 +21,7 @@ const userRepository = Database.instance
   .getDataSource('default')
   .getRepository(User);
 
-export const sendEmail = async (email: string) => {
+export const sendOtp = async (email: string) => {
   const otp = otpGenerator.generate(6, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
@@ -43,18 +42,18 @@ export const sendEmail = async (email: string) => {
   redis.expire(email, 60);
 };
 
-export const checkOtp = async (dto: OtpDto) => {
-  const savedOtp = await redis.get(dto.email);
+export const checkOtp = async (email: string, code: string) => {
+  const savedOtp = await redis.get(email);
 
-  if (dto.otp !== savedOtp) {
+  if (code !== savedOtp) {
     return false;
   }
 
-  redis.del(dto.email);
+  redis.del(email);
 
-  const user = await getOneOrThrow({ where: { email: dto.email } });
+  const user = await getOneOrThrow({ where: { email: email } });
 
-  user.status = EUserStatus.Activate;
+  user.status = EUserStatus.Active;
 
   await userRepository.save(user);
 

@@ -1,3 +1,4 @@
+import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
@@ -6,6 +7,7 @@ import {
   login,
   logout,
   register,
+  sendOtpRegister,
 } from 'src/controllers/auth.controller';
 import { Router } from 'express';
 import { LoginDto, OtpDto } from 'src/dto/auth';
@@ -105,6 +107,23 @@ router.post(
 
 /**
  * @swagger
+ * /api/auth/send-otp:
+ *   post:
+ *     summary: send otp to check
+ *     tags: [Auth]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: successfully
+ *       500:
+ *         description: Some server error
+ */
+
+router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
+
+/**
+ * @swagger
  * /api/auth/check-otp:
  *   post:
  *     summary: send otp to check
@@ -119,9 +138,8 @@ router.post(
  *                   otp:
  *                      type: string
  *                      description: otp
- *                   email:
- *                      type: string
- *                      description: email
+ *     security:
+ *          - bearerAuth: []
  *     responses:
  *       200:
  *         description: successfully
@@ -129,7 +147,12 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/check-otp', validationMiddleware(OtpDto), checkOtpRegister);
+router.post(
+  '/check-otp',
+  requireAuthMiddleware,
+  validationMiddleware(OtpDto),
+  checkOtpRegister
+);
 
 /**
  * @swagger
