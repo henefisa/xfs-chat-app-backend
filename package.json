@@ -12,7 +12,7 @@
     "format": "prettier --check --write src/**/*.ts",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "NODE_ENV=TEST jest --detectOpenHandles",
-    "test:win": "SET NODE_ENV=TEST && jest --coverage",
+    "test:win": "SET NODE_ENV=TEST && jest --detectOpenHandles",
     "test:coverage": "NODE_ENV=TEST jest --coverage"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "http-status-codes": "^2.2.0",
+    "ioredis": "^5.2.4",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.4",
     "morgan": "^1.10.0",

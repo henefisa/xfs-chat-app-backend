@@ -4,11 +4,13 @@ import {
   checkOtpRegister,
   getRefreshToken,
   login,
+  logout,
   register,
 } from 'src/controllers/auth.controller';
 import { Router } from 'express';
 import { LoginDto, OtpDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
+import { LogoutDto } from 'src/dto/auth/logout.dto';
 
 const router: Router = Router();
 
@@ -103,9 +105,9 @@ router.post(
 
 /**
  * @swagger
- * /api/auth/check-otp:
+ * /api/auth/logout:
  *   post:
- *     summary: send otp to check
+ *     summary: get refresh token
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -114,19 +116,16 @@ router.post(
  *           schema:
  *                type: object
  *                properties:
- *                   otp:
+ *                   refreshToken:
  *                      type: string
- *                      description: otp
- *                   email:
- *                      type: string
- *                      description: email
+ *                      description: refreshToken
  *     responses:
  *       200:
- *         description: successfully
+ *         description: Logout successfully
  *       500:
- *         description: Some server error
+ *         description: Internal server error
  */
 
-router.post('/check-otp', validationMiddleware(OtpDto), checkOtpRegister);
+router.post('/logout', validationMiddleware(LogoutDto), logout);
 
 export const authRoutes = router;

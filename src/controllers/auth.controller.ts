@@ -1,15 +1,16 @@
 import { checkOtp } from '../services/otp.service';
 import { sendEmail } from 'src/services/otp.service';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
-import { createRefreshToken, refreshToken } from 'src/services/auth.service';
 import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { LoginDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
-import { createToken } from 'src/services/auth.service';
 import { comparePassword, createUser } from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
-import { OtpDto } from 'src/dto/auth/otp.dto';
+import redis from 'src/configs/Redis';
+import * as authService from 'src/services/auth.service';
+import { getRefreshTokenKey } from 'src/utils/redis';
+import { LogoutDto } from 'src/dto/auth/logout.dto';
 
 export const login = async (
   req: RequestWithBody<LoginDto>,
@@ -19,8 +20,10 @@ export const login = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const user = await comparePassword(req.body);
-    const token = createToken(user);
-    const refreshToken = createRefreshToken(user);
+    const token = authService.createToken(user);
+    const refreshToken = authService.createRefreshToken(user);
+    redis.set(getRefreshTokenKey(user.id), refreshToken);
+
     return res
       .status(StatusCodes.OK)
       .json({ access_token: token, refresh_token: refreshToken });
@@ -38,6 +41,7 @@ export const register = async (
     res.setHeader('Content-Type', 'application/json');
     await sendEmail(req.body.email);
     const user = await createUser(req.body);
+
     return res
       .status(StatusCodes.CREATED)
       .json({ ...user, password: undefined });
@@ -53,21 +57,23 @@ export const getRefreshToken = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const token = await refreshToken(req.body);
+    const token = await authService.refreshToken(req.body);
+
     return res.status(StatusCodes.CREATED).json(token);
   } catch (error) {
     next(error);
   }
 };
 
-export const checkOtpRegister = async (
-  req: RequestWithBody<OtpDto>,
+export const logout = async (
+  req: RequestWithBody<LogoutDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const check = await checkOtp(req.body);
-    return res.status(StatusCodes.OK).json(check);
+    await authService.logout(req.body);
+
+    return res.status(StatusCodes.NO_CONTENT).json();
   } catch (error) {
     next(error);
   }

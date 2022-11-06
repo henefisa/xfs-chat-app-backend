@@ -8,6 +8,10 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
+import { config } from 'dotenv';
+import 'src/configs/Redis';
+
+config();
 
 const port = process.env.PORT || 8000;
 const swaggerHost = process.env.SWAGGER_HOST || 'localhost';
