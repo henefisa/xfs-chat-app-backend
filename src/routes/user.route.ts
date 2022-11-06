@@ -1,7 +1,6 @@
-import { selfActivate, activateById } from 'src/controllers/user.controller';
+import { selfActivate } from 'src/controllers/user.controller';
 import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
-import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
   createUser,
   deleteUser,

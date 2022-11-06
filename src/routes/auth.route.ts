@@ -105,6 +105,34 @@ router.post(
 
 /**
  * @swagger
+ * /api/auth/check-otp:
+ *   post:
+ *     summary: send otp to check
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   otp:
+ *                      type: string
+ *                      description: otp
+ *                   email:
+ *                      type: string
+ *                      description: email
+ *     responses:
+ *       200:
+ *         description: successfully
+ *       500:
+ *         description: Some server error
+ */
+
+router.post('/check-otp', validationMiddleware(OtpDto), checkOtpRegister);
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     summary: get refresh token

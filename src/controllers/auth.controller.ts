@@ -7,6 +7,7 @@ import { LoginDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
 import { comparePassword, createUser } from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
+import { OtpDto } from 'src/dto/auth/otp.dto';
 import redis from 'src/configs/Redis';
 import * as authService from 'src/services/auth.service';
 import { getRefreshTokenKey } from 'src/utils/redis';
@@ -60,6 +61,19 @@ export const getRefreshToken = async (
     const token = await authService.refreshToken(req.body);
 
     return res.status(StatusCodes.CREATED).json(token);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkOtpRegister = async (
+  req: RequestWithBody<OtpDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const check = await checkOtp(req.body);
+    return res.status(StatusCodes.OK).json(check);
   } catch (error) {
     next(error);
   }

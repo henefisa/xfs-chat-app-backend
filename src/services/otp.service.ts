@@ -1,4 +1,4 @@
-import { NotFoundException } from './../exceptions/not-found.exception';
+import redis from 'src/configs/Redis';
 import { OtpDto } from 'src/dto/auth/otp.dto';
 import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
@@ -6,8 +6,6 @@ import nodemailer from 'nodemailer';
 import { EUserStatus } from 'src/interfaces/user.interface';
 import Database from 'src/configs/Database';
 import { User } from 'src/entities/user.entity';
-import { VerificationOtp } from 'src/entities/verification-otp.entity';
-import { FindOneOptions } from 'typeorm';
 import { getOneOrThrow } from './user.service';
 
 config();
@@ -20,17 +18,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const otpRepository = Database.instance
-  .getDataSource('default')
-  .getRepository(VerificationOtp);
-
 const userRepository = Database.instance
   .getDataSource('default')
   .getRepository(User);
-
-export const getOne = async (options: FindOneOptions<VerificationOtp>) => {
-  return otpRepository.findOne(options);
-};
 
 export const sendEmail = async (email: string) => {
   const otp = otpGenerator.generate(6, {
@@ -49,27 +39,18 @@ export const sendEmail = async (email: string) => {
 
   transporter.sendMail(mainOptions);
 
-  const verification = new VerificationOtp();
-
-  const object = { otp, email };
-
-  Object.assign(verification, object);
-
-  await otpRepository.save(verification);
+  redis.set(email, otp);
+  redis.expire(email, 60);
 };
 
 export const checkOtp = async (dto: OtpDto) => {
-  const otp = await getOne({ where: { email: dto.email } });
+  const savedOtp = await redis.get(dto.email);
 
-  if (!otp) {
-    throw new NotFoundException('email');
-  }
-
-  if (dto.otp !== otp.otp) {
+  if (dto.otp !== savedOtp) {
     return false;
   }
 
-  otpRepository.delete(otp.id);
+  redis.del(dto.email);
 
   const user = await getOneOrThrow({ where: { email: dto.email } });
 
