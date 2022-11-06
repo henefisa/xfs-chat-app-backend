@@ -134,6 +134,7 @@ export const updateProfileUser = async (
     const user = req.user as User;
 
     const updated = await userService.updateProfileUser(req.body, user.id);
+
     return res.status(StatusCodes.OK).json(updated);
   } catch (error) {
     next(error);
@@ -152,7 +153,7 @@ export const updatePasswordUser = async (
     }
     const reqUser = req.user as User;
     await userService.updatePasswordUser(req.body, reqUser.id);
-    return res.status(StatusCodes.OK).json(messages.Successfully);
+    return res.status(StatusCodes.OK).json({});
   } catch (error) {
     next(error);
   }
