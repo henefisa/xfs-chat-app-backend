@@ -9,7 +9,7 @@ export const createToken = (user: User) => {
     { id: user.id, username: user.username },
     process.env.SECRET || 'anything',
     {
-      expiresIn: 86400,
+      expiresIn: 300,
     }
   );
 };
