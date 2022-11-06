@@ -472,48 +472,6 @@ router.post(
 
 /**
  * @swagger
- * /api/friends:
- *   get:
- *     summary: list friend of user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *              $ref: '#/components/schemas/getFriends'
- *     security:
- *         - bearerAuth: []
- *     responses:
- *       200:
- *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
- *       500:
- *         description: Internal server error
- */
-
-router.get(
-  '/friends',
-  requireAuthMiddleware,
-  activateMiddleware,
-  getFriendsRequest
-);
-
-/**
- * @swagger
  * /api/users/self-deactivate:
  *   post:
  *     summary: self-deactivate or reactivate
@@ -544,48 +502,6 @@ router.post(
   requireAuthMiddleware,
   validationMiddleware(ActivateDto),
   selfActivate
-);
-
-/**
- * @swagger
- * /api/users/activate:
- *   post:
- *     summary: deactivate or reactivate
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: user id
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *                type: object
- *                properties:
- *                   status:
- *                      type: string
- *                      description: status for deactivate or activate
- *           example:
- *                status: DEACTIVATE
- *     security:
- *         - bearerAuth: []
- *     responses:
- *       200:
- *         description: user was successfully created
- *       500:
- *         description: Some server error
- */
-
-router.post(
-  '/activate/:id',
-  requireAuthMiddleware,
-  roleMiddleware,
-  validationMiddleware(ActivateDto),
-  activateById
 );
 
 /**
