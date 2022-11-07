@@ -1,16 +1,18 @@
 import Database from 'src/configs/Database';
 import request from 'supertest';
 import server from 'src/server';
+import redis from 'src/configs/Redis';
 
 const testUser = {
-  username: 'testuser',
+  username: 'auth',
   password: '123456',
-  email: 'sample@gmail.com',
+  email: 'auth@gmail.com',
 };
 
 const routes = {
   register: '/api/auth/register',
   login: '/api/auth/login',
+  logout: '/api/auth/logout',
 };
 
 beforeAll(async () => {
@@ -18,8 +20,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await Database.instance.cleanDatabases();
   await Database.instance.close();
+  redis.quit();
 });
 
 describe(`POST ${routes.register}`, () => {
@@ -72,6 +74,14 @@ describe(`POST ${routes.register}`, () => {
 });
 
 describe(`POST ${routes.login}`, () => {
+  beforeAll(async () => {
+    await Database.instance.seedUsers([testUser]);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
   test('Login user', async () => {
     const response = await request(server)
       .post(routes.login)
@@ -109,9 +119,40 @@ describe(`POST ${routes.login}`, () => {
   test('Login using email', async () => {
     const response = await request(server)
       .post(routes.login)
-      .send({ email: testUser.email, password: testUser.password });
+      .send({ username: testUser.email, password: testUser.password });
 
     expect(response.status).toBe(200);
     expect(typeof response.body.access_token).toBe('string');
+  });
+});
+
+describe(`POST ${routes.logout}`, () => {
+  beforeAll(async () => {
+    await Database.instance.seedUsers([testUser]);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
+  let refresh_token = '';
+
+  test('Login user', async () => {
+    const response = await request(server)
+      .post(routes.login)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(200);
+    expect(typeof response.body.access_token).toBe('string');
+    expect(typeof response.body.refresh_token).toBe('string');
+    refresh_token = response.body.refresh_token;
+  });
+
+  test('Logout user', async () => {
+    const response = await request(server)
+      .post(routes.logout)
+      .send({ refreshToken: refresh_token });
+
+    expect(response.status).toBe(204);
   });
 });

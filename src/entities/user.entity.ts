@@ -31,7 +31,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   location: string;
 
-  @Column({ enum: EUserStatus, default: EUserStatus.Inactive })
+  @Column({ enum: EUserStatus, default: EUserStatus.Pending })
   status: EUserStatus;
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
