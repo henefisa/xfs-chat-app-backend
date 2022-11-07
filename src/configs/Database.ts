@@ -2,6 +2,8 @@ import { config } from 'dotenv';
 import { join } from 'path';
 import { NotFoundException } from 'src/exceptions';
 import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { EUserStatus } from 'src/interfaces/user.interface';
 
 config();
 
@@ -75,5 +77,21 @@ export default class Database {
     }
 
     return target.dataSource;
+  }
+
+  async seedUsers(
+    data: { username: string; password: string; email: string }[]
+  ) {
+    const dataSource = this.getDataSource('default');
+
+    const seedPromises = data.map(async (item) => {
+      const password = await bcrypt.hash(item.password, await bcrypt.genSalt());
+
+      return dataSource.query(
+        `INSERT INTO users (username, password, email, status) VALUES ('${item.username}', '${password}', '${item.email}', '${EUserStatus.Active}')`
+      );
+    });
+
+    await Promise.all(seedPromises);
   }
 }
