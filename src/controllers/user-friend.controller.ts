@@ -5,7 +5,6 @@ import * as userFriendService from 'src/services/user-friend.service';
 import { User } from 'src/entities/user.entity';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
-import { SearchFriendDto } from 'src/dto/friend/search-friends.dto';
 
 export const sendFriendRequest = async (
   req: RequestWithBody<FriendRequestDto>,
@@ -27,7 +26,7 @@ export const sendFriendRequest = async (
   }
 };
 
-export const getFriendsRequest = async (
+export const getFriends = async (
   req: RequestWithBody<GetUserFriendDto>,
   res: Response,
   next: NextFunction
@@ -92,29 +91,6 @@ export const cancelFriendRequest = async (
     await userFriendService.cancelFriendRequest(req.body, reqUser.id);
 
     return res.status(StatusCodes.OK).json(messages.Cancelled);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const searchFriends = async (
-  req: RequestWithBody<SearchFriendDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-
-    const reqUser = req.user as User;
-
-    const { friends, count } = await userFriendService.searchFriends(
-      reqUser.id,
-      req.body
-    );
-    return res.status(StatusCodes.OK).json({
-      friends,
-      count,
-    });
   } catch (error) {
     next(error);
   }

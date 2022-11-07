@@ -1,7 +1,6 @@
 import { selfActivate, activateById } from 'src/controllers/user.controller';
 import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
-import { getFriendsRequest } from 'src/controllers/user-friend.controller';
 import {
   createUser,
   deleteUser,
@@ -130,10 +129,13 @@ const router: Router = Router();
  *       getFriendRequest:
  *             type: object
  *             properties:
+ *              q:
+ *                type:string
  *              status:
  *                type: string
  *                description: status for get
  *             example:
+ *              q: khang
  *              status: REQUESTED
  *       getFriends:
  *             type: object
@@ -468,48 +470,6 @@ router.post(
   '/check-email-exists',
   validationMiddleware(CheckEmailExistsDto),
   checkEmailExist
-);
-
-/**
- * @swagger
- * /api/friends:
- *   get:
- *     summary: list friend of user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *              $ref: '#/components/schemas/getFriends'
- *     security:
- *         - bearerAuth: []
- *     responses:
- *       200:
- *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
- *       500:
- *         description: Internal server error
- */
-
-router.get(
-  '/friends',
-  requireAuthMiddleware,
-  activateMiddleware,
-  getFriendsRequest
 );
 
 /**

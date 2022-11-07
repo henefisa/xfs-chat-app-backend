@@ -1,14 +1,10 @@
-import { SearchFriendDto } from './../dto/friend/search-friends.dto';
 import {
   approveFriendRequest,
   cancelFriendRequest,
-  searchFriends,
+  getFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
-import {
-  getFriendsRequest,
-  sendFriendRequest,
-} from 'src/controllers/user-friend.controller';
+import { sendFriendRequest } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
@@ -61,7 +57,7 @@ router.post(
 
 /**
  * @swagger
- * /api/friends/requests:
+ * /api/friends:
  *   get:
  *     summary: list request of user
  *     tags: [Friends]
@@ -76,30 +72,11 @@ router.post(
  *     responses:
  *       200:
  *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
  *       500:
  *         description: Internal server error
  */
 
-router.get(
-  '/requests',
-  requireAuthMiddleware,
-  activateMiddleware,
-  getFriendsRequest
-);
+router.get('/', requireAuthMiddleware, activateMiddleware, getFriends);
 
 /**
  * @swagger
@@ -158,40 +135,4 @@ router.post(
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
 );
-
-/**
- * @swagger
- * /api/friends/search-friends:
- *   post:
- *     summary: search friends by username or full name
- *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *                type: object
- *                properties:
- *                   name:
- *                      type: string
- *                      description: username or full name
- *           example:
- *                name: khang
- *     security:
- *         - bearerAuth: []
- *     responses:
- *       200:
- *         description: user was successfully created
- *       500:
- *         description: Some server error
- */
-
-router.post(
-  '/search-friends',
-  requireAuthMiddleware,
-  activateMiddleware,
-  validationMiddleware(SearchFriendDto),
-  searchFriends
-);
-
 export const UserFriendRoutes = router;
