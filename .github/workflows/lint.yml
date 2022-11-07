@@ -6,6 +6,8 @@ env:
   POSTGRES_USERNAME: 'postgres'
   POSTGRES_PASSWORD: 'password'
   POSTGRES_DATABASE: 'postgres'
+  REDIS_PORT: 6379
+  REDIS_HOST: 'redis'
 
 on:
   pull_request:
@@ -46,6 +48,14 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@v3

@@ -1,4 +1,3 @@
-import { selfActivate } from 'src/controllers/user.controller';
 import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
 import {
@@ -13,6 +12,7 @@ import {
   checkUsernameExist,
   checkEmailExist,
   selfDeleteUser,
+  selfActivate,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
