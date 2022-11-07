@@ -1,16 +1,15 @@
 import {
   approveFriendRequest,
   cancelFriendRequest,
+  getFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
-import {
-  getFriendsRequest,
-  sendFriendRequest,
-} from 'src/controllers/user-friend.controller';
+import { sendFriendRequest } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
+import activateMiddleware from 'src/middlewares/activate.middleware';
 const router: Router = Router();
 
 /**
@@ -51,13 +50,14 @@ const router: Router = Router();
 router.post(
   '/',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendRequestDto),
   sendFriendRequest
 );
 
 /**
  * @swagger
- * /api/friends/requests:
+ * /api/friends:
  *   get:
  *     summary: list request of user
  *     tags: [Friends]
@@ -72,25 +72,11 @@ router.post(
  *     responses:
  *       200:
  *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
  *       500:
  *         description: Internal server error
  */
 
-router.get('/requests', requireAuthMiddleware, getFriendsRequest);
+router.get('/', requireAuthMiddleware, activateMiddleware, getFriends);
 
 /**
  * @swagger
@@ -116,6 +102,7 @@ router.get('/requests', requireAuthMiddleware, getFriendsRequest);
 router.post(
   '/approve',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   approveFriendRequest
 );
@@ -144,8 +131,8 @@ router.post(
 router.post(
   '/cancel',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
 );
-
 export const UserFriendRoutes = router;

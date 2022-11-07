@@ -26,7 +26,7 @@ export const sendFriendRequest = async (
   }
 };
 
-export const getFriendsRequest = async (
+export const getFriends = async (
   req: RequestWithBody<GetUserFriendDto>,
   res: Response,
   next: NextFunction

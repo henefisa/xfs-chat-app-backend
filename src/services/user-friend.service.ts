@@ -82,14 +82,16 @@ export const getFriends = async (
 
   query.leftJoinAndSelect('friends.owner', 'users');
 
-  query.andWhere('friends.userTarget = :id', { id: id });
+  query.where('users.id = :id OR friends.userTarget = :id ', { id: id });
+
+  if (dto?.q) {
+    query.andWhere('full_name ILIKE :q OR username ILIKE :q', {
+      q: `%${dto.q}%`,
+    });
+  }
 
   if (dto?.status) {
     query.andWhere('friends.status = :s', { s: dto?.status });
-  }
-
-  if (options?.id) {
-    query.andWhere('friends.id = :id', { id: options.id });
   }
 
   query.orderBy('friends.createdAt', 'DESC');

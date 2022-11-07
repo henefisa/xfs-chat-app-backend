@@ -129,10 +129,13 @@ const router: Router = Router();
  *       getFriendRequest:
  *             type: object
  *             properties:
+ *              q:
+ *                type:string
  *              status:
  *                type: string
  *                description: status for get
  *             example:
+ *              q: khang
  *              status: REQUESTED
  *       getFriends:
  *             type: object
