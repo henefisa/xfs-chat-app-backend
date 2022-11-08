@@ -110,7 +110,7 @@ router.post(
  * @swagger
  * /api/auth/send-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: send otp to email
  *     tags: [Auth]
  *     security:
  *          - bearerAuth: []
@@ -127,7 +127,7 @@ router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
  * @swagger
  * /api/auth/check-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: check otp
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -183,7 +183,7 @@ router.post('/logout', validationMiddleware(LogoutDto), logout);
 /**
  * @swagger
  * /api/auth/check-activate:
- *   post:
+ *   get:
  *     summary: check validate activate
  *     tags: [Auth]
  *     security:
@@ -195,6 +195,6 @@ router.post('/logout', validationMiddleware(LogoutDto), logout);
  *         description: Internal server error
  */
 
-router.post('/check-activate', requireAuthMiddleware, checkActivate);
+router.get('/check-activate', requireAuthMiddleware, checkActivate);
 
 export const authRoutes = router;
