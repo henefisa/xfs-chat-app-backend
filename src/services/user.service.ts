@@ -50,7 +50,10 @@ export const getUsers = async (
   }
 
   if (dto?.q) {
-    query.andWhere('full_name ILIKE :q', { q: dto.q });
+    query.andWhere(
+      'full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q',
+      { q: `%${dto.q}%` }
+    );
   }
 
   if (dto?.status) {

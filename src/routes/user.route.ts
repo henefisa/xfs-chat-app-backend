@@ -20,7 +20,9 @@ import { GetUserDto } from 'src/dto/user/get-user.dto';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
-import validationMiddleware from 'src/middlewares/validation.middleware';
+import validationMiddleware, {
+  validationQueryMiddleware,
+} from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
 
 const router: Router = Router();
@@ -94,8 +96,11 @@ const router: Router = Router();
  *             properties:
  *              access_token:
  *                type: string
+ *              refresh_token:
+ *                type: string
  *             example:
  *              access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0OTFlOTQyLTdhNDMtNDE4YS1iYWRjLTk3ZTlkNjVlYjU3ZiIsInVzZXJuYW1lIjoia2hhbmdraGFuZyIsImlhdCI6MTY2NTY2MjAxMSwiZXhwIjoxNjY1NzQ4NDExfQ.AvboGm3j-_cX-3iT7XZhA1cIlwPNNWq88HQoImQaRd8
+ *              refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBiN2Y5M2Y5LTAzY2QtNDQ4Ni04OGE2LWJiZThiYWZjYzUwMCIsInVzZXJuYW1lIjoia2hhbmcyMDM4IiwiaWF0IjoxNjY3ODkyMzExLCJleHAiOjE2NzA0ODQzMTF9.IrAF3FYeXBQB5Nv_wklMtsmlH6BbMb_bXwY-1cPa_MY
  *       username:
  *             type: object
  *             properties:
@@ -126,25 +131,6 @@ const router: Router = Router();
  *                description: user sent the request
  *             example:
  *              userRequest: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
- *       getFriendRequest:
- *             type: object
- *             properties:
- *              q:
- *                type:string
- *              status:
- *                type: string
- *                description: status for get
- *             example:
- *              q: khang
- *              status: REQUESTED
- *       getFriends:
- *             type: object
- *             properties:
- *              status:
- *                type: string
- *                description: status for get
- *             example:
- *              status: ACCEPTED
  *       password:
  *             type: object
  *             properties:
@@ -402,6 +388,32 @@ router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
  *    get:
  *      summary: returns the list of user
  *      tags: [Users]
+ *      parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: status of user
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
  *      responses:
  *          200:
  *            description: the list of user
@@ -418,8 +430,8 @@ router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
 router.get(
   '/',
   requireAuthMiddleware,
-  roleMiddleware,
-  validationMiddleware(GetUserDto),
+  activateMiddleware,
+  validationQueryMiddleware(GetUserDto),
   getAllUser
 );
 

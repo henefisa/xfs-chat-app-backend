@@ -1,3 +1,5 @@
+import { GetUserFriendDto } from './../dto/friend/get-friend.dto';
+import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
 import {
   approveFriendRequest,
   cancelFriendRequest,
@@ -61,12 +63,33 @@ router.post(
  *   get:
  *     summary: list request of user
  *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *              $ref: '#/components/schemas/getFriendRequest'
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: status of user friend
+ *         example: ACCEPTED
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
  *     security:
  *         - bearerAuth: []
  *     responses:
@@ -76,7 +99,13 @@ router.post(
  *         description: Internal server error
  */
 
-router.get('/', requireAuthMiddleware, activateMiddleware, getFriends);
+router.get(
+  '/',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(GetUserFriendDto),
+  getFriends
+);
 
 /**
  * @swagger

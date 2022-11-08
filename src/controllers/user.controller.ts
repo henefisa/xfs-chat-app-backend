@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CreateUserDto } from 'src/dto/user';
-import { GetUserDto } from 'src/dto/user/get-user.dto';
 import * as userService from 'src/services/user.service';
 import { messages, RequestWithBody } from 'src/shares';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
@@ -84,14 +83,13 @@ export const getUserById = async (
 };
 
 export const getAllUser = async (
-  req: RequestWithBody<GetUserDto>,
+  req: RequestWithBody,
   res: Response,
   next: NextFunction
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const { users, count } = await userService.getUsers('', req.body);
-
+    const { users, count } = await userService.getUsers('', req.query);
     return res.status(StatusCodes.OK).json({
       users,
       count,
