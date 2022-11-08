@@ -109,7 +109,7 @@ router.post(
 /**
  * @swagger
  * /api/auth/send-otp:
- *   post:
+ *   get:
  *     summary: send otp to check
  *     tags: [Auth]
  *     security:
@@ -121,7 +121,7 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
+router.get('/send-otp', requireAuthMiddleware, sendOtpRegister);
 
 /**
  * @swagger
@@ -183,7 +183,7 @@ router.post('/logout', validationMiddleware(LogoutDto), logout);
 /**
  * @swagger
  * /api/auth/check-activate:
- *   post:
+ *   get:
  *     summary: check validate activate
  *     tags: [Auth]
  *     security:
@@ -195,6 +195,6 @@ router.post('/logout', validationMiddleware(LogoutDto), logout);
  *         description: Internal server error
  */
 
-router.post('/check-activate', requireAuthMiddleware, checkActivate);
+router.get('/check-activate', requireAuthMiddleware, checkActivate);
 
 export const authRoutes = router;
