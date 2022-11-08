@@ -402,6 +402,18 @@ router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
  *    get:
  *      summary: returns the list of user
  *      tags: [Users]
+ *      requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   q:
+ *                      type: string
+ *                      description: search by username or full_name or phone
+ *                example:
+ *                   q: khang
  *      responses:
  *          200:
  *            description: the list of user
@@ -418,7 +430,7 @@ router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
 router.get(
   '/',
   requireAuthMiddleware,
-  roleMiddleware,
+  activateMiddleware,
   validationMiddleware(GetUserDto),
   getAllUser
 );
