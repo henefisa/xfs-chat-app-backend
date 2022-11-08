@@ -109,7 +109,7 @@ router.post(
 /**
  * @swagger
  * /api/auth/send-otp:
- *   get:
+ *   post:
  *     summary: send otp to check
  *     tags: [Auth]
  *     security:
@@ -121,7 +121,7 @@ router.post(
  *         description: Some server error
  */
 
-router.get('/send-otp', requireAuthMiddleware, sendOtpRegister);
+router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
 
 /**
  * @swagger
