@@ -110,7 +110,7 @@ router.post(
  * @swagger
  * /api/auth/send-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: send otp to email
  *     tags: [Auth]
  *     security:
  *          - bearerAuth: []
@@ -127,7 +127,7 @@ router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
  * @swagger
  * /api/auth/check-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: check otp
  *     tags: [Auth]
  *     requestBody:
  *       required: true
