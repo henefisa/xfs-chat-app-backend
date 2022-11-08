@@ -241,12 +241,7 @@ export const activate = async (dto: ActivateDto, id: string) => {
   return userRepository.save(user);
 };
 
-export const checkActivateValidation = async (req: Request) => {
-  const payload = verifyToken(req);
-  const user = await getOne({ where: { id: payload.id } });
-  if (!user) {
-    throw new UnauthorizedException();
-  }
+export const checkActivateValidation = async (user: User) => {
   if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(user.status)) {
     return false;
   }

@@ -104,7 +104,8 @@ export const checkActivate = async (
   next: NextFunction
 ) => {
   try {
-    const check = await checkActivateValidation(req);
+    const user = req.user as User;
+    const check = await checkActivateValidation(user);
     return res.status(StatusCodes.OK).json(check);
   } catch (error) {
     next(error);
