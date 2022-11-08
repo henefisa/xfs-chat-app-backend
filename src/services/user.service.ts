@@ -14,8 +14,6 @@ import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 import { EUserStatus, GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
-import { Request } from 'express';
-import { verifyToken } from 'src/middlewares/check-roles.middleware';
 
 const userRepository = Database.instance
   .getDataSource('default')
