@@ -239,8 +239,8 @@ export const activate = async (dto: ActivateDto, id: string) => {
   return userRepository.save(user);
 };
 
-export const checkActivateValidation = async (user: User) => {
-  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(user.status)) {
+export const checkActivateValidation = async (status: EUserStatus) => {
+  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(status)) {
     return false;
   }
 
