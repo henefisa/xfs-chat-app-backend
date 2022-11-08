@@ -7,7 +7,7 @@ env:
   POSTGRES_PASSWORD: 'password'
   POSTGRES_DATABASE: 'postgres'
   REDIS_PORT: 6379
-  REDIS_HOST: 'redis'
+  REDIS_HOST: 'localhost'
 
 on:
   pull_request:
