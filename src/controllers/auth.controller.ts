@@ -1,3 +1,4 @@
+import { checkActivateValidation } from 'src/services/user.service';
 import { checkOtp, sendOtp } from 'src/services/send-otp.service';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import { NextFunction, Response } from 'express';
@@ -91,6 +92,20 @@ export const checkOtpRegister = async (
   try {
     const user = req.user as User;
     const check = await checkOtp(user.email, req.body.otp);
+    return res.status(StatusCodes.OK).json(check);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkActivate = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    const check = await checkActivateValidation(user.status);
     return res.status(StatusCodes.OK).json(check);
   } catch (error) {
     next(error);

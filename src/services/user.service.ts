@@ -11,7 +11,7 @@ import {
   NotFoundException,
 } from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
-import { GetUserOptions } from 'src/interfaces/user.interface';
+import { EUserStatus, GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
 
@@ -240,4 +240,12 @@ export const activate = async (dto: ActivateDto, id: string) => {
   user.status = dto.status;
 
   return userRepository.save(user);
+};
+
+export const checkActivateValidation = async (status: EUserStatus) => {
+  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(status)) {
+    return false;
+  }
+
+  return true;
 };
