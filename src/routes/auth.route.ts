@@ -159,7 +159,7 @@ router.post(
  * @swagger
  * /api/auth/logout:
  *   post:
- *     summary: get refresh token
+ *     summary: logout
  *     tags: [Auth]
  *     requestBody:
  *       required: true
