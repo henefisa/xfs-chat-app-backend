@@ -2,6 +2,7 @@ import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
+  checkActivate,
   checkOtpRegister,
   getRefreshToken,
   login,
@@ -178,5 +179,22 @@ router.post(
  */
 
 router.post('/logout', validationMiddleware(LogoutDto), logout);
+
+/**
+ * @swagger
+ * /api/auth/check-activate:
+ *   post:
+ *     summary: check validate activate
+ *     tags: [Auth]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: check successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/check-activate', requireAuthMiddleware, checkActivate);
 
 export const authRoutes = router;

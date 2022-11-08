@@ -11,9 +11,11 @@ import {
   NotFoundException,
 } from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
-import { GetUserOptions } from 'src/interfaces/user.interface';
+import { EUserStatus, GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
+import { Request } from 'express';
+import { verifyToken } from 'src/middlewares/check-roles.middleware';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -237,4 +239,17 @@ export const activate = async (dto: ActivateDto, id: string) => {
   user.status = dto.status;
 
   return userRepository.save(user);
+};
+
+export const checkActivateValidation = async (req: Request) => {
+  const payload = verifyToken(req);
+  const user = await getOne({ where: { id: payload.id } });
+  if (!user) {
+    throw new UnauthorizedException();
+  }
+  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(user.status)) {
+    return false;
+  }
+
+  return true;
 };
