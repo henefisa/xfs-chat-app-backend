@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { messages, RequestWithBody } from 'src/shares';
 import * as userFriendService from 'src/services/user-friend.service';
 import { User } from 'src/entities/user.entity';
-import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
+import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 
 export const sendFriendRequest = async (
@@ -27,7 +27,7 @@ export const sendFriendRequest = async (
 };
 
 export const getFriends = async (
-  req: RequestWithBody<GetUserFriendDto>,
+  req: RequestWithBody,
   res: Response,
   next: NextFunction
 ) => {
@@ -42,7 +42,7 @@ export const getFriends = async (
 
     const { friends, count } = await userFriendService.getFriends(
       reqUser.id,
-      req.body
+      req.query
     );
     return res.status(StatusCodes.OK).json({
       friends,
