@@ -8,5 +8,5 @@ export class sendMessageDto {
 
   @IsString()
   @IsNotBlank()
-  conversationId: string;
+  conversation: string;
 }

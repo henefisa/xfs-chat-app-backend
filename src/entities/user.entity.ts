@@ -3,7 +3,6 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/shares';
 import { EUserStatus } from 'src/interfaces/user.interface';
 import { UserFriend } from './user-friend.entity';
-import { Message } from './message.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -39,7 +38,4 @@ export class User extends BaseEntity {
 
   @OneToMany(() => UserFriend, (UserFriends) => UserFriends.owner)
   friends: UserFriend[];
-
-  @OneToMany(() => Message, (message) => message.sender)
-  messages: Message[];
 }

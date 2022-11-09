@@ -11,10 +11,10 @@ export class Message extends BaseEntity {
   @Column({ nullable: true })
   attachment: string;
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'is_pin' })
   isPin: boolean;
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'is_tick' })
   isTick: boolean;
 
   @ManyToOne(() => User)

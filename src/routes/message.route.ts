@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendMessages } from 'src/controllers/message.controller';
+import { deleteMessage, sendMessage } from 'src/controllers/message.controller';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 
 const router: Router = Router();
@@ -59,6 +59,8 @@ const router: Router = Router();
  *         description: Internal server error
  */
 
-router.post('/', requireAuthMiddleware, sendMessages);
+router.post('/', requireAuthMiddleware, sendMessage);
+
+router.post('/delete', requireAuthMiddleware, deleteMessage);
 
 export const MessageRoutes = router;
