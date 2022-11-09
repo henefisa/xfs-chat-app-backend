@@ -113,8 +113,8 @@ describe(`PUT ${routes.profile}`, () => {
       .send(testUser2);
 
     expect(response.status).toBe(201);
-    expect(response.body.username).toBe(testUser2.username);
-    expect(typeof response.body.id).toBe('string');
+    expect(typeof response.body.access_token).toBe('string');
+    expect(typeof response.body.refresh_token).toBe('string');
   });
 
   test('Update user profile without access token', async () => {
