@@ -1,9 +1,9 @@
-import { GetMessageDto } from 'src/dto/message/get-message.dto';
 import { RequestWithBody } from 'src/shares';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import * as messageService from 'src/services/message.service';
 import { sendMessageDto } from 'src/dto/message/send-message.dto';
+import { User } from 'src/entities/user.entity';
 
 export const sendMessages = async (
   req: RequestWithBody<sendMessageDto>,
@@ -12,42 +12,12 @@ export const sendMessages = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const saved = await messageService.createMessage(req.body);
+
+    const reqUser = req.user as User;
+
+    const saved = await messageService.createMessage(req.body, reqUser.id);
+
     return res.status(StatusCodes.CREATED).json(saved);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getMessages = async (
-  req: RequestWithBody<GetMessageDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    const { messages, count } = await messageService.getMessages(
-      req.params.conversationId,
-      req.body
-    );
-    return res.status(StatusCodes.OK).json({
-      messages,
-      count,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteMessages = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    await messageService.deleteMessage(req.params.id);
-    return res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
     next(error);
   }
