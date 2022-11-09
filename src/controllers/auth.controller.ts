@@ -42,10 +42,13 @@ export const register = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const user = await createUser(req.body);
-
+    await sendOtp(user.email);
+    const token = authService.createToken(user);
+    const refreshToken = authService.createRefreshToken(user);
+    redis.set(getRefreshTokenKey(user.id), refreshToken);
     return res
       .status(StatusCodes.CREATED)
-      .json({ ...user, password: undefined });
+      .json({ access_token: token, refresh_token: refreshToken });
   } catch (error) {
     next(error);
   }
