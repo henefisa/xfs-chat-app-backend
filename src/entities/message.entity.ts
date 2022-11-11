@@ -1,19 +1,25 @@
-import { User } from 'src/entities/user.entity';
-import { Conversation } from './conversation.entity';
-import { BaseEntity } from '../shares';
+import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne } from 'typeorm';
+import { Conversation } from './conversation.entity';
+import { User } from './user.entity';
 
 @Entity('messages')
 export class Message extends BaseEntity {
-  @Column()
+  @Column({ nullable: true })
   message: string;
 
-  @Column()
+  @Column({ nullable: true })
   attachment: string;
 
-  @ManyToOne(() => Conversation, (conversations) => conversations.messages)
-  conversation: Conversation;
+  @Column({ default: false, name: 'is_pin' })
+  isPin: boolean;
 
-  @ManyToOne(() => User, (users) => users.messages)
-  owner: User;
+  @Column({ default: false, name: 'is_tick' })
+  isTick: boolean;
+
+  @ManyToOne(() => User)
+  sender: User;
+
+  @ManyToOne(() => Conversation)
+  conversation: Conversation;
 }

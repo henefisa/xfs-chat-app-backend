@@ -8,13 +8,5 @@ export class sendMessageDto {
 
   @IsString()
   @IsNotBlank()
-  attachment: string;
-
-  @IsString()
-  @IsNotBlank()
   conversation: string;
-
-  @IsString()
-  @IsNotBlank()
-  owner: string;
 }

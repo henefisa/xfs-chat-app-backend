@@ -41,6 +41,7 @@ const options = {
 const specs = swaggerJSDoc(options);
 
 const app = express();
+
 app.disable('x-powered-by');
 
 app.use(morgan('tiny'));

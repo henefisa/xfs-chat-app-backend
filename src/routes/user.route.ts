@@ -78,6 +78,19 @@ const router: Router = Router();
  *              email: khang@gmail.com
  *              username: khang2038
  *              password: khang123
+ *       createMessage:
+ *            type: object
+ *            required:
+ *              - conversation
+ *              - message
+ *            properties:
+ *              conversation:
+ *                type: string
+ *              message:
+ *                type: string
+ *            example:
+ *              conversation: "fbbb20b9-c25e-430b-9222-7acf59b0aa23"
+ *              message: "Hello world!"
  *       login:
  *            type: object
  *            required:
