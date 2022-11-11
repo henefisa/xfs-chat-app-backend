@@ -8,6 +8,8 @@ env:
   POSTGRES_DATABASE: 'postgres'
   REDIS_PORT: 6379
   REDIS_HOST: 'localhost'
+  EMAIL: ${{ secrets.EMAIL }}
+  PASSWORD: ${{ secrets.PASSWORD }}
 
 on:
   pull_request:
