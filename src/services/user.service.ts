@@ -48,8 +48,6 @@ export const getUsers = async (
     query.skip(offset).take(limit);
   }
 
-  query.where('u.Id <> :id', { id: userId });
-
   if (dto?.q) {
     query.andWhere(
       '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND u.id != :userId ',
