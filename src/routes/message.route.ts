@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { deleteMessage, sendMessage } from 'src/controllers/message.controller';
+import { hideMessage } from 'src/controllers/hide-message.controller';
+import {
+  deleteMessage,
+  getMessages,
+  sendMessage,
+} from 'src/controllers/message.controller';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 
 const router: Router = Router();
@@ -62,5 +67,9 @@ const router: Router = Router();
 router.post('/', requireAuthMiddleware, sendMessage);
 
 router.post('/delete', requireAuthMiddleware, deleteMessage);
+
+router.post('/hide-message', requireAuthMiddleware, hideMessage);
+
+router.get('/:id', requireAuthMiddleware, getMessages);
 
 export const MessageRoutes = router;
