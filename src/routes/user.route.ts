@@ -11,7 +11,7 @@ import {
   checkUsernameExist,
   checkEmailExist,
   selfDeleteUser,
-  selfActivate,
+  selfDeactivate,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -500,6 +500,6 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/deactivate', requireAuthMiddleware, selfActivate);
+router.post('/deactivate', requireAuthMiddleware, selfDeactivate);
 
 export const UserRoutes = router;

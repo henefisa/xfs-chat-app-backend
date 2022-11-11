@@ -52,8 +52,8 @@ export const getUsers = async (
 
   if (dto?.q) {
     query.andWhere(
-      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND u.id <> :id ',
-      { q: `%${dto.q}%`, id: userId }
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND u.id != :userId ',
+      { q: `%${dto.q}%`, userId: userId }
     );
   }
 
@@ -233,7 +233,7 @@ export const updatePasswordUser = async (
   return userRepository.save(user);
 };
 
-export const activate = async (id: string) => {
+export const Deactivate = async (id: string) => {
   const user = await getOneOrThrow({
     where: { id: id },
   });

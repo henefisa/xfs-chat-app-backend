@@ -187,14 +187,14 @@ export const checkEmailExist = async (
   }
 };
 
-export const selfActivate = async (
+export const selfDeactivate = async (
   req: RequestWithBody,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const user = req.user as User;
-    await userService.activate(user.id);
+    await userService.Deactivate(user.id);
     return res.status(StatusCodes.OK).json(messages.Successfully);
   } catch (error) {
     next(error);
