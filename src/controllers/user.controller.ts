@@ -7,7 +7,6 @@ import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
-import { ActivateDto } from 'src/dto/user/activate.dto';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
@@ -89,7 +88,8 @@ export const getAllUser = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
-    const { users, count } = await userService.getUsers('', req.query);
+    const user = req.user as User;
+    const { users, count } = await userService.getUsers(user.id, req.query);
     return res.status(StatusCodes.OK).json({
       users,
       count,
@@ -188,26 +188,13 @@ export const checkEmailExist = async (
 };
 
 export const selfActivate = async (
-  req: RequestWithBody<ActivateDto>,
+  req: RequestWithBody,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const user = req.user as User;
-    await userService.activate(req.body, user.id);
-    return res.status(StatusCodes.OK).json(messages.Successfully);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const activateById = async (
-  req: RequestWithBody<ActivateDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    await userService.activate(req.body, req.params.id);
+    await userService.activate(user.id);
     return res.status(StatusCodes.OK).json(messages.Successfully);
   } catch (error) {
     next(error);

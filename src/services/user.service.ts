@@ -1,4 +1,3 @@
-import { ActivateDto } from 'src/dto/user/activate.dto';
 import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -49,10 +48,12 @@ export const getUsers = async (
     query.skip(offset).take(limit);
   }
 
+  query.where('u.Id <> :id', { id: userId });
+
   if (dto?.q) {
     query.andWhere(
-      'full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q',
-      { q: `%${dto.q}%` }
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND u.id <> :id ',
+      { q: `%${dto.q}%`, id: userId }
     );
   }
 
@@ -232,12 +233,12 @@ export const updatePasswordUser = async (
   return userRepository.save(user);
 };
 
-export const activate = async (dto: ActivateDto, id: string) => {
+export const activate = async (id: string) => {
   const user = await getOneOrThrow({
     where: { id: id },
   });
 
-  user.status = dto.status;
+  user.status = EUserStatus.Deactivate;
 
   return userRepository.save(user);
 };
