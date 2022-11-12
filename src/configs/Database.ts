@@ -23,11 +23,11 @@ export default class Database {
       name: 'default',
       dataSource: new DataSource({
         type: 'postgres',
-        host: process.env.POSTGRES_HOST,
-        port: Number(process.env.POSTGRES_PORT),
-        username: process.env.POSTGRES_USERNAME,
-        password: process.env.POSTGRES_PASSWORD,
-        database: process.env.POSTGRES_DATABASE,
+        host: 'localhost',
+        port: 5432,
+        username: 'postgres',
+        password: 'password',
+        database: 'chatapp',
         entities: [join(__dirname, '../entities/*.entity.{ts,js}')],
         synchronize: true,
       }),
@@ -62,11 +62,11 @@ export default class Database {
   }
 
   async close() {
-    const detroyDatabasePromises = this.databases.map(async (database) =>
+    const destroyDatabasePromises = this.databases.map(async (database) =>
       database.dataSource.destroy()
     );
 
-    await Promise.all(detroyDatabasePromises);
+    await Promise.all(destroyDatabasePromises);
   }
 
   getDataSource(name: string) {
@@ -80,7 +80,12 @@ export default class Database {
   }
 
   async seedUsers(
-    data: { username: string; password: string; email: string }[]
+    data: {
+      username: string;
+      password: string;
+      email: string;
+      status?: EUserStatus;
+    }[]
   ) {
     const dataSource = this.getDataSource('default');
 
@@ -88,7 +93,11 @@ export default class Database {
       const password = await bcrypt.hash(item.password, await bcrypt.genSalt());
 
       return dataSource.query(
-        `INSERT INTO users (username, password, email, status) VALUES ('${item.username}', '${password}', '${item.email}', '${EUserStatus.Active}')`
+        `INSERT INTO users (username, password, email, status) VALUES ('${
+          item.username
+        }', '${password}', '${item.email}', '${
+          item.status || EUserStatus.Active
+        }')`
       );
     });
 

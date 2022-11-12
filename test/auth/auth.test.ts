@@ -13,6 +13,8 @@ const routes = {
   register: '/api/auth/register',
   login: '/api/auth/login',
   logout: '/api/auth/logout',
+  refreshToken: '/api/auth/refresh-token',
+  profile: '/api/users/profile',
 };
 
 beforeAll(async () => {
@@ -153,5 +155,57 @@ describe(`POST ${routes.logout}`, () => {
       .send({ refreshToken: refresh_token });
 
     expect(response.status).toBe(204);
+  });
+});
+
+describe(`POST ${routes.refreshToken}`, () => {
+  beforeAll(async () => {
+    await Database.instance.seedUsers([testUser]);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
+  let access_token = '';
+  let refresh_token = '';
+
+  test('Login user', async () => {
+    const response = await request(server)
+      .post(routes.login)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(200);
+    expect(typeof response.body.access_token).toBe('string');
+    expect(typeof response.body.refresh_token).toBe('string');
+    refresh_token = response.body.refresh_token;
+    access_token = response.body.access_token;
+  });
+
+  test('Get user profile', async () => {
+    const response = await request(server)
+      .get(routes.profile)
+      .set('Authorization', `Bearer ${access_token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.username).toBe(testUser.username);
+  });
+
+  test('Refresh token', async () => {
+    const response = await request(server)
+      .post(routes.refreshToken)
+      .send({ refreshToken: refresh_token });
+
+    refresh_token = response.body.refresh_token;
+    access_token = response.body.access_token;
+  });
+
+  test('Get user profile using new access token', async () => {
+    const response = await request(server)
+      .get(routes.profile)
+      .set('Authorization', `Bearer ${access_token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.username).toBe(testUser.username);
   });
 });
