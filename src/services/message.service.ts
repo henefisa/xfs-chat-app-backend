@@ -5,7 +5,7 @@ import { deleteMessageDto } from 'src/dto/message/delete-messages.dto';
 import { hideMessageDto } from 'src/dto/message/hide-message.dto';
 import { HideMessage } from 'src/entities/hide-message.entity';
 import { Equal, FindOneOptions } from 'typeorm';
-import { InValidSenderException } from 'src/exceptions/invalid-sender.exception';
+import { InValidException } from 'src/exceptions/invalid.exception';
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -46,7 +46,7 @@ export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
 export const hideMessage = async (dto: hideMessageDto, id: string) => {
   const hideMessage = new HideMessage();
   const request = {
-    eraser: id,
+    user: id,
     message: dto.messageId,
   };
   Object.assign(hideMessage, request);
@@ -58,11 +58,11 @@ export const getMessages = async (conversation: string, id: string) => {
   const query = messageRepository.createQueryBuilder('m');
   query
     .leftJoinAndSelect('m.hideMessage', 'hide_message')
-    .leftJoinAndSelect('hide_message.eraser', 'users')
-    .where('hide_message.eraser != :eraserId', {
-      eraserId: id,
+    .leftJoinAndSelect('hide_message.user', 'users')
+    .where('hide_message.user != :userId', {
+      userId: id,
     })
-    .orWhere('hide_message.eraser IS NULL')
+    .orWhere('hide_message.user IS NULL')
     .andWhere('m.conversation = :conversation', { conversation: conversation });
 
   const messages = await query.getMany();
@@ -87,7 +87,7 @@ export const checkSenderValid = async (senderId: string, messageId: string) => {
   });
 
   if (!message) {
-    throw new InValidSenderException();
+    throw new InValidException();
   }
 
   return message;

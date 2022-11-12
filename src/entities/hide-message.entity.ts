@@ -9,5 +9,5 @@ export class HideMessage extends BaseEntity {
   message: Message;
 
   @ManyToOne(() => User)
-  eraser: User;
+  user: User;
 }

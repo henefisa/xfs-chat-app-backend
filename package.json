@@ -89,5 +89,7 @@
       "yarn format",
       "git add ."
     ]
-  }
+  },
+  "repository": "https://github.com/henefisa/xfs-chat-app-backend.git",
+  "author": "LuanCodeDao <hoangtheluan2016@gmail.com>"
 }
