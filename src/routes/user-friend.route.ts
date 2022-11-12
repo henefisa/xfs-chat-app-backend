@@ -31,20 +31,6 @@ const router: Router = Router();
  *     responses:
  *       200:
  *         description: send request successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: string
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
  *       500:
  *         description: Internal server error
  */

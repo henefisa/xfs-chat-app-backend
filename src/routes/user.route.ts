@@ -1,4 +1,3 @@
-import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
 import {
   createUser,
@@ -12,7 +11,7 @@ import {
   checkUsernameExist,
   checkEmailExist,
   selfDeleteUser,
-  selfActivate,
+  selfDeactivate,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -222,6 +221,8 @@ const router: Router = Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/createUser'
+ *     security:
+ *        - bearerAuth: []
  *     responses:
  *       200:
  *         description: user was successfully created
@@ -539,18 +540,6 @@ router.post(
  *   post:
  *     summary: self-deactivate or reactivate
  *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *                type: object
- *                properties:
- *                   status:
- *                      type: string
- *                      description: status for deactivate or activate
- *           example:
- *                status: DEACTIVATE
  *     security:
  *         - bearerAuth: []
  *     responses:
@@ -560,11 +549,6 @@ router.post(
  *         description: Some server error
  */
 
-router.post(
-  '/deactivate',
-  requireAuthMiddleware,
-  validationMiddleware(ActivateDto),
-  selfActivate
-);
+router.post('/deactivate', requireAuthMiddleware, selfDeactivate);
 
 export const UserRoutes = router;
