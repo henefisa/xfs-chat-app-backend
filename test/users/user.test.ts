@@ -22,6 +22,7 @@ const routes = {
   password: '/api/users/password',
   username: '/api/users/check-username-exists',
   email: '/api/users/check-email-exists',
+  deactivate: '/api/users/deactivate',
 };
 
 beforeAll(async () => {
@@ -339,5 +340,43 @@ describe(`POST ${routes.email}`, () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toBe(false);
+  });
+});
+
+describe(`POST ${routes.deactivate}`, () => {
+  beforeAll(async () => {
+    await Database.instance.seedUsers([testUser]);
+  });
+
+  afterAll(async () => {
+    await Database.instance.cleanDatabases();
+  });
+
+  let access_token = '';
+
+  test('Login user', async () => {
+    const response = await request(server)
+      .post(routes.login)
+      .send({ username: testUser.username, password: testUser.password });
+
+    expect(response.status).toBe(200);
+    expect(typeof response.body.access_token).toBe('string');
+    access_token = response.body.access_token;
+  });
+
+  test('Deactivate user', async () => {
+    const response = await request(server)
+      .post(routes.deactivate)
+      .set('Authorization', `Bearer ${access_token}`);
+
+    expect(response.status).toBe(204);
+  });
+
+  test('Get user profile', async () => {
+    const response = await request(server)
+      .get(routes.profile)
+      .set('Authorization', `Bearer ${access_token}`);
+
+    expect(response.status).toBe(403);
   });
 });
