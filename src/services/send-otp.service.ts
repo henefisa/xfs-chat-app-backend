@@ -22,6 +22,10 @@ const userRepository = Database.instance
   .getRepository(User);
 
 export const sendOtp = async (email: string) => {
+  if (process.env.NODE_ENV === 'TEST') {
+    return;
+  }
+
   const otp = otpGenerator.generate(6, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
