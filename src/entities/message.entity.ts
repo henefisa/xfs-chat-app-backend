@@ -25,5 +25,5 @@ export class Message extends BaseEntity {
   conversation: Conversation;
 
   @OneToMany(() => HideMessage, (hideMessage) => hideMessage.message)
-  hideMessage: HideMessage;
+  hideMessage: HideMessage[];
 }

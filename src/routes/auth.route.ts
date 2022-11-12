@@ -2,6 +2,7 @@ import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import {
+  checkActivate,
   checkOtpRegister,
   getRefreshToken,
   login,
@@ -109,7 +110,7 @@ router.post(
  * @swagger
  * /api/auth/send-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: send otp to email
  *     tags: [Auth]
  *     security:
  *          - bearerAuth: []
@@ -126,7 +127,7 @@ router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
  * @swagger
  * /api/auth/check-otp:
  *   post:
- *     summary: send otp to check
+ *     summary: check otp
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -158,7 +159,7 @@ router.post(
  * @swagger
  * /api/auth/logout:
  *   post:
- *     summary: get refresh token
+ *     summary: logout
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -178,5 +179,22 @@ router.post(
  */
 
 router.post('/logout', validationMiddleware(LogoutDto), logout);
+
+/**
+ * @swagger
+ * /api/auth/check-activate:
+ *   get:
+ *     summary: check validate activate
+ *     tags: [Auth]
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: check successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/check-activate', requireAuthMiddleware, checkActivate);
 
 export const authRoutes = router;

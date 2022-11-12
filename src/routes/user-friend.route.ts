@@ -1,16 +1,17 @@
+import { GetUserFriendDto } from './../dto/friend/get-friend.dto';
+import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
 import {
   approveFriendRequest,
   cancelFriendRequest,
+  getFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
-import {
-  getFriendsRequest,
-  sendFriendRequest,
-} from 'src/controllers/user-friend.controller';
+import { sendFriendRequest } from 'src/controllers/user-friend.controller';
 import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
+import activateMiddleware from 'src/middlewares/activate.middleware';
 const router: Router = Router();
 
 /**
@@ -51,46 +52,60 @@ const router: Router = Router();
 router.post(
   '/',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendRequestDto),
   sendFriendRequest
 );
 
 /**
  * @swagger
- * /api/friends/requests:
+ * /api/friends:
  *   get:
  *     summary: list request of user
  *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *              $ref: '#/components/schemas/getFriendRequest'
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: status of user friend
+ *         example: ACCEPTED
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
  *     security:
  *         - bearerAuth: []
  *     responses:
  *       200:
  *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *                type: object
- *                properties:
- *                   user:
- *                      type: object
- *                      description: user send request
- *                   owner:
- *                      type: string
- *                      description: user was sent request
- *                   status:
- *                      type: string
- *                      description: status
  *       500:
  *         description: Internal server error
  */
 
-router.get('/requests', requireAuthMiddleware, getFriendsRequest);
+router.get(
+  '/',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(GetUserFriendDto),
+  getFriends
+);
 
 /**
  * @swagger
@@ -116,6 +131,7 @@ router.get('/requests', requireAuthMiddleware, getFriendsRequest);
 router.post(
   '/approve',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   approveFriendRequest
 );
@@ -144,8 +160,8 @@ router.post(
 router.post(
   '/cancel',
   requireAuthMiddleware,
+  activateMiddleware,
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
 );
-
 export const UserFriendRoutes = router;

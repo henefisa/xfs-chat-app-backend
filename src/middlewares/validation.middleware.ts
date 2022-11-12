@@ -52,4 +52,26 @@ const validationMiddleware = (dto: Class) => {
   };
 };
 
+export const validationQueryMiddleware = (dto: Class) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = Object.assign(new dto(), req.query);
+      const errors = await validate(data, { whitelist: true });
+      const result: IValidationError[] = [];
+
+      if (errors.length > 0) {
+        throw new HttpException(
+          StatusCodes.BAD_REQUEST,
+          'Input data validation failed',
+          buildError(errors, result)
+        );
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 export default validationMiddleware;

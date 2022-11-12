@@ -29,9 +29,8 @@ describe(`POST ${routes.register}`, () => {
     const response = await request(server).post(routes.register).send(testUser);
 
     expect(response.status).toBe(201);
-    expect(response.body.username).toBe(testUser.username);
-    expect(response.body.password).toBeUndefined();
-    expect(typeof response.body.id).toBe('string');
+    expect(typeof response.body.access_token).toBe('string');
+    expect(typeof response.body.refresh_token).toBe('string');
     return;
   });
 

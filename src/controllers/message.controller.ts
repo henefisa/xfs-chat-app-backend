@@ -31,7 +31,9 @@ export const deleteMessage = async (
   next: NextFunction
 ) => {
   try {
-    await messageService.deleteMessage(req.body);
+    const reqUser = req.user as User;
+
+    await messageService.deleteMessage(req.body, reqUser.id);
 
     return res.status(StatusCodes.NO_CONTENT).json({});
   } catch (error) {
@@ -45,7 +47,9 @@ export const deleteUserSideMessage = async (
   next: NextFunction
 ) => {
   try {
-    await messageService.deleteMessage(req.body);
+    const reqUser = req.user as User;
+
+    await messageService.hideMessage(req.body, reqUser.id);
 
     return res.status(StatusCodes.NO_CONTENT).json({});
   } catch (error) {
