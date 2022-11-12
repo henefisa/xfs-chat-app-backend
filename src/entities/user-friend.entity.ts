@@ -14,6 +14,6 @@ export class UserFriend extends BaseEntity {
   @ManyToOne(() => User)
   userTarget: User;
 
-  @ManyToOne(() => User, (users) => users.friends)
+  @ManyToOne(() => User)
   owner: User;
 }

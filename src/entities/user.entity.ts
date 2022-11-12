@@ -35,7 +35,4 @@ export class User extends BaseEntity {
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
   role: EUserRole;
-
-  @OneToMany(() => UserFriend, (UserFriends) => UserFriends.owner)
-  friends: UserFriend[];
 }
