@@ -11,6 +11,6 @@ router.use('/users', UserRoutes);
 router.use('/auth', authRoutes);
 router.use('/messages', MessageRoutes);
 router.use('/friends', UserFriendRoutes);
-router.use('/conversation', ConversationRoutes);
+router.use('/conversations', ConversationRoutes);
 
 export const MainRoutes = router;

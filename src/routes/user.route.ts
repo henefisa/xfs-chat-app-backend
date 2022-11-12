@@ -1,3 +1,4 @@
+import { ActivateDto } from 'src/dto/user/activate.dto';
 import { Router } from 'express';
 import {
   createUser,
@@ -11,7 +12,7 @@ import {
   checkUsernameExist,
   checkEmailExist,
   selfDeleteUser,
-  selfDeactivate,
+  selfActivate,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
@@ -60,6 +61,34 @@ const router: Router = Router();
  *              phone: 012345678
  *              description: khang
  *              location: VietNam
+ *       Message:
+ *          type: object
+ *          required:
+ *            - message
+ *            - attachment
+ *            - senderId
+ *            - conversationId
+ *            - is_pin
+ *            - is_tick
+ *          properties:
+ *              message:
+ *                type: string
+ *              attachment:
+ *                type: string
+ *              senderId:
+ *                type: string
+ *              conversationId:
+ *                type: string
+ *              is_pin:
+ *                type: string
+ *              is_tick:
+ *          example:
+ *              message: khangkhang
+ *              attachment: null
+ *              senderId: "c52585ff-f1b4-42e3-87bf-7340d0f11e58"
+ *              conversationId: "c52585ff-f1b4-42e3-87bf-7340d0f11e50"
+ *              is_pin: true
+ *              is_tick: false
  *       createUser:
  *            type: object
  *            required:
@@ -135,6 +164,14 @@ const router: Router = Router();
  *                description: user was sent request
  *             example:
  *              userTarget: cf4040c0-a965-41e2-a1e1-cd0284e9cc7d
+ *       sendDeleteRequest:
+ *             type: object
+ *             properties:
+ *              userTarget:
+ *                type: string
+ *                description: user was sent delete request
+ *             example:
+ *              messageId: "cf4040c0-a965-41e2-a1e1-cd0284e9cc7d"
  *       actionRequest:
  *             type: object
  *             properties:
@@ -185,8 +222,6 @@ const router: Router = Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/createUser'
- *     security:
- *        - bearerAuth: []
  *     responses:
  *       200:
  *         description: user was successfully created
@@ -504,6 +539,18 @@ router.post(
  *   post:
  *     summary: self-deactivate or reactivate
  *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *                type: object
+ *                properties:
+ *                   status:
+ *                      type: string
+ *                      description: status for deactivate or activate
+ *           example:
+ *                status: DEACTIVATE
  *     security:
  *         - bearerAuth: []
  *     responses:
@@ -513,6 +560,11 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/deactivate', requireAuthMiddleware, selfDeactivate);
+router.post(
+  '/deactivate',
+  requireAuthMiddleware,
+  validationMiddleware(ActivateDto),
+  selfActivate
+);
 
 export const UserRoutes = router;
