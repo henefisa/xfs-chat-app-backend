@@ -62,11 +62,11 @@ export default class Database {
   }
 
   async close() {
-    const detroyDatabasePromises = this.databases.map(async (database) =>
+    const destroyDatabasePromises = this.databases.map(async (database) =>
       database.dataSource.destroy()
     );
 
-    await Promise.all(detroyDatabasePromises);
+    await Promise.all(destroyDatabasePromises);
   }
 
   getDataSource(name: string) {
@@ -80,7 +80,12 @@ export default class Database {
   }
 
   async seedUsers(
-    data: { username: string; password: string; email: string }[]
+    data: {
+      username: string;
+      password: string;
+      email: string;
+      status?: EUserStatus;
+    }[]
   ) {
     const dataSource = this.getDataSource('default');
 
@@ -88,7 +93,11 @@ export default class Database {
       const password = await bcrypt.hash(item.password, await bcrypt.genSalt());
 
       return dataSource.query(
-        `INSERT INTO users (username, password, email, status) VALUES ('${item.username}', '${password}', '${item.email}', '${EUserStatus.Active}')`
+        `INSERT INTO users (username, password, email, status) VALUES ('${
+          item.username
+        }', '${password}', '${item.email}', '${
+          item.status || EUserStatus.Active
+        }')`
       );
     });
 

@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto } from 'src/dto/user';
-import * as userService from 'src/services/user.service';
-import { messages, RequestWithBody } from 'src/shares';
+import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
-import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
-import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
+import * as userService from 'src/services/user.service';
+import { RequestWithBody } from 'src/shares';
 
 export const createUser = async (
   req: RequestWithBody<CreateUserDto>,
@@ -195,7 +195,7 @@ export const selfDeactivate = async (
   try {
     const user = req.user as User;
     await userService.Deactivate(user.id);
-    return res.status(StatusCodes.OK).json(messages.Successfully);
+    return res.status(StatusCodes.NO_CONTENT).json();
   } catch (error) {
     next(error);
   }
