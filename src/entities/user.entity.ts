@@ -1,9 +1,7 @@
 import { EUserRole } from 'src/interfaces/user.interface';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shares';
 import { EUserStatus } from 'src/interfaces/user.interface';
-import { UserFriend } from './user-friend.entity';
-
 @Entity('users')
 export class User extends BaseEntity {
   @Column()
@@ -35,7 +33,4 @@ export class User extends BaseEntity {
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
   role: EUserRole;
-
-  @OneToMany(() => UserFriend, (UserFriends) => UserFriends.owner)
-  friends: UserFriend[];
 }
