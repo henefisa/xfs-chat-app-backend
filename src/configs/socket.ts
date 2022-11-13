@@ -13,7 +13,7 @@ export class ServerSocket {
     ServerSocket.instance = this;
     this.io = new Server(server, {
       cors: {
-        origin: process.env.URL || 'http://127.0.0.1:5173/',
+        origin: process.env.URL || 'http://127.0.0.1:5173',
       },
     });
   }
