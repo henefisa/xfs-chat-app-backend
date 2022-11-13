@@ -10,8 +10,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { config } from 'dotenv';
 import 'src/configs/Redis';
-import { ServerSocket } from './socket';
-import http from 'http';
 
 config();
 
@@ -43,10 +41,6 @@ const options = {
 const specs = swaggerJSDoc(options);
 
 const app = express();
-const httpServer = http.createServer(app);
-
-const serverSocket = new ServerSocket(httpServer);
-serverSocket.start();
 
 app.disable('x-powered-by');
 
