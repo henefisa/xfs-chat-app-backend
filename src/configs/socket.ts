@@ -21,8 +21,20 @@ export class ServerSocket {
   public listeners(socket: Socket) {
     console.info('a user connected.');
 
+    socket.on('subscribe', (room) => {
+      socketService.subscribe(room, socket);
+    });
+
+    socket.on('unsubscribe', (room) => {
+      socketService.unsubscribe(room, socket);
+    });
+
     socket.on('disconnect', () => {
-      socketService.disconect(socket.id);
+      socketService.disconnect(socket);
+    });
+
+    socket.on('sendMessage', ({ senderId, room, text }) => {
+      socketService.sendMessage(room, socket, senderId, text);
     });
   }
 
