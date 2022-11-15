@@ -515,4 +515,4 @@ router.post(
 
 router.post('/deactivate', requireAuthMiddleware, selfDeactivate);
 
-export const UserRoutes = router;
+export const userRoutes = router;

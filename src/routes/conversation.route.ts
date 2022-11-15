@@ -9,4 +9,4 @@ const router: Router = Router();
 router.post('/', createConversation);
 router.get('/:id', getConversationById);
 
-export const ConversationRoutes = router;
+export const conversationRoutes = router;

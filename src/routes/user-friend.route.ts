@@ -150,4 +150,4 @@ router.post(
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
 );
-export const UserFriendRoutes = router;
+export const userFriendRoutes = router;

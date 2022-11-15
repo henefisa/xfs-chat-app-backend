@@ -63,4 +63,4 @@ router.post('/', requireAuthMiddleware, sendMessage);
 
 router.post('/delete', requireAuthMiddleware, deleteMessage);
 
-export const MessageRoutes = router;
+export const messageRoutes = router;

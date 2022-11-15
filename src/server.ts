@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import { config } from 'dotenv';
+import { config as AWSConfig } from 'aws-sdk';
 import 'src/configs/Redis';
 
 config();
@@ -46,6 +47,13 @@ app.disable('x-powered-by');
 
 app.use(morgan('tiny'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+
+AWSConfig.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+  signatureVersion: 'v4',
+});
 
 const errorHandler = (
   error: any,
