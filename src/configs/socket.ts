@@ -1,4 +1,4 @@
-import { ESocketEvent } from './../interfaces/socket.interface';
+import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
