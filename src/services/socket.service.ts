@@ -1,13 +1,36 @@
 import { Socket } from 'socket.io';
+import { createMessage } from './message.service';
+import { addMember, checkMemberExist } from './participants.service';
 
-export const disconnect = (socket: Socket) => {
+export const disconnect = (
+  socket: Socket,
+  conversation: string,
+  member: string
+) => {
   console.info('user disconect ' + socket.id);
+  socket.to(conversation).emit('message', {
+    user: 'Admin',
+    text: `${member} just left the room`,
+  });
 };
 
-export const subscribe = (room: string, socket: Socket) => {
+export const subscribe = async (
+  conversation: string,
+  member: string,
+  socket: Socket
+) => {
   try {
-    socket.join(room);
-    socket.to(room).emit('user joined', socket.id);
+    socket.join(conversation);
+
+    const checked = await checkMemberExist(conversation, member);
+
+    if (!checked) {
+      addMember(conversation, member);
+    }
+
+    socket.broadcast
+      .to(conversation)
+      .emit('message', { user: 'Admin', text: `${conversation} has joined!` });
   } catch (error) {
     socket.emit('error', 'couldnt perform requested action');
   }
@@ -32,4 +55,13 @@ export const sendMessage = (
     senderId,
     text,
   });
+};
+
+export const saveMessage = (
+  conversation: string,
+  socket: Socket,
+  senderId: string,
+  text: string
+) => {
+  createMessage(conversation, senderId, text);
 };

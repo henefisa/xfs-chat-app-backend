@@ -1,66 +1,77 @@
 import { Router } from 'express';
-import { deleteMessage, sendMessage } from 'src/controllers/message.controller';
+import { hideMessage } from 'src/controllers/hide-message.controller';
+import { deleteMessage, getMessages } from 'src/controllers/message.controller';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 
 const router: Router = Router();
 
 /**
  * @swagger
- * /api/messages:
- *   post:
- *     summary: send message
+ * /api/messages/delete:
+ *   delete:
+ *     summary: delete message
  *     tags: [Messages]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/createMessage'
+ *             $ref: '#/components/schemas/sendDeleteRequest'
  *     security:
- *         - bearerAuth: []
+ *          - bearerAuth: []
  *     responses:
- *       200:
- *          description: send message successfully
- *          content:
- *            application/json:
- *              schema:
- *                 type: object
- *                 properties:
- *                    id:
- *                       type: string
- *                       description: id
- *                    sender:
- *                       type: string
- *                       description: sender
- *                    message:
- *                       type: string
- *                       description: message
- *                    attachment:
- *                       type: string
- *                       description: attachment
- *                    conversation:
- *                       type: string
- *                       description: conversation id
- *                    createAt:
- *                       type: string
- *                       description: create at
- *                    updateAt:
- *                       type: string
- *                       description: update at
- *                 example:
- *                    id: "0a215b6b-f102-4c9b-bd19-67b8ff34f8fb"
- *                    sender: "5c6aa055-7eb1-4b71-8a91-d2f7795117bf"
- *                    conversation: "fbbb20b9-c25e-430b-9222-7acf59b0aa23"
- *                    message: "Hello world!"
- *                    attachment: null
- *                    createAt: "2022-11-08T16:35:32.703Z"
- *                    updateAt: "2022-11-08T16:35:32.703Z"
- *       500:
- *         description: Internal server error
+ *       204:
+ *         description: Message deleted
  */
+router.delete('/delete', requireAuthMiddleware, deleteMessage);
 
-router.post('/', requireAuthMiddleware, sendMessage);
+/**
+ * @swagger
+ * /api/messages/hide-message:
+ *   post:
+ *     summary: hide message
+ *     tags: [Messages]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/sendDeleteRequest'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: message has been hidden
+ */
+router.post('/hide-message', requireAuthMiddleware, hideMessage);
 
-router.post('/delete', requireAuthMiddleware, deleteMessage);
+/**
+ * @swagger
+ * /api/messages/{id}:
+ *  get:
+ *    summary: get list message in conversation by the id
+ *    tags: [Messages]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: conversation id
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: the list of message
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                  $ref: '#/components/schemas/Message'
+ *      500:
+ *        description: Internal server error
+ */
+router.get('/:id', requireAuthMiddleware, getMessages);
 
 export const MessageRoutes = router;
