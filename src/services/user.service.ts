@@ -1,10 +1,10 @@
-import { UserFriend } from 'src/entities/user-friend.entity';
-import { LoginDto } from 'src/dto/auth';
-import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
+import { LoginDto } from 'src/dto/auth';
 import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
+import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { User } from 'src/entities/user.entity';
+import { UserFriend } from 'src/entities/user-friend.entity';
 import { ExistsException } from 'src/exceptions/exists.exception';
 import {
   NotExistException,
@@ -18,6 +18,10 @@ import { FindOneOptions, Not } from 'typeorm';
 const userRepository = Database.instance
   .getDataSource('default')
   .getRepository(User);
+
+const userFriendRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(UserFriend);
 
 export const getOneOrThrow = async (options: FindOneOptions<User>) => {
   const user = await userRepository.findOne(options);
@@ -43,30 +47,24 @@ export const getUsers = async (
     offset: dto?.offset,
   });
 
-  const query = userRepository.createQueryBuilder('u');
+  const query = userRepository
+    .createQueryBuilder('u')
+    .andWhere('u.id != :userId', { userId })
+    .andWhere('u.status = :status', {
+      status: EUserStatus.Active,
+    });
 
   if (!options?.unlimited) {
     query.skip(offset).take(limit);
   }
 
-  query.leftJoinAndSelect(
-    UserFriend,
-    'user_friends',
-    'u.id = user_friends.userTargetId OR u.id = user_friends.ownerId '
-  );
-
   if (dto?.q) {
     query.andWhere(
-      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND (u.id != :userId)',
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) ',
       {
         q: `%${dto.q}%`,
-        userId: userId,
       }
     );
-    query.andWhere('(u.status != :s) AND (u.status != :s1)', {
-      s: EUserStatus.Pending,
-      s1: EUserStatus.Deactivate,
-    });
   }
 
   if (dto?.status) {
@@ -77,7 +75,36 @@ export const getUsers = async (
     query.andWhere('u.id = :id', { id: options.id });
   }
 
-  return query.getRawMany();
+  const [users, count] = await query.getManyAndCount();
+
+  const promises = users.map(async (user) => {
+    const friendStatus = userFriendRepository
+      .createQueryBuilder('uf')
+      .where(`uf.ownerId = :userId AND uf.userTargetId = :targetId`, {
+        userId,
+        targetId: user.id,
+      })
+      .orWhere(`uf.userTargetId = :userId AND uf.ownerId = :targetId`, {
+        userId,
+        targetId: user.id,
+      })
+      .innerJoin('uf.owner', 'owner')
+      .innerJoin('uf.userTarget', 'userTarget')
+      .addSelect('owner.id')
+      .addSelect('userTarget.id');
+
+    return {
+      ...user,
+      friendStatus: await friendStatus.getOne(),
+    };
+  });
+
+  const usersWithFriendStatus = await Promise.all(promises);
+
+  return {
+    users: usersWithFriendStatus,
+    count,
+  };
 };
 
 export const checkUsernameExists = async (
