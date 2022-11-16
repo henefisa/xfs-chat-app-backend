@@ -2,6 +2,7 @@ import { ESocketEvent } from './../interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';
+import { NotFoundException } from 'src/exceptions';
 
 export const disconnect = (
   socket: Socket,
@@ -21,14 +22,14 @@ export const subscribe = async (
     const checked = await checkMemberExist(conversation, user);
 
     if (!checked) {
-      throw new Error();
+      throw new NotFoundException('ss');
     }
 
     socket.join(conversation);
 
     socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
-    socket.emit(ESocketEvent.Error, 'couldnt perform requested action');
+    socket.emit(ESocketEvent.Error, error);
   }
 };
 
@@ -37,7 +38,7 @@ export const unsubscribe = (room: string, socket: Socket) => {
     socket.leave(room);
     socket.to(room).emit(ESocketEvent.UserLeft, socket.id);
   } catch (error) {
-    socket.emit(ESocketEvent.Error, 'couldnt perform requested action');
+    socket.emit(ESocketEvent.Error, error);
   }
 };
 
