@@ -3,8 +3,8 @@ import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity('user_friends')
-export class UserFriend extends BaseEntity {
+@Entity('friend_request')
+export class FriendRequest extends BaseEntity {
   @Column({
     enum: EUserFriendRequestStatus,
     default: EUserFriendRequestStatus.REQUESTED,

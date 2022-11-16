@@ -1,24 +1,26 @@
 import { Equal, FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
-import { UserFriend } from 'src/entities/user-friend.entity';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import {
-  EUserFriendRequestStatus,
-  GetUserFriendsOptions,
-} from 'src/interfaces/user-friend.interface';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import { NotExistException } from 'src/exceptions';
+import { FriendRequest } from 'src/entities/friend-request.entity';
+import { FriendWasRequested } from 'src/entities/friend-was-requested.entity';
 
-const userFriendRepository = Database.instance
+const friendRequestRepository = Database.instance
   .getDataSource('default')
-  .getRepository(UserFriend);
+  .getRepository(FriendRequest);
+
+const friendWasRequestedRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(FriendWasRequested);
 
 export const getFriendRequest = async (
   userTargetId: string,
   ownerId: string
 ) => {
-  const friendRequest = await getOne({
+  const friendRequest = await getOneFriendRequest({
     where: {
       userTarget: Equal(userTargetId),
       owner: Equal(ownerId),
@@ -32,67 +34,152 @@ export const getFriendRequest = async (
   return friendRequest;
 };
 
+export const getFriendWasRequested = async (
+  userTargetId: string,
+  ownerId: string
+) => {
+  const Requested = await getOneFriendWasRequested({
+    where: {
+      userTarget: Equal(userTargetId),
+      owner: Equal(ownerId),
+    },
+  });
+
+  if (!Requested) {
+    throw new NotExistException('friend_Was_request');
+  }
+
+  return Requested;
+};
+
 export const approveFriendRequest = async (
   dto: FriendActionDto,
   id: string
 ) => {
   const friendRequest = await getFriendRequest(id, dto.userRequest);
+  const friendWasRequested = await getFriendWasRequested(id, dto.userRequest);
 
   friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
-  return userFriendRepository.save(friendRequest);
+  friendWasRequested.status = EUserFriendRequestStatus.ACCEPTED;
+  await friendRequestRepository.save(friendRequest);
+  await friendWasRequestedRepository.save(friendWasRequested);
 };
 
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
-  await getFriendRequest(id, dto.userRequest);
-  return userFriendRepository.delete({
+  await friendRequestRepository.delete({
+    userTarget: Equal(id),
+    owner: Equal(dto.userRequest),
+  });
+  await friendWasRequestedRepository.delete({
     userTarget: Equal(id),
     owner: Equal(dto.userRequest),
   });
 };
 
+export const cancelRequestToUser = async (dto: FriendActionDto, id: string) => {
+  await friendRequestRepository.delete({
+    userTarget: Equal(dto.userRequest),
+    owner: Equal(id),
+  });
+  await friendWasRequestedRepository.delete({
+    userTarget: Equal(dto.userRequest),
+    owner: Equal(id),
+  });
+};
+
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
-  const friend = new UserFriend();
+  const friendRequest = new FriendRequest();
+  const friendWasRequested = new FriendWasRequested();
   const request = {
     userTarget: dto.userTarget,
     owner: id,
   };
-  Object.assign(friend, request);
-  return userFriendRepository.save(friend);
+  Object.assign(friendRequest, request);
+  Object.assign(friendWasRequested, request);
+  await friendWasRequestedRepository.save(friendWasRequested);
+  return friendRequestRepository.save(friendRequest);
 };
 
-export const getOne = async (option: FindOneOptions<UserFriend>) => {
-  return userFriendRepository.findOne(option);
+export const getOneFriendRequest = async (
+  option: FindOneOptions<FriendRequest>
+) => {
+  return friendRequestRepository.findOne(option);
 };
 
-export const getFriends = async (
+export const getOneFriendWasRequested = async (
+  option: FindOneOptions<FriendWasRequested>
+) => {
+  return friendWasRequestedRepository.findOne(option);
+};
+
+export const getListRequest = async (id: string, dto?: GetUserFriendDto) => {
+  const { limit, offset } = getLimitAndOffset({
+    limit: dto?.limit,
+    offset: dto?.offset,
+  });
+
+  const query = friendWasRequestedRepository.createQueryBuilder('friends');
+
+  query.skip(offset).take(limit);
+
+  query.leftJoinAndSelect('friends.owner', 'users');
+
+  query.where('friends.userTarget = :id ', { id: id });
+
+  if (dto?.q) {
+    query.andWhere(
+      '(full_name ILIKE :q OR username ILIKE :q) AND (u.id != :userId)',
+      {
+        q: `%${dto.q}%`,
+        userId: id,
+      }
+    );
+  }
+
+  query.andWhere('friends.status = :s', {
+    s: EUserFriendRequestStatus.REQUESTED,
+  });
+
+  query.orderBy('friends.createdAt', 'DESC');
+
+  const [friends, count] = await query.getManyAndCount();
+
+  return {
+    friends,
+    count,
+  };
+};
+
+export const getListSendRequest = async (
   id: string,
-  dto?: GetUserFriendDto,
-  options?: GetUserFriendsOptions
+  dto?: GetUserFriendDto
 ) => {
   const { limit, offset } = getLimitAndOffset({
     limit: dto?.limit,
     offset: dto?.offset,
   });
 
-  const query = userFriendRepository.createQueryBuilder('friends');
+  const query = friendWasRequestedRepository.createQueryBuilder('friends');
 
-  if (!options?.unlimited) {
-    query.skip(offset).take(limit);
-  }
+  query.skip(offset).take(limit);
 
-  query.leftJoinAndSelect('friends.owner', 'users');
+  query.leftJoinAndSelect('friends.userTarget', 'users');
 
-  query.where('users.id = :id OR friends.userTarget = :id ', { id: id });
+  query.where('friends.owner = :id ', { id: id });
 
   if (dto?.q) {
-    query.andWhere('full_name ILIKE :q OR username ILIKE :q', {
-      q: `%${dto.q}%`,
-    });
+    query.andWhere(
+      '(full_name ILIKE :q OR username ILIKE :q) AND (u.id != :userId)',
+      {
+        q: `%${dto.q}%`,
+        userId: id,
+      }
+    );
   }
 
-  if (dto?.status) {
-    query.andWhere('friends.status = :s', { s: dto?.status });
-  }
+  query.andWhere('friends.status = :s', {
+    s: EUserFriendRequestStatus.REQUESTED,
+  });
 
   query.orderBy('friends.createdAt', 'DESC');
 

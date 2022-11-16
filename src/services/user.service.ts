@@ -1,4 +1,4 @@
-import { UserFriend } from 'src/entities/user-friend.entity';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -49,12 +49,6 @@ export const getUsers = async (
     query.skip(offset).take(limit);
   }
 
-  query.leftJoinAndSelect(
-    UserFriend,
-    'user_friends',
-    'u.id = user_friends.userTargetId OR u.id = user_friends.ownerId '
-  );
-
   if (dto?.q) {
     query.andWhere(
       '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND (u.id != :userId)',
@@ -64,7 +58,7 @@ export const getUsers = async (
       }
     );
     query.andWhere('(u.status != :s) AND (u.status != :s1)', {
-      s: EUserStatus.Pending,
+      s: EUserStatus.Inactive,
       s1: EUserStatus.Deactivate,
     });
   }
@@ -77,7 +71,81 @@ export const getUsers = async (
     query.andWhere('u.id = :id', { id: options.id });
   }
 
-  return query.getRawMany();
+  query.leftJoinAndSelect(
+    'u.friendRequest',
+    'friend_request',
+    'friend_request.ownerId = :id ',
+    { id: userId }
+  );
+
+  query.leftJoinAndSelect(
+    'u.friendWasRequested',
+    'friend_was_requested',
+    'friend_was_requested.userTargetId = :id ',
+    { id: userId }
+  );
+
+  return query.getMany();
+};
+
+export const getListFriends = async (
+  userId: string,
+  dto?: GetUserDto,
+  options?: GetUserOptions
+) => {
+  const { limit, offset } = getLimitAndOffset({
+    limit: dto?.limit,
+    offset: dto?.offset,
+  });
+
+  const query = userRepository.createQueryBuilder('u');
+
+  if (!options?.unlimited) {
+    query.skip(offset).take(limit);
+  }
+
+  if (dto?.q) {
+    query.andWhere(
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND (u.id != :userId)',
+      {
+        q: `%${dto.q}%`,
+        userId: userId,
+      }
+    );
+    query.andWhere('(u.status != :s) AND (u.status != :s1)', {
+      s: EUserStatus.Inactive,
+      s1: EUserStatus.Deactivate,
+    });
+  }
+
+  if (dto?.status) {
+    query.andWhere('status = :s', { s: dto.status });
+  }
+
+  if (options?.id) {
+    query.andWhere('u.id = :id', { id: options.id });
+  }
+
+  query.leftJoinAndSelect(
+    'u.friendRequest',
+    'friend_request',
+    'friend_request.ownerId = :id ',
+    { id: userId }
+  );
+
+  query.leftJoinAndSelect(
+    'u.friendWasRequested',
+    'friend_was_requested',
+    'friend_was_requested.userTargetId = :id ',
+    { id: userId }
+  );
+
+  query.andWhere(
+    '(friend_request.status = :s) OR (friend_was_requested.status = :s )',
+    { s: EUserFriendRequestStatus.ACCEPTED }
+  );
+
+  return query.getMany();
 };
 
 export const checkUsernameExists = async (
@@ -251,7 +319,7 @@ export const Deactivate = async (id: string) => {
 };
 
 export const checkActivateValidation = async (status: EUserStatus) => {
-  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(status)) {
+  if ([EUserStatus.Deactivate, EUserStatus.Inactive].includes(status)) {
     return false;
   }
 

@@ -3,7 +3,10 @@ import { validationQueryMiddleware } from 'src/middlewares/validation.middleware
 import {
   approveFriendRequest,
   cancelFriendRequest,
-  getFriends,
+  cancelRequestToUser,
+  getListFriends,
+  getListRequest,
+  getListSendRequest,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
 import { sendFriendRequest } from 'src/controllers/user-friend.controller';
@@ -12,6 +15,7 @@ import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
+import { GetUserDto } from 'src/dto/user/get-user.dto';
 const router: Router = Router();
 
 /**
@@ -45,7 +49,7 @@ router.post(
 
 /**
  * @swagger
- * /api/friends:
+ * /api/friends/list-request:
  *   get:
  *     summary: list request of user
  *     tags: [Friends]
@@ -57,13 +61,6 @@ router.post(
  *         required: false
  *         description: search name or username or phone
  *         example: khang
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *         required: false
- *         description: status of user friend
- *         example: ACCEPTED
  *       - in: query
  *         name: limit
  *         schema:
@@ -86,11 +83,103 @@ router.post(
  */
 
 router.get(
-  '/',
+  '/list-request',
   requireAuthMiddleware,
   activateMiddleware,
   validationQueryMiddleware(GetUserFriendDto),
-  getFriends
+  getListRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/list-send-request:
+ *   get:
+ *     summary: list send request of user
+ *     tags: [Friends]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/list-send-request',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(GetUserFriendDto),
+  getListSendRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/list-friends:
+ *   get:
+ *     summary: list friend of user
+ *     tags: [Friends]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: status of user
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/list-friends',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(GetUserDto),
+  getListFriends
 );
 
 /**
@@ -149,5 +238,34 @@ router.post(
   activateMiddleware,
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/cancel-request:
+ *   post:
+ *     summary:  cancel request
+ *     tags: [Friends]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/actionRequest'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *        description: Cancelled as a friend
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  '/cancel-request',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationMiddleware(FriendActionDto),
+  cancelRequestToUser
 );
 export const userFriendRoutes = router;
