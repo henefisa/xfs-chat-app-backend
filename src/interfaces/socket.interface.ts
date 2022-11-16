@@ -1,8 +1,11 @@
 export enum ESocketEvent {
-  SendMessage = 'sendMessage',
-  Subscribe = 'subscribe',
-  GetMessage = 'getMessage',
-  Disconnect = 'disconnect',
-  Unsubscribe = 'unsubscribe',
-  Connection = 'connection',
+  SendMessage = 'SEND_MESSAGE',
+  Subscribe = 'SUBSCRIBE',
+  GetMessage = 'GET_MESSAGE',
+  Disconnect = 'DISCONNECT',
+  Unsubscribe = 'UNSUBSCRIBE',
+  Connection = 'CONNECTION',
+  Error = 'ERROR',
+  UserLeft = 'USER_LEFT',
+  UserJoin = 'USER_JOIN',
 }

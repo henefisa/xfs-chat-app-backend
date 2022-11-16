@@ -20,23 +20,19 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    socket.on(ESocketEvent.Subscribe, ({ conversation, member }) => {
-      socketService.subscribe(conversation, member, socket);
+    socket.on(ESocketEvent.Subscribe, ({ conversation, user }) => {
+      socketService.subscribe(conversation, user, socket);
 
-      socket.on(
-        ESocketEvent.SendMessage,
-        ({ member, conversation, message }) => {
-          socket.to(conversation).emit(ESocketEvent.GetMessage, {
-            user: member,
-            text: message,
-          });
-
-          socketService.saveMessage(conversation, socket, member, message);
-        }
-      );
+      socket.on(ESocketEvent.SendMessage, ({ user, conversation, message }) => {
+        socketService.saveMessage(conversation, user, message);
+        socket.to(conversation).emit(ESocketEvent.GetMessage, {
+          user: user,
+          text: message,
+        });
+      });
 
       socket.on(ESocketEvent.Disconnect, () => {
-        socketService.disconnect(socket, conversation, member);
+        socketService.disconnect(socket, conversation, user);
       });
     });
 
@@ -44,7 +40,6 @@ export class ServerSocket {
       socketService.unsubscribe(room, socket);
     });
   }
-
   public start() {
     this.io.on(ESocketEvent.Connection, this.listeners);
     console.info('Socket IO started.');

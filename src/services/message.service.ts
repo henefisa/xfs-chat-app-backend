@@ -2,17 +2,17 @@ import Database from 'src/configs/Database';
 import { Message } from 'src/entities/message.entity';
 import { deleteMessageDto } from 'src/dto/message/delete-messages.dto';
 import { hideMessageDto } from 'src/dto/message/hide-message.dto';
-import { HideMessage } from 'src/entities/hide-message.entity';
 import { Equal, FindOneOptions } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
+import { MessageHided } from 'src/entities/message-hided.entity';
 
 const messageRepository = Database.instance
   .getDataSource('default')
   .getRepository(Message);
 
-const hideMessageRepository = Database.instance
+const messageHidedRepository = Database.instance
   .getDataSource('default')
-  .getRepository(HideMessage);
+  .getRepository(MessageHided);
 
 export const createMessage = async (
   conversation: string,
@@ -47,25 +47,25 @@ export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
 };
 
 export const hideMessage = async (dto: hideMessageDto, id: string) => {
-  const hideMessage = new HideMessage();
+  const hideMessage = new MessageHided();
   const request = {
     eraser: id,
     message: dto.messageId,
   };
   Object.assign(hideMessage, request);
 
-  return hideMessageRepository.save(hideMessage);
+  return messageHidedRepository.save(hideMessage);
 };
 
 export const getMessages = async (conversation: string, id: string) => {
   const query = messageRepository.createQueryBuilder('m');
   query
-    .leftJoinAndSelect('m.hideMessage', 'hide_message')
-    .leftJoinAndSelect('hide_message.eraser', 'users')
-    .where('hide_message.eraser != :eraserId', {
+    .leftJoinAndSelect('m.hideMessage', 'message_hided')
+    .leftJoinAndSelect('message_hided.eraser', 'users')
+    .where('message_hided.eraser != :eraserId', {
       eraserId: id,
     })
-    .orWhere('hide_message.eraser IS NULL')
+    .orWhere('message_hided.eraser IS NULL')
     .andWhere('m.conversation = :conversation', { conversation: conversation });
 
   const messages = await query.getMany();
@@ -74,11 +74,11 @@ export const getMessages = async (conversation: string, id: string) => {
 };
 
 export const deleteHideMessage = async (id: string) => {
-  return hideMessageRepository.delete({ id: id });
+  return messageHidedRepository.delete({ id: id });
 };
 
-export const getOne = async (options: FindOneOptions<HideMessage>) => {
-  return hideMessageRepository.findOne(options);
+export const getOne = async (options: FindOneOptions<MessageHided>) => {
+  return messageHidedRepository.findOne(options);
 };
 
 export const checkSenderValid = async (senderId: string, messageId: string) => {

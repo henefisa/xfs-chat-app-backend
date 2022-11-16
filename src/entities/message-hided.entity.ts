@@ -3,9 +3,9 @@ import { Entity, ManyToOne } from 'typeorm';
 import { Message } from './message.entity';
 import { User } from './user.entity';
 
-@Entity('hide_message')
-export class HideMessage extends BaseEntity {
-  @ManyToOne(() => Message, (message) => message.hideMessage)
+@Entity('message_hided')
+export class MessageHided extends BaseEntity {
+  @ManyToOne(() => Message, (message) => message.messageHided)
   message: Message;
 
   @ManyToOne(() => User)

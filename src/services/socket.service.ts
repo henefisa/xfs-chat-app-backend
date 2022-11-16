@@ -1,47 +1,43 @@
+import { ESocketEvent } from './../interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
-import { addMember, checkMemberExist } from './participants.service';
+import { checkMemberExist } from './participants.service';
 
 export const disconnect = (
   socket: Socket,
   conversation: string,
-  member: string
+  user: string
 ) => {
   console.info('user disconect ' + socket.id);
-  socket.to(conversation).emit('message', {
-    user: 'Admin',
-    text: `${member} just left the room`,
-  });
+  socket.to(conversation).emit(ESocketEvent.UserLeft, { user });
 };
 
 export const subscribe = async (
   conversation: string,
-  member: string,
+  user: string,
   socket: Socket
 ) => {
   try {
-    socket.join(conversation);
-
-    const checked = await checkMemberExist(conversation, member);
+    const checked = await checkMemberExist(conversation, user);
 
     if (!checked) {
-      addMember(conversation, member);
+      throw new Error();
     }
 
-    socket.broadcast
-      .to(conversation)
-      .emit('message', { user: 'Admin', text: `${conversation} has joined!` });
+    socket.join(conversation);
+
+    socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
-    socket.emit('error', 'couldnt perform requested action');
+    socket.emit(ESocketEvent.Error, 'couldnt perform requested action');
   }
 };
 
 export const unsubscribe = (room: string, socket: Socket) => {
   try {
     socket.leave(room);
-    socket.to(room).emit('user left', socket.id);
+    socket.to(room).emit(ESocketEvent.UserLeft, socket.id);
   } catch (error) {
-    socket.emit('error', 'couldnt perform requested action');
+    socket.emit(ESocketEvent.Error, 'couldnt perform requested action');
   }
 };
 
@@ -51,7 +47,7 @@ export const sendMessage = (
   senderId: string,
   text: string
 ) => {
-  socket.to(room).emit('getMessage', {
+  socket.to(room).emit(ESocketEvent.GetMessage, {
     senderId,
     text,
   });
@@ -59,7 +55,6 @@ export const sendMessage = (
 
 export const saveMessage = (
   conversation: string,
-  socket: Socket,
   senderId: string,
   text: string
 ) => {

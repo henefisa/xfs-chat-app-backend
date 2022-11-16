@@ -7,26 +7,23 @@ const participantRepository = Database.instance
   .getDataSource('default')
   .getRepository(Participants);
 
-export const addMember = async (conversation: string, member: string) => {
+export const addMember = async (conversation: string, user: string) => {
   const participant = new Participants();
   const request = {
     conversation: conversation,
-    member: member,
+    user: user,
   };
   Object.assign(participant, request);
 
   return participantRepository.save(participant);
 };
 
-export const checkMemberExist = async (
-  conversation: string,
-  member: string
-) => {
+export const checkMemberExist = async (conversation: string, user: string) => {
   try {
     const participant = await getOne({
       where: {
         conversation: Equal(conversation),
-        member: Equal(member),
+        user: Equal(user),
       },
     });
 

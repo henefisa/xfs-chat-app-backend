@@ -9,5 +9,5 @@ export class Participants extends BaseEntity {
   conversation: Conversation;
 
   @ManyToOne(() => User)
-  member: User;
+  user: User;
 }
