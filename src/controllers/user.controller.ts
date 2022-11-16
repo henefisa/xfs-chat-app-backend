@@ -89,11 +89,9 @@ export const getAllUser = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     const user = req.user as User;
-    const { users, count } = await userService.getUsers(user.id, req.query);
-    return res.status(StatusCodes.OK).json({
-      users,
-      count,
-    });
+    const users = await userService.getUsers(user.id, req.query);
+
+    return res.status(StatusCodes.OK).json(users);
   } catch (error) {
     next(error);
   }

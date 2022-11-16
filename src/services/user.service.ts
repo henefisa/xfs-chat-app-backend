@@ -1,3 +1,4 @@
+import { UserFriend } from 'src/entities/user-friend.entity';
 import { LoginDto } from 'src/dto/auth';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -48,11 +49,24 @@ export const getUsers = async (
     query.skip(offset).take(limit);
   }
 
+  query.leftJoinAndSelect(
+    UserFriend,
+    'user_friends',
+    'u.id = user_friends.userTargetId OR u.id = user_friends.ownerId '
+  );
+
   if (dto?.q) {
     query.andWhere(
-      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND u.id != :userId ',
-      { q: `%${dto.q}%`, userId: userId }
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) AND (u.id != :userId)',
+      {
+        q: `%${dto.q}%`,
+        userId: userId,
+      }
     );
+    query.andWhere('(u.status != :s) AND (u.status != :s1)', {
+      s: EUserStatus.Pending,
+      s1: EUserStatus.Deactivate,
+    });
   }
 
   if (dto?.status) {
@@ -63,12 +77,7 @@ export const getUsers = async (
     query.andWhere('u.id = :id', { id: options.id });
   }
 
-  const [users, count] = await query.getManyAndCount();
-
-  return {
-    users,
-    count,
-  };
+  return query.getRawMany();
 };
 
 export const checkUsernameExists = async (

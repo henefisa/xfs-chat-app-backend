@@ -1,16 +1,18 @@
-import { MessageRoutes } from './message.route';
+import { messageRoutes } from './message.route';
 import { Router } from 'express';
 import { authRoutes } from './auth.route';
-import { UserRoutes } from './user.route';
-import { UserFriendRoutes } from './user-friend.route';
-import { ConversationRoutes } from './conversation.route';
+import { userRoutes } from './user.route';
+import { userFriendRoutes } from './user-friend.route';
+import { conversationRoutes } from './conversation.route';
+import { uploadRoutes } from './upload.route';
 
 const router: Router = Router();
 
-router.use('/users', UserRoutes);
+router.use('/users', userRoutes);
 router.use('/auth', authRoutes);
-router.use('/messages', MessageRoutes);
-router.use('/friends', UserFriendRoutes);
-router.use('/conversation', ConversationRoutes);
+router.use('/messages', messageRoutes);
+router.use('/friends', userFriendRoutes);
+router.use('/conversation', conversationRoutes);
+router.use('/upload', uploadRoutes);
 
 export const MainRoutes = router;

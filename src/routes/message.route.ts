@@ -74,4 +74,4 @@ router.post('/hide-message', requireAuthMiddleware, hideMessage);
  */
 router.get('/:id', requireAuthMiddleware, getMessages);
 
-export const MessageRoutes = router;
+export const messageRoutes = router;

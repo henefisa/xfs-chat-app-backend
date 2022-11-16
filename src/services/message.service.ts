@@ -1,4 +1,3 @@
-import { sendMessageDto } from 'src/dto/message/send-message.dto';
 import Database from 'src/configs/Database';
 import { Message } from 'src/entities/message.entity';
 import { deleteMessageDto } from 'src/dto/message/delete-messages.dto';
