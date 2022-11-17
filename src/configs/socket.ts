@@ -1,3 +1,4 @@
+import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
@@ -19,15 +20,28 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    console.info('a user connected.');
+    socket.on(ESocketEvent.Subscribe, ({ conversation, user }) => {
+      socketService.subscribe(conversation, user, socket);
 
-    socket.on('disconnect', () => {
-      socketService.disconect(socket.id);
+      socket.on(ESocketEvent.SendMessage, ({ user, conversation, message }) => {
+        socketService.saveMessage(conversation, user, message);
+        socket.to(conversation).emit(ESocketEvent.GetMessage, {
+          user: user,
+          text: message,
+        });
+      });
+
+      socket.on(ESocketEvent.Disconnect, () => {
+        socketService.disconnect(socket, conversation, user);
+      });
+    });
+
+    socket.on(ESocketEvent.Unsubscribe, (room) => {
+      socketService.unsubscribe(room, socket);
     });
   }
-
   public start() {
-    this.io.on('connection', this.listeners);
+    this.io.on(ESocketEvent.Connection, this.listeners);
     console.info('Socket IO started.');
   }
 }

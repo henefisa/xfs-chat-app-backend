@@ -1,6 +1,7 @@
 import { BaseEntity } from 'src/shares';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Conversation } from './conversation.entity';
+import { MessageHided } from './message-hided.entity';
 import { User } from './user.entity';
 
 @Entity('messages')
@@ -22,4 +23,7 @@ export class Message extends BaseEntity {
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;
+
+  @OneToMany(() => MessageHided, (messageHided) => messageHided.message)
+  messageHided: MessageHided[];
 }
