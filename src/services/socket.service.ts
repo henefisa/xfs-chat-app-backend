@@ -22,7 +22,7 @@ export const subscribe = async (
     const checked = await checkMemberExist(conversation, user);
 
     if (!checked) {
-      throw new NotFoundException('ss');
+      throw new NotFoundException('member');
     }
 
     socket.join(conversation);
