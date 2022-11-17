@@ -42,6 +42,11 @@ export const approveFriendRequest = async (
   return userFriendRepository.save(friendRequest);
 };
 
+export const cancelRequest = async (dto: FriendActionDto, id: string) => {
+  const request = await getFriendRequest(dto.userRequest, id);
+  return userFriendRepository.delete(request.id);
+};
+
 export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
   await getFriendRequest(id, dto.userRequest);
   return userFriendRepository.delete({

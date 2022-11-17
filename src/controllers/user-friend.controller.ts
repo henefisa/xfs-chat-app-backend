@@ -95,3 +95,20 @@ export const cancelFriendRequest = async (
     next(error);
   }
 };
+
+export const cancelRequest = async (
+  req: RequestWithBody<FriendActionDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+
+    const reqUser = req.user as User;
+
+    await userFriendService.cancelRequest(req.body, reqUser.id);
+    return res.status(StatusCodes.OK).json(messages.Cancelled);
+  } catch (error) {
+    next(error);
+  }
+};

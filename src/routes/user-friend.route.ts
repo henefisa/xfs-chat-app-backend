@@ -3,6 +3,7 @@ import { validationQueryMiddleware } from 'src/middlewares/validation.middleware
 import {
   approveFriendRequest,
   cancelFriendRequest,
+  cancelRequest,
   getFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
@@ -149,5 +150,34 @@ router.post(
   activateMiddleware,
   validationMiddleware(FriendActionDto),
   cancelFriendRequest
+);
+
+/**
+ * @swagger
+ * /api/friends/cancel-request:
+ *   post:
+ *     summary: cancel request to user
+ *     tags: [Friends]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/actionRequest'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *        description: Cancelled as a friend
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  '/cancel-request',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationMiddleware(FriendActionDto),
+  cancelRequest
 );
 export const userFriendRoutes = router;
