@@ -1,4 +1,4 @@
-import { Equal, FindOneOptions } from 'typeorm';
+import { FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
 import { UserFriend } from 'src/entities/user-friend.entity';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
@@ -8,7 +8,7 @@ import {
 } from 'src/interfaces/user-friend.interface';
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
-import { NotExistException } from 'src/exceptions';
+import { NotFoundException } from 'src/exceptions';
 
 const userFriendRepository = Database.instance
   .getDataSource('default')
@@ -18,18 +18,13 @@ export const getFriendRequest = async (
   userTargetId: string,
   ownerId: string
 ) => {
-  const friendRequest = await getOne({
-    where: {
-      userTarget: Equal(userTargetId),
-      owner: Equal(ownerId),
-    },
-  });
+  const query = userFriendRepository.createQueryBuilder('f');
+  query.andWhere(
+    '(f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)',
+    { id: userTargetId, requestId: ownerId }
+  );
 
-  if (!friendRequest) {
-    throw new NotExistException('friend_request');
-  }
-
-  return friendRequest;
+  return query.getOne();
 };
 
 export const approveFriendRequest = async (
@@ -38,25 +33,38 @@ export const approveFriendRequest = async (
 ) => {
   const friendRequest = await getFriendRequest(id, dto.userRequest);
 
+  if (!friendRequest) {
+    throw new NotFoundException('friend_request');
+  }
+
   friendRequest.status = EUserFriendRequestStatus.ACCEPTED;
   return userFriendRepository.save(friendRequest);
 };
 
 export const cancelRequest = async (dto: FriendActionDto, id: string) => {
-  const request = await getFriendRequest(dto.userRequest, id);
-  return userFriendRepository.delete(request.id);
-};
+  const friendRequest = await getFriendRequest(id, dto.userRequest);
 
-export const cancelFriendRequest = async (dto: FriendActionDto, id: string) => {
-  await getFriendRequest(id, dto.userRequest);
-  return userFriendRepository.delete({
-    userTarget: Equal(id),
-    owner: Equal(dto.userRequest),
-  });
+  if (!friendRequest) {
+    throw new NotFoundException('friend_request');
+  }
+
+  friendRequest.status = EUserFriendRequestStatus.REJECTED;
+  return userFriendRepository.save(friendRequest);
 };
 
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
+  const friendRequest = await getFriendRequest(id, dto.userTarget);
+
+  if (
+    friendRequest &&
+    friendRequest.status === EUserFriendRequestStatus.REJECTED
+  ) {
+    friendRequest.status = EUserFriendRequestStatus.REQUESTED;
+    return userFriendRepository.save(friendRequest);
+  }
+
   const friend = new UserFriend();
+
   const request = {
     userTarget: dto.userTarget,
     owner: id,

@@ -5,24 +5,6 @@ import * as messageService from 'src/services/message.service';
 import { User } from 'src/entities/user.entity';
 import { deleteMessageDto } from 'src/dto/message/delete-messages.dto';
 
-// export const sendMessage = async (
-//   req: RequestWithBody<sendMessageDto>,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     res.setHeader('Content-Type', 'application/json');
-
-//     const reqUser = req.user as User;
-
-//     const saved = await messageService.createMessage(req.body, reqUser.id);
-
-//     return res.status(StatusCodes.CREATED).json(saved);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 export const deleteMessage = async (
   req: RequestWithBody<deleteMessageDto>,
   res: Response,

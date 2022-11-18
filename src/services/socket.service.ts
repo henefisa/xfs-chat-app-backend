@@ -1,4 +1,4 @@
-import { ESocketEvent } from './../interfaces/socket.interface';
+import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';

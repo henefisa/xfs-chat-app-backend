@@ -6,7 +6,6 @@ export enum EUserStatus {
   Inactive = 'INACTIVE',
   Deactivate = 'DEACTIVATE',
   Banned = 'BANNED',
-  Pending = 'PENDING',
 }
 
 export enum EUserRole {
