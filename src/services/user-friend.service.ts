@@ -95,10 +95,10 @@ export const getFriends = async (
 
   query.leftJoinAndSelect('friends.owner', 'users');
 
-  query.where('users.id = :id OR friends.userTarget = :id ', { id: id });
+  query.where('friends.userTarget = :id ', { id: id });
 
   if (dto?.q) {
-    query.andWhere('full_name ILIKE :q OR username ILIKE :q', {
+    query.andWhere('(full_name ILIKE :q) OR (username ILIKE :q)', {
       q: `%${dto.q}%`,
     });
   }
