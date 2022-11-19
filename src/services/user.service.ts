@@ -278,7 +278,7 @@ export const Deactivate = async (id: string) => {
 };
 
 export const checkActivateValidation = async (status: EUserStatus) => {
-  if ([EUserStatus.Deactivate, EUserStatus.Pending].includes(status)) {
+  if ([EUserStatus.Deactivate, EUserStatus.Inactive].includes(status)) {
     return false;
   }
 

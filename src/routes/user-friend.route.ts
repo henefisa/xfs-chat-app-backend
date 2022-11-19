@@ -2,7 +2,6 @@ import { GetUserFriendDto } from './../dto/friend/get-friend.dto';
 import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
 import {
   approveFriendRequest,
-  cancelFriendRequest,
   cancelRequest,
   getFriends,
 } from 'src/controllers/user-friend.controller';
@@ -127,35 +126,6 @@ router.post(
  * @swagger
  * /api/friends/cancel:
  *   post:
- *     summary: send friend cancel request
- *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/actionRequest'
- *     security:
- *          - bearerAuth: []
- *     responses:
- *       200:
- *        description: Cancelled as a friend
- *       500:
- *         description: Internal server error
- */
-
-router.post(
-  '/cancel',
-  requireAuthMiddleware,
-  activateMiddleware,
-  validationMiddleware(FriendActionDto),
-  cancelFriendRequest
-);
-
-/**
- * @swagger
- * /api/friends/cancel-request:
- *   post:
  *     summary: cancel request to user
  *     tags: [Friends]
  *     requestBody:
@@ -174,7 +144,7 @@ router.post(
  */
 
 router.post(
-  '/cancel-request',
+  '/cancel',
   requireAuthMiddleware,
   activateMiddleware,
   validationMiddleware(FriendActionDto),
