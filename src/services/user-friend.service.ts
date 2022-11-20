@@ -59,7 +59,14 @@ export const friendRequest = async (id: string, dto: FriendRequestDto) => {
     friendRequest &&
     friendRequest.status === EUserFriendRequestStatus.REJECTED
   ) {
-    friendRequest.status = EUserFriendRequestStatus.REQUESTED;
+    const request = {
+      status: EUserFriendRequestStatus.REQUESTED,
+      userTarget: dto.userTarget,
+      owner: id,
+    };
+
+    Object.assign(friendRequest, request);
+
     return userFriendRepository.save(friendRequest);
   }
 
