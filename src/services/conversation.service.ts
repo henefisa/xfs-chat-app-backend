@@ -1,6 +1,6 @@
-import { GetConversationOptions } from './../interfaces/conversation.interface';
-import { getLimitAndOffset } from './../shares/get-limit-and-offset';
-import { GetConversationDto } from './../dto/conversation/get-conversation.dto';
+import { GetConversationOptions } from 'src/interfaces/conversation.interface';
+import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
+import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
 import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
@@ -39,14 +39,14 @@ export const getConversationsOfUser = async (
   }
 
   query
-    .leftJoinAndSelect('conversation.participant', 'participant')
-    .leftJoinAndSelect('participant.user', 'users')
-    .andWhere('conversation.participant = :userId', { userId: userId });
+    .leftJoin('conversation.participants', 'participants')
+    .leftJoin('participants.user', 'users')
+    .andWhere('participants.userId = :userId', { userId });
 
   if (dto?.q) {
     query.andWhere(
-      '(title ILIKE :q) OR (username ILIKE :q) OR (full_name ILIKE :q ) OR (phone ILIKE :q)  ',
-      { q: dto.q }
+      'title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q',
+      { q: `%${dto.q}%` }
     );
   }
 
