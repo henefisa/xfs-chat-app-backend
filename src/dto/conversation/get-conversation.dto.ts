@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class GetUserDto {
+export class GetConversationDto {
   @IsString()
   @IsOptional()
   q?: string;

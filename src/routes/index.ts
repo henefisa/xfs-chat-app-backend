@@ -12,7 +12,7 @@ router.use('/users', userRoutes);
 router.use('/auth', authRoutes);
 router.use('/messages', messageRoutes);
 router.use('/friends', userFriendRoutes);
-router.use('/conversation', conversationRoutes);
+router.use('/conversations', conversationRoutes);
 router.use('/upload', uploadRoutes);
 
 export const MainRoutes = router;
