@@ -19,12 +19,14 @@ export const getFriendRequest = async (
   ownerId: string
 ) => {
   const query = userFriendRepository.createQueryBuilder('f');
-  query
-    .andWhere('f.status != :s', { s: EUserFriendRequestStatus.REJECTED })
-    .andWhere(
-      '(f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)',
-      { id: userTargetId, requestId: ownerId }
-    );
+  query.andWhere(
+    '((f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)) AND (f.status != :s)',
+    {
+      id: userTargetId,
+      requestId: ownerId,
+      s: EUserFriendRequestStatus.REJECTED,
+    }
+  );
 
   return query.getOne();
 };
@@ -45,6 +47,8 @@ export const approveFriendRequest = async (
 
 export const cancelRequest = async (dto: FriendActionDto, id: string) => {
   const friendRequest = await getFriendRequest(id, dto.userRequest);
+
+  console.log(friendRequest);
 
   if (!friendRequest) {
     throw new NotFoundException('friend_request');
