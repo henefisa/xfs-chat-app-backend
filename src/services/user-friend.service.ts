@@ -48,8 +48,6 @@ export const approveFriendRequest = async (
 export const cancelRequest = async (dto: FriendActionDto, id: string) => {
   const friendRequest = await getFriendRequest(id, dto.userRequest);
 
-  console.log(friendRequest);
-
   if (!friendRequest) {
     throw new NotFoundException('friend_request');
   }
