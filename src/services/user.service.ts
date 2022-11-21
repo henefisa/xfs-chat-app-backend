@@ -14,6 +14,7 @@ import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 import { EUserStatus, GetUserOptions } from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
+import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -88,6 +89,7 @@ export const getUsers = async (
         userId,
         targetId: user.id,
       })
+      .andWhere('uf.status != :s', { s: EUserFriendRequestStatus.REJECTED })
       .innerJoin('uf.owner', 'owner')
       .innerJoin('uf.userTarget', 'userTarget')
       .addSelect('owner.id')
