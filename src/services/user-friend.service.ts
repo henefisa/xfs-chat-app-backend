@@ -20,11 +20,11 @@ export const getFriendRequest = async (
 ) => {
   const query = userFriendRepository.createQueryBuilder('f');
   query
+    .andWhere('f.status != :s', { s: EUserFriendRequestStatus.REJECTED })
     .andWhere(
       '(f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)',
       { id: userTargetId, requestId: ownerId }
-    )
-    .andWhere('f.status != :s', { s: EUserFriendRequestStatus.REJECTED });
+    );
 
   return query.getOne();
 };
