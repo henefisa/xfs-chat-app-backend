@@ -19,10 +19,12 @@ export const getFriendRequest = async (
   ownerId: string
 ) => {
   const query = userFriendRepository.createQueryBuilder('f');
-  query.andWhere(
-    '(f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)',
-    { id: userTargetId, requestId: ownerId }
-  );
+  query
+    .andWhere(
+      '(f.userTarget = :id AND f.owner = :requestId) OR (f.owner = :id AND f.userTarget = :requestId)',
+      { id: userTargetId, requestId: ownerId }
+    )
+    .andWhere('f.status != :s', { s: EUserFriendRequestStatus.REJECTED });
 
   return query.getOne();
 };
@@ -55,12 +57,8 @@ export const cancelRequest = async (dto: FriendActionDto, id: string) => {
 export const friendRequest = async (id: string, dto: FriendRequestDto) => {
   const friendRequest = await getFriendRequest(id, dto.userTarget);
 
-  if (
-    friendRequest &&
-    friendRequest.status === EUserFriendRequestStatus.REJECTED
-  ) {
-    friendRequest.status = EUserFriendRequestStatus.REQUESTED;
-    return userFriendRepository.save(friendRequest);
+  if (friendRequest) {
+    return friendRequest;
   }
 
   const friend = new UserFriend();
