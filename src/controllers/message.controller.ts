@@ -46,7 +46,8 @@ export const getMessages = async (
     const reqUser = req.user as User;
     const messages = await messageService.getMessages(
       req.params.id,
-      reqUser.id
+      reqUser.id,
+      req.query
     );
     return res.status(StatusCodes.OK).json(messages);
   } catch (error) {

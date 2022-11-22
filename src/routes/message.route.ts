@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { hideMessage } from 'src/controllers/hide-message.controller';
 import { deleteMessage, getMessages } from 'src/controllers/message.controller';
+import { GetMessageDto } from 'src/dto/message';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
+import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
 
 const router: Router = Router();
 
@@ -48,30 +50,47 @@ router.post('/hide-message', requireAuthMiddleware, hideMessage);
 /**
  * @swagger
  * /api/messages/{id}:
- *  get:
- *    summary: get list message in conversation by the id
- *    tags: [Messages]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: conversation id
- *    security:
+ *    get:
+ *      summary: messages of conversation
+ *      tags: [Messages]
+ *      parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: id of conversation
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search messages
+ *         example: hello
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
+ *      responses:
+ *          200:
+ *            description: succesfully
+ *      security:
  *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: the list of message
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                  $ref: '#/components/schemas/Message'
- *      500:
- *        description: Internal server error
  */
-router.get('/:id', requireAuthMiddleware, getMessages);
+
+router.get(
+  '/:id',
+  requireAuthMiddleware,
+  validationQueryMiddleware(GetMessageDto),
+  getMessages
+);
 
 export const messageRoutes = router;
