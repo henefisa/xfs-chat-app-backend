@@ -36,7 +36,7 @@ export class ServerSocket {
       });
     });
 
-    socket.on(ESocketEvent.Unsubscribe, (room) => {
+    socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
       socketService.unsubscribe(room, socket);
     });
   }

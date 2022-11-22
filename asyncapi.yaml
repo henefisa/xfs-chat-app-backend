@@ -1,0 +1,77 @@
+asyncapi.yamlasyncapi: 2.5.0
+info:
+  title: socket Service
+  version: 1.0.0
+  description: This service is in charge of processing user signups 
+
+channels:
+  /:
+    publish:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/GET_MESSAGE"
+          - $ref: "#/components/messages/USER_LEFT"
+          - $ref: "#/components/messages/USER_JOIN"
+    subscribe:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/SUBSCRIBE"
+          - $ref: "#/components/messages/UNSUBSCRIBE"
+          - $ref: "#/components/messages/SEND_MESSAGE"
+
+components:
+  messages:
+     SUBSCRIBE:
+      payload:
+        type: object
+        properties:
+            conversation:
+              type: string
+              description: id of conversation
+            user:
+              type: string
+              description: id of user
+     UNSUBSCRIBE:
+      payload:
+        type: object
+        properties:
+            room:
+              type: string
+              description: id of conversation
+     SEND_MESSAGE:
+      payload:
+        type: object       
+        properties:
+            user:
+              type: string
+              description: id of user
+            conversation:
+              type: string
+              description: id of conversation
+            message: 
+              type: string
+              description: text
+     GET_MESSAGE:
+      payload:
+        type: object
+        properties:
+            user:  
+              type: string
+              description: id of user
+            text:
+              type: string
+              description: message
+     USER_LEFT:
+      payload:
+        type: object
+        properties:
+            user:
+              type: string
+              description: id of user
+     USER_JOIN:
+      payload:
+        type: object
+        properties:
+            user:
+              type: string
+              description: id of user
