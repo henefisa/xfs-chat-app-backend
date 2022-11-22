@@ -13,7 +13,8 @@
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "NODE_ENV=TEST jest --detectOpenHandles",
     "test:win": "SET NODE_ENV=TEST && jest --detectOpenHandles",
-    "test:coverage": "NODE_ENV=TEST jest --coverage"
+    "test:coverage": "NODE_ENV=TEST jest --coverage",
+    "asyncapi":"asyncapi start studio"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
