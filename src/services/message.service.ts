@@ -1,10 +1,15 @@
+import { GetMessageOptions } from 'src/interfaces/message.interface';
 import Database from 'src/configs/Database';
 import { Message } from 'src/entities/message.entity';
-import { deleteMessageDto } from 'src/dto/message/delete-messages.dto';
-import { hideMessageDto } from 'src/dto/message/hide-message.dto';
 import { Equal, FindOneOptions } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
 import { MessageHided } from 'src/entities/message-hided.entity';
+import {
+  deleteMessageDto,
+  GetMessageDto,
+  hideMessageDto,
+} from 'src/dto/message';
+import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -57,20 +62,41 @@ export const hideMessage = async (dto: hideMessageDto, id: string) => {
   return messageHidedRepository.save(hideMessage);
 };
 
-export const getMessages = async (conversation: string, id: string) => {
+export const getMessages = async (
+  conversation: string,
+  id: string,
+  dto?: GetMessageDto,
+  options?: GetMessageOptions
+) => {
   const query = messageRepository.createQueryBuilder('m');
+
+  const { offset, limit } = getLimitAndOffset({
+    limit: dto?.limit,
+    offset: dto?.offset,
+  });
+
+  if (!options?.unlimited) {
+    query.skip(offset).take(limit);
+  }
+
   query
-    .leftJoinAndSelect('m.hideMessage', 'message_hided')
-    .leftJoinAndSelect('message_hided.eraser', 'users')
-    .where('message_hided.eraser != :eraserId', {
-      eraserId: id,
-    })
-    .orWhere('message_hided.eraser IS NULL')
-    .andWhere('m.conversation = :conversation', { conversation: conversation });
+    .andWhere('m.conversation = :conversation', { conversation: conversation })
+    .leftJoinAndSelect('m.sender', 'users');
 
-  const messages = await query.getMany();
+  if (dto?.q) {
+    query.andWhere('m.message ILIKE :q', { q: dto.q });
+  }
 
-  return messages;
+  if (options?.id) {
+    query.andWhere('m.id = :id', { id: options.id });
+  }
+
+  const [messages, count] = await query.getManyAndCount();
+
+  return {
+    messages,
+    count,
+  };
 };
 
 export const deleteHideMessage = async (id: string) => {
