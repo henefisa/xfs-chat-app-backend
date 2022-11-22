@@ -93,7 +93,8 @@ export const getUsers = async (
       .innerJoin('uf.owner', 'owner')
       .innerJoin('uf.userTarget', 'userTarget')
       .addSelect('owner.id')
-      .addSelect('userTarget.id');
+      .addSelect('userTarget.id')
+      .orderBy('uf.createdAt', 'DESC');
 
     return {
       ...user,
