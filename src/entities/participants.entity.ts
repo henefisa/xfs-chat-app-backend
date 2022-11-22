@@ -10,4 +10,7 @@ export class Participants extends BaseEntity {
 
   @ManyToOne(() => User)
   user: User;
+
+  @ManyToOne(() => User)
+  adder: User;
 }
