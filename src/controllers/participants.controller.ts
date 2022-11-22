@@ -1,72 +1,25 @@
-// import { Participants } from 'src/entities/participants.entity';
-// import { StatusCodes } from 'http-status-codes';
-// import dataSource from 'src/configs/data-source';
-// import { NextFunction, Request, Response } from 'express';
-// import { Equal } from 'typeorm';
-// import { HttpException } from 'src/shares/http-exception';
-// import { message } from 'src/shares';
+import { NextFunction, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { User } from 'src/entities/user.entity';
+import { RequestWithBody } from 'src/shares';
+import * as participantServices from 'src/services/participants.service';
+import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
 
-// const participantsRepository = dataSource.getRepository(Participants);
-
-// export const createParticipanst = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const participants = new Participants();
-//     participants.conversation = req.body.conversationId;
-//     participants.owner = req.body.userId;
-
-//     const saved = await participantsRepository.save(participants);
-//     return res.status(StatusCodes.CREATED).json(saved);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const updateParticipans = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const participants = await participantsRepository.findOne({
-//       where: {
-//         conversation: Equal(req.params.conversationId),
-//       },
-//     });
-//     if (!participants) {
-//       throw new HttpException(
-//         StatusCodes.BAD_REQUEST,
-//         message.Conversation_not_found
-//       );
-//     }
-//     participants.owner = req.body.userid;
-
-//     const updated = await participantsRepository.save(participants);
-
-//     return res.status(StatusCodes.OK).json(updated);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const deleteParticipants = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     await dataSource
-//       .createQueryBuilder()
-//       .delete()
-//       .from(Participants)
-//       .where('id = :id', { id: req.params.id })
-//       .execute();
-
-//     return res.status(StatusCodes.NO_CONTENT);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const addMember = async (
+  req: RequestWithBody<addParticipantDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const reqUser = req.user as User;
+    const added = await participantServices.addMember(
+      req.body,
+      req.params.id,
+      reqUser.id
+    );
+    return res.status(StatusCodes.CREATED).json(added);
+  } catch (error) {
+    next(error);
+  }
+};

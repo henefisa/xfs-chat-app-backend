@@ -60,6 +60,35 @@ const router: Router = Router();
  *              phone: 012345678
  *              description: khang
  *              location: VietNam
+ *       Participant:
+ *          type: object
+ *          required:
+ *            - conversation
+ *            - user
+ *            - adder
+ *            - id
+ *            - createdAt
+ *            - updatedAt
+ *          properties:
+ *              conversation:
+ *                type: string
+ *              user:
+ *                type: string
+ *              adder:
+ *                type: string
+ *              id:
+ *                type: string
+ *              createdAt:
+ *                type: string
+ *              updatedAt:
+ *                type: string
+ *          example:
+ *              conversation: "2f9ae041-2553-40ba-a9e7-c9c885873e85"
+ *              user: "3e1b6781-a470-4a65-830c-973a19ed4559"
+ *              adder: "8c9d761a-9356-4f9d-a603-d4c0b5756bd7"
+ *              id: "590b7ef5-a722-45f3-bd25-b8124f41a069"
+ *              createdAt: "2022-11-22T13:19:07.018Z"
+ *              updatedAt: "2022-11-22T13:19:07.018Z"
  *       createUser:
  *            type: object
  *            required:
@@ -90,6 +119,15 @@ const router: Router = Router();
  *            example:
  *              conversation: "fbbb20b9-c25e-430b-9222-7acf59b0aa23"
  *              message: "Hello world!"
+ *       addParticipant:
+ *            type: object
+ *            required:
+ *              - userTarget
+ *            properties:
+ *              conversation:
+ *                type: string
+ *            example:
+ *              userTarget: "2f9ae041-2553-40ba-a9e7-c9c885873e85"
  *       login:
  *            type: object
  *            required:
