@@ -1,3 +1,4 @@
+import { setOnline } from 'src/services/user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
@@ -20,6 +21,10 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
+    socket.on(ESocketEvent.Online, ({ userId }) => {
+      setOnline(userId);
+    });
+
     socket.on(ESocketEvent.Subscribe, ({ conversation, user }) => {
       socketService.subscribe(conversation, user, socket);
 

@@ -1,3 +1,4 @@
+import { setOffline } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
@@ -11,6 +12,7 @@ export const disconnect = (
 ) => {
   console.info('user disconect ' + socket.id);
   socket.to(conversation).emit(ESocketEvent.UserLeft, { user });
+  setOffline(user);
 };
 
 export const subscribe = async (
