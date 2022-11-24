@@ -1,7 +1,7 @@
 import { EUserRole } from 'src/interfaces/user.interface';
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shares';
-import { EUserStatus } from 'src/interfaces/user.interface';
+import { EUserStatus, EUserActiveStatus } from 'src/interfaces/user.interface';
 @Entity('users')
 export class User extends BaseEntity {
   @Column()
@@ -27,6 +27,9 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   location: string;
+
+  @Column({ nullable: true, default: EUserActiveStatus.OFFLINE })
+  activeStatus: EUserActiveStatus;
 
   @Column({ enum: EUserStatus, default: EUserStatus.Inactive })
   status: EUserStatus;

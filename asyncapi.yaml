@@ -18,6 +18,7 @@ channels:
           - $ref: "#/components/messages/SUBSCRIBE"
           - $ref: "#/components/messages/UNSUBSCRIBE"
           - $ref: "#/components/messages/SEND_MESSAGE"
+          - $ref: "#/components/messages/ONLINE"
 
 components:
   messages:
@@ -75,3 +76,10 @@ components:
             user:
               type: string
               description: id of user
+     ONLINE:
+      payload:
+        type: object
+        properties:
+            userId:
+              type: string
+              description: id of user 
