@@ -11,7 +11,11 @@ import {
   NotFoundException,
 } from 'src/exceptions/not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
-import { EUserStatus, GetUserOptions } from 'src/interfaces/user.interface';
+import {
+  EUserActiveStatus,
+  EUserStatus,
+  GetUserOptions,
+} from 'src/interfaces/user.interface';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
 import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
@@ -286,4 +290,24 @@ export const checkActivateValidation = async (status: EUserStatus) => {
   }
 
   return true;
+};
+
+export const setOnline = async (userId: string) => {
+  const user = await getOneOrThrow({
+    where: { id: userId },
+  });
+
+  user.activeStatus = EUserActiveStatus.ONLINE;
+
+  return userRepository.save(user);
+};
+
+export const setOffline = async (userId: string) => {
+  const user = await getOneOrThrow({
+    where: { id: userId },
+  });
+
+  user.activeStatus = EUserActiveStatus.OFFLINE;
+
+  return userRepository.save(user);
 };

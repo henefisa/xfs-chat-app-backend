@@ -8,4 +8,5 @@ export enum ESocketEvent {
   Error = 'ERROR',
   UserLeft = 'USER_LEFT',
   UserJoin = 'USER_JOIN',
+  Online = 'ONLINE',
 }

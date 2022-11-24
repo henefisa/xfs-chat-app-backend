@@ -45,8 +45,8 @@ export const getConversationsOfUser = async (
 
   if (dto?.q) {
     query.andWhere(
-      'title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q',
-      { q: `%${dto.q}%` }
+      '(title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q) AND participants.userId = :userId ',
+      { q: `%${dto.q}%`, userId: userId }
     );
   }
 

@@ -15,4 +15,10 @@ export enum EUserRole {
   USER = 'USER',
 }
 
+export enum EUserActiveStatus {
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  BUSY = 'BUSY',
+}
+
 export type GetUserOptions = GetOptions<User>;
