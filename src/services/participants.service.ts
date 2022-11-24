@@ -14,7 +14,7 @@ export const addMember = async (
 ) => {
   const participants: Array<Participants> = [];
 
-  members.map((member) => {
+  members.forEach((member) => {
     const participant = new Participants();
     const request = {
       conversation: conversationId,
