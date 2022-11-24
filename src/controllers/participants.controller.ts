@@ -1,10 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
+import { AddParticipantDto } from './../dto/participant/add-participant.dto';
+import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/entities/user.entity';
 import * as participantServices from 'src/services/participants.service';
+import { RequestWithBody } from 'src/shares';
 
 export const addMember = async (
-  req: Request,
+  req: RequestWithBody<AddParticipantDto>,
   res: Response,
   next: NextFunction
 ) => {

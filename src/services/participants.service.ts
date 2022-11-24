@@ -1,6 +1,6 @@
+import { AddParticipantDto } from './../dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
 import { Participants } from 'src/entities/participants.entity';
-import { IAddParticipant } from 'src/interfaces/participant.interface';
 import { Equal, FindOneOptions } from 'typeorm';
 
 const participantRepository = Database.instance
@@ -8,13 +8,13 @@ const participantRepository = Database.instance
   .getRepository(Participants);
 
 export const addMember = async (
-  members: Array<IAddParticipant>,
+  dto: AddParticipantDto,
   conversationId: string,
   adderId: string
 ) => {
   const participants: Array<Participants> = [];
 
-  members.forEach((member) => {
+  dto.members.forEach((member) => {
     const participant = new Participants();
     const request = {
       conversation: conversationId,

@@ -123,9 +123,6 @@ const router: Router = Router();
  *            type: object
  *            required:
  *              - userTarget
- *            properties:
- *              conversation:
- *                type: string
  *            example:
  *              userTarget: "2f9ae041-2553-40ba-a9e7-c9c885873e85"
  *       login:
