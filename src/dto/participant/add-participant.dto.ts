@@ -1,8 +1,9 @@
-import { ArrayNotEmpty, IsArray, IsUUID } from 'class-validator';
+import { ArrayNotEmpty, IsArray } from 'class-validator';
+import { IsArrayOfUuid } from 'src/decorators/is-array-of-uuid.decorator';
 
 export class AddParticipantDto {
   @IsArray()
   @ArrayNotEmpty()
-  @IsUUID()
+  @IsArrayOfUuid()
   members: string[];
 }
