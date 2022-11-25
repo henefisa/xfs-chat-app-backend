@@ -1,41 +1,50 @@
+import { AddParticipantDto } from './../dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
-import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { Participants } from 'src/entities/participants.entity';
-import { FindOneOptions } from 'typeorm';
+import { Equal, FindOneOptions } from 'typeorm';
+import { ExistsException } from 'src/exceptions';
 
 const participantRepository = Database.instance
   .getDataSource('default')
   .getRepository(Participants);
 
 export const addMember = async (
-  dto: addParticipantDto,
+  dto: AddParticipantDto,
   conversationId: string,
   adderId: string
 ) => {
-  const participant = new Participants();
-  const request = {
-    conversation: conversationId,
-    user: dto.userTarget,
-    adder: adderId,
-  };
+  const participants = dto.members.map(async (member) => {
+    const checked = await checkMemberExist(conversationId, member);
+    if (checked) {
+      throw new ExistsException('member');
+    }
+    const participant = new Participants();
+    const request = {
+      conversation: conversationId,
+      user: member,
+      adder: adderId,
+    };
+    Object.assign(participant, request);
+    await participantRepository.save(participant);
+    return participant;
+  });
+  const p = await Promise.all(participants);
 
-  Object.assign(participant, request);
-  return participantRepository.save(participant);
+  return p;
 };
 
 export const checkMemberExist = async (
   conversationId: string,
   userId: string
 ) => {
-  const query = await participantRepository.createQueryBuilder('p');
-  query
-    .where('p.conversation = :conversationId', {
-      conversationId: conversationId,
-    })
-    .andWhere('p.user = :userId OR p.adder = :userId', { userId: userId });
-  const participants = await query.getOne();
+  const participant = await getOne({
+    where: {
+      conversation: Equal(conversationId),
+      user: Equal(userId),
+    },
+  });
 
-  if (!participants) {
+  if (!participant) {
     return false;
   }
 

@@ -22,7 +22,12 @@ const router: Router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/addParticipant'
+ *             type: object
+ *             properties:
+ *               members:
+ *                 type: array
+ *                 items:
+ *                   $ref: "#/components/schemas/addParticipant"
  *     security:
  *          - bearerAuth: []
  *     responses:
@@ -31,7 +36,9 @@ const router: Router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Participant'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Participant'
  */
 router.post('/:id', requireAuthMiddleware, addMember);
 
