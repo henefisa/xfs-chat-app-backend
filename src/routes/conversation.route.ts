@@ -4,10 +4,13 @@ import {
   getConversationById,
   GetConversations,
 } from 'src/controllers/conversation.controller';
+import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
 import activateMiddleware from 'src/middlewares/activate.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
-import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
+import validationMiddleware, {
+  validationQueryMiddleware,
+} from 'src/middlewares/validation.middleware';
 
 const router: Router = Router();
 
@@ -35,7 +38,13 @@ const router: Router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/', createConversation);
+router.post(
+  '/',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationMiddleware(CreateConversationDto),
+  createConversation
+);
 
 /**
  * @swagger
@@ -59,7 +68,12 @@ router.post('/', createConversation);
  *        description: Internal server error
  */
 
-router.get('/:id', getConversationById);
+router.get(
+  '/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  getConversationById
+);
 
 /**
  * @swagger
