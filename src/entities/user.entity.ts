@@ -28,7 +28,11 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   location: string;
 
-  @Column({ nullable: true, default: EUserActiveStatus.OFFLINE })
+  @Column({
+    nullable: true,
+    default: EUserActiveStatus.OFFLINE,
+    name: 'user_active_status',
+  })
   activeStatus: EUserActiveStatus;
 
   @Column({ enum: EUserStatus, default: EUserStatus.Inactive })
