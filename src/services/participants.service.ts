@@ -2,6 +2,7 @@ import { AddParticipantDto } from './../dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
 import { Participants } from 'src/entities/participants.entity';
 import { Equal, FindOneOptions } from 'typeorm';
+import { ExistsException } from 'src/exceptions';
 
 const participantRepository = Database.instance
   .getDataSource('default')
@@ -12,21 +13,24 @@ export const addMember = async (
   conversationId: string,
   adderId: string
 ) => {
-  const participants: Array<Participants> = [];
-
-  dto.members.forEach((member) => {
+  const participants = dto.members.map(async (member) => {
+    const checked = await checkMemberExist(conversationId, member);
+    if (checked) {
+      throw new ExistsException('member');
+    }
     const participant = new Participants();
     const request = {
       conversation: conversationId,
-      user: member.userTarget,
+      user: member,
       adder: adderId,
     };
     Object.assign(participant, request);
-    participantRepository.save(participant);
-    participants.push(participant);
+    await participantRepository.save(participant);
+    return participant;
   });
+  const p = await Promise.all(participants);
 
-  return participants;
+  return p;
 };
 
 export const checkMemberExist = async (
