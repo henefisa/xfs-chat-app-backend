@@ -1,12 +1,10 @@
 import { AddParticipantDto } from './../dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
-import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import { Participants } from 'src/entities/participants.entity';
-import { NotFoundException } from 'src/exceptions';
+import { NotFoundException, ExistsException } from 'src/exceptions';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { Equal, FindOneOptions } from 'typeorm';
-import { ExistsException } from 'src/exceptions';
 
 const participantRepository = Database.instance
   .getDataSource('default')

@@ -3,7 +3,6 @@ import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/entities/user.entity';
 import * as participantServices from 'src/services/participants.service';
-import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import { RequestWithBody } from 'src/shares';
 

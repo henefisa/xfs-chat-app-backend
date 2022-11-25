@@ -4,7 +4,7 @@ import { addMember, setAdmin } from 'src/controllers/participants.controller';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
-import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
+import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 
 const router: Router = Router();
 
@@ -48,7 +48,7 @@ router.post(
   '/:id',
   requireAuthMiddleware,
   activateMiddleware,
-  validationMiddleware(addParticipantDto),
+  validationMiddleware(AddParticipantDto),
   addMember
 );
 
