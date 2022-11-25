@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/entities/user.entity';
 import { RequestWithBody } from 'src/shares';
@@ -19,6 +19,23 @@ export const addMember = async (
       reqUser.id
     );
     return res.status(StatusCodes.CREATED).json(added);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getParticipants = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const reqUser = req.user as User;
+    const { participants, count } = await participantServices.getParticipants(
+      req.params.id,
+      reqUser.id
+    );
+    return res.status(StatusCodes.CREATED).json({ participants, count });
   } catch (error) {
     next(error);
   }

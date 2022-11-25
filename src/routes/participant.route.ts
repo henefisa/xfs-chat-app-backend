@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { addMember } from 'src/controllers/participants.controller';
+import {
+  addMember,
+  getParticipants,
+} from 'src/controllers/participants.controller';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 
 const router: Router = Router();
@@ -34,5 +37,27 @@ const router: Router = Router();
  *               $ref: '#/components/schemas/Participant'
  */
 router.post('/:id', requireAuthMiddleware, addMember);
+
+/**
+ * @swagger
+ * /api/participants/{id}:
+ *   get:
+ *     summary: get participants in conversation
+ *     tags: [Participant]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: conversation id
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: the list participant
+ */
+
+router.get('/:id', requireAuthMiddleware, getParticipants);
 
 export const participantRoutes = router;

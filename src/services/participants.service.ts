@@ -1,7 +1,8 @@
+import { NotExistException } from './../exceptions/not-found.exception';
 import Database from 'src/configs/Database';
 import { addParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { Participants } from 'src/entities/participants.entity';
-import { FindOneOptions } from 'typeorm';
+import { FindOneOptions, Equal } from 'typeorm';
 
 const participantRepository = Database.instance
   .getDataSource('default')
@@ -27,15 +28,14 @@ export const checkMemberExist = async (
   conversationId: string,
   userId: string
 ) => {
-  const query = await participantRepository.createQueryBuilder('p');
-  query
-    .where('p.conversation = :conversationId', {
-      conversationId: conversationId,
-    })
-    .andWhere('p.user = :userId OR p.adder = :userId', { userId: userId });
-  const participants = await query.getOne();
+  const participant = await getOne({
+    where: {
+      conversation: Equal(conversationId),
+      user: Equal(userId),
+    },
+  });
 
-  if (!participants) {
+  if (!participant) {
     return false;
   }
 
@@ -44,4 +44,29 @@ export const checkMemberExist = async (
 
 export const getOne = async (options: FindOneOptions<Participants>) => {
   return participantRepository.findOne(options);
+};
+
+export const getParticipants = async (
+  conversationId: string,
+  userId: string
+) => {
+  const checked = await checkMemberExist(conversationId, userId);
+
+  if (!checked) {
+    throw new NotExistException('member');
+  }
+
+  const query = await participantRepository
+    .createQueryBuilder('p')
+    .leftJoinAndSelect('p.user', 'users')
+    .where('p.conversation = :conversationId', {
+      conversationId: conversationId,
+    });
+
+  const [participants, count] = await query.getManyAndCount();
+
+  return {
+    participants,
+    count,
+  };
 };
