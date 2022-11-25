@@ -31,18 +31,13 @@ const router: Router = Router();
  *               members:
  *                 type: array
  *                 items:
- *                   $ref: "#/components/schemas/addParticipant"
+ *                   schema:
+ *                      type:string
  *     security:
  *          - bearerAuth: []
  *     responses:
  *       200:
  *         description: successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Participant'
  */
 router.post(
   '/:id',
