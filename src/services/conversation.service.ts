@@ -99,11 +99,11 @@ export const getGroups = async (
 
   const c: Conversation[] = [];
 
-  for (let i = 0; i < conversations.length; i++) {
+  for (const i of conversations) {
     const conv = conversationRepository
       .createQueryBuilder('conv')
       .leftJoin('conv.participants', 'participants')
-      .where('conv.id = :id', { id: conversations[i].id })
+      .where('conv.id = :id', { id: i.id })
       .andWhere('participants.userId = :userId', { userId: userId });
     const con = await conv.getOne();
     if (con) {
