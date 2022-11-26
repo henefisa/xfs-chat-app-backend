@@ -21,4 +21,9 @@ export enum EUserActiveStatus {
   BUSY = 'BUSY',
 }
 
+export enum EGroupRole {
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
+}
+
 export type GetUserOptions = GetOptions<User>;

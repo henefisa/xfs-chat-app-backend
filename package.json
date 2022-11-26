@@ -14,7 +14,7 @@
     "test": "NODE_ENV=TEST jest --detectOpenHandles",
     "test:win": "SET NODE_ENV=TEST && jest --detectOpenHandles",
     "test:coverage": "NODE_ENV=TEST jest --coverage",
-    "asyncapi":"asyncapi start studio"
+    "asyncapi": "asyncapi start studio"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",

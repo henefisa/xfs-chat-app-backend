@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { hideMessage } from 'src/controllers/hide-message.controller';
 import { deleteMessage, getMessages } from 'src/controllers/message.controller';
 import { GetMessageDto } from 'src/dto/message';
+import activateMiddleware from 'src/middlewares/activate.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
 
@@ -25,7 +26,12 @@ const router: Router = Router();
  *       204:
  *         description: Message deleted
  */
-router.delete('/delete', requireAuthMiddleware, deleteMessage);
+router.delete(
+  '/delete',
+  requireAuthMiddleware,
+  activateMiddleware,
+  deleteMessage
+);
 
 /**
  * @swagger
@@ -45,7 +51,7 @@ router.delete('/delete', requireAuthMiddleware, deleteMessage);
  *       204:
  *         description: message has been hidden
  */
-router.post('/hide-message', requireAuthMiddleware, hideMessage);
+router.post('/hide-message', hideMessage);
 
 /**
  * @swagger
@@ -89,6 +95,7 @@ router.post('/hide-message', requireAuthMiddleware, hideMessage);
 router.get(
   '/:id',
   requireAuthMiddleware,
+  activateMiddleware,
   validationQueryMiddleware(GetMessageDto),
   getMessages
 );
