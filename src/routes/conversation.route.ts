@@ -3,6 +3,7 @@ import {
   createConversation,
   getConversationById,
   GetConversations,
+  GetGroups,
 } from 'src/controllers/conversation.controller';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
@@ -44,6 +45,47 @@ router.post(
   activateMiddleware,
   validationMiddleware(CreateConversationDto),
   createConversation
+);
+
+/**
+ * @swagger
+ * /api/conversations/groups:
+ *    get:
+ *      summary: returns the list conversations groups
+ *      tags: [Conversations]
+ *      parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: search name or username or phone
+ *         example: khang
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: page limit
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: offset
+ *      responses:
+ *          200:
+ *            description: the list conversations
+ *      security:
+ *          - bearerAuth: []
+ */
+
+router.get(
+  '/groups',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(GetConversationDto),
+  GetGroups
 );
 
 /**
