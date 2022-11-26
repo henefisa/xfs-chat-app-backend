@@ -1,6 +1,10 @@
 import activateMiddleware from 'src/middlewares/activate.middleware';
 import { Router } from 'express';
-import { addMember, setAdmin } from 'src/controllers/participants.controller';
+import {
+  addMember,
+  setAdmin,
+  getParticipants,
+} from 'src/controllers/participants.controller';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
@@ -83,5 +87,27 @@ router.post(
   validationMiddleware(SetAdminDto),
   setAdmin
 );
+
+/**
+ * @swagger
+ * /api/participants/{id}:
+ *   get:
+ *     summary: get participants in conversation
+ *     tags: [Participant]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: conversation id
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: the list participant
+ */
+
+router.get('/:id', requireAuthMiddleware, getParticipants);
 
 export const participantRoutes = router;

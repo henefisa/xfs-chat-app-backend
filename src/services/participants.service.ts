@@ -1,8 +1,12 @@
-import { AddParticipantDto } from './../dto/participant/add-participant.dto';
+import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import { Participants } from 'src/entities/participants.entity';
-import { NotFoundException, ExistsException } from 'src/exceptions';
+import {
+  NotFoundException,
+  ExistsException,
+  NotExistException,
+} from 'src/exceptions';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { Equal, FindOneOptions } from 'typeorm';
 
@@ -55,6 +59,31 @@ export const checkMemberExist = async (
 
 export const getOne = async (options: FindOneOptions<Participants>) => {
   return participantRepository.findOne(options);
+};
+
+export const getParticipants = async (
+  conversationId: string,
+  userId: string
+) => {
+  const checked = await checkMemberExist(conversationId, userId);
+
+  if (!checked) {
+    throw new NotExistException('member');
+  }
+
+  const query = await participantRepository
+    .createQueryBuilder('p')
+    .leftJoinAndSelect('p.user', 'users')
+    .where('p.conversation = :conversationId', {
+      conversationId: conversationId,
+    });
+
+  const [participants, count] = await query.getManyAndCount();
+
+  return {
+    participants,
+    count,
+  };
 };
 
 export const setGroupAdmin = async (
