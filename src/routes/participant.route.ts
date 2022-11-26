@@ -1,6 +1,10 @@
 import activateMiddleware from 'src/middlewares/activate.middleware';
 import { Router } from 'express';
-import { addMember, setAdmin, getParticipants } from 'src/controllers/participants.controller';
+import {
+  addMember,
+  setAdmin,
+  getParticipants,
+} from 'src/controllers/participants.controller';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';

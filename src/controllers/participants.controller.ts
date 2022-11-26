@@ -1,6 +1,5 @@
 import { NextFunction, Response, Request } from 'express';
-import { AddParticipantDto } from './../dto/participant/add-participant.dto';
-import { NextFunction, Response } from 'express';
+import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/entities/user.entity';
 import * as participantServices from 'src/services/participants.service';

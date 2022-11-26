@@ -2,7 +2,11 @@ import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
 import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import { Participants } from 'src/entities/participants.entity';
-import { NotFoundException, ExistsException, NotExistException } from 'src/exceptions';
+import {
+  NotFoundException,
+  ExistsException,
+  NotExistException,
+} from 'src/exceptions';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { Equal, FindOneOptions } from 'typeorm';
 
