@@ -34,7 +34,7 @@ export class ServerSocket {
           .to(conversation)
           .emit(
             ESocketEvent.GetMessage,
-            socketService.getMessage(user, message)
+            socketService.getInfoMessage(user, message)
           );
       });
 

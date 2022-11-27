@@ -64,7 +64,7 @@ export const saveMessage = (
   createMessage(conversation, senderId, text);
 };
 
-export const getMessage = async (userId: string, message: string) => {
+export const getInfoMessage = async (userId: string, message: string) => {
   const user = await getOneOrThrow({ where: { id: userId } });
   return {
     user: user,
