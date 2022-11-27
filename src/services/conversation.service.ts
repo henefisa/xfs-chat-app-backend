@@ -5,17 +5,25 @@ import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
+import { addMember } from './participants.service';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
   .getRepository(Conversation);
 
-export const createConversation = async (dto: CreateConversationDto) => {
+export const createConversation = async (
+  dto: CreateConversationDto,
+  userId: string
+) => {
   const newConversation = new Conversation();
 
   Object.assign(newConversation, dto);
 
-  return conversationRepository.save(newConversation);
+  const conversation = await conversationRepository.save(newConversation);
+
+  await addMember(dto, conversation.id, userId);
+
+  return conversation;
 };
 
 export const getOne = async (options: FindOneOptions<Conversation>) => {

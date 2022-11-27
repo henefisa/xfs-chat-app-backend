@@ -12,8 +12,12 @@ export const createConversation = async (
 ) => {
   try {
     res.setHeader('Content-Type', 'application/json');
+
+    const user = req.user as User;
+
     const newConversation = await conversationService.createConversation(
-      req.body
+      req.body,
+      user.id
     );
     return res.status(StatusCodes.OK).json(newConversation);
   } catch (error) {
