@@ -57,8 +57,8 @@ components:
         type: object
         properties:
             user:  
-              type: string
-              description: id of user
+              type: object
+              description: user
             text:
               type: string
               description: message

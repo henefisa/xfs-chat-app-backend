@@ -30,10 +30,12 @@ export class ServerSocket {
 
       socket.on(ESocketEvent.SendMessage, ({ user, conversation, message }) => {
         socketService.saveMessage(conversation, user, message);
-        socket.to(conversation).emit(ESocketEvent.GetMessage, {
-          user: user,
-          text: message,
-        });
+        socket
+          .to(conversation)
+          .emit(
+            ESocketEvent.GetMessage,
+            socketService.getInfoMessage(user, message)
+          );
       });
 
       socket.on(ESocketEvent.Disconnect, () => {

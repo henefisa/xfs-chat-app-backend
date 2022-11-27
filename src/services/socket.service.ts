@@ -1,4 +1,4 @@
-import { setOffline } from './user.service';
+import { setOffline, getOneOrThrow } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
@@ -62,4 +62,12 @@ export const saveMessage = (
   text: string
 ) => {
   createMessage(conversation, senderId, text);
+};
+
+export const getInfoMessage = async (userId: string, message: string) => {
+  const user = await getOneOrThrow({ where: { id: userId } });
+  return {
+    user: user,
+    text: message,
+  };
 };
