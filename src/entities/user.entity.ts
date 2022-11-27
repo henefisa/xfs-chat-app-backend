@@ -2,6 +2,7 @@ import { EUserRole } from 'src/interfaces/user.interface';
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shares';
 import { EUserStatus, EUserActiveStatus } from 'src/interfaces/user.interface';
+import { getSignedUrl } from 'src/services/s3.service';
 @Entity('users')
 export class User extends BaseEntity {
   @Column()
@@ -16,7 +17,22 @@ export class User extends BaseEntity {
   @Column({ nullable: true, name: 'full_name' })
   fullName: string;
 
-  @Column({ nullable: true })
+  @Column({
+    nullable: true,
+    transformer: {
+      from(value: string) {
+        if (value) {
+          return getSignedUrl(value);
+        }
+
+        return value;
+      },
+
+      to(value: string) {
+        return value;
+      },
+    },
+  })
   avatar: string;
 
   @Column({ nullable: true })
