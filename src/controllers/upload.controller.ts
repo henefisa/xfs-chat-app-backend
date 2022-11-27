@@ -17,3 +17,16 @@ export const getPreSignedUrl = async (
     next(error);
   }
 };
+
+export const getSignedUrl = async (
+  req: RequestWithBody<GetPreSignedUrlDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const presigned = S3Service.getSignedUrl(req.body.key);
+    return res.status(StatusCodes.OK).json(presigned);
+  } catch (error) {
+    next(error);
+  }
+};
