@@ -75,19 +75,3 @@ export const getConversations = async (
     next(error);
   }
 };
-
-export const checkConversationExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userTarget = req.body.userTarget;
-    const owner = req.body.owner;
-    const { conversations, count } =
-      await conversationService.checkConversationExists(userTarget, owner);
-    return res.status(StatusCodes.CREATED).json({ conversations, count });
-  } catch (error) {
-    next(error);
-  }
-};
