@@ -54,7 +54,23 @@ export const getConversationsOfUser = async (
     query.andWhere('conversation.id = :id', { id: options.id });
   }
 
-  const [conversations, count] = await query.getManyAndCount();
+  const c = await query.getMany();
+
+  const conversations: Conversation[] = [];
+  let count = 0;
+
+  for (const i of c) {
+    const conv = conversationRepository
+      .createQueryBuilder('conv')
+      .where('conv.id = :id', { id: i.id })
+      .leftJoinAndSelect('conv.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'users');
+    const con = await conv.getOne();
+    if (con) {
+      conversations.push(con);
+      count++;
+    }
+  }
 
   return {
     conversations,
