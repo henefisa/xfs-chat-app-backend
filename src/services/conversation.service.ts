@@ -113,3 +113,37 @@ export const getGroups = async (
 
   return c;
 };
+
+export const checkConversationExists = async (
+  userTargetId: string,
+  ownerId: string
+) => {
+  const query = await conversationRepository.createQueryBuilder('c');
+  query
+    .leftJoinAndSelect('c.participants', 'participants')
+    .where(
+      'participants.user = :userTargetId AND participants.adder = :ownerId',
+      { userTargetId: userTargetId, ownerId: ownerId }
+    )
+    .orWhere(
+      'participants.user = :ownerId AND participants.adder = :userTargetId',
+      { userTargetId: userTargetId, ownerId: ownerId }
+    );
+
+  const [conversations, count] = await query.getManyAndCount();
+
+  conversations.map(async (conversation) => {
+    const subquery = await conversationRepository.createQueryBuilder('c');
+    subquery
+      .leftJoinAndSelect('c.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'users')
+      .where('c.id = :conversationId', { conversationId: conversation.id });
+    const quantity = await subquery.getOne();
+    console.log(quantity);
+  });
+
+  return {
+    conversations,
+    count,
+  };
+};

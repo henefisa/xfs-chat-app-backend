@@ -28,7 +28,6 @@ export const subscribe = async (
     }
 
     socket.join(conversation);
-
     socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
     socket.emit(ESocketEvent.Error, error);
@@ -64,10 +63,10 @@ export const saveMessage = (
   createMessage(conversation, senderId, text);
 };
 
-export const getInfoMessage = async (userId: string, message: string) => {
+export const getInfoMessage = async (userId: string, text: string) => {
   const user = await getOneOrThrow({ where: { id: userId } });
   return {
     user: user,
-    text: message,
+    message: text,
   };
 };

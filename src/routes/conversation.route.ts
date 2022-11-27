@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  checkConversationExists,
   createConversation,
   getConversationById,
   getConversations,
@@ -157,5 +158,7 @@ router.get(
   validationQueryMiddleware(GetConversationDto),
   GetConversations
 );
+
+router.post('/check', checkConversationExists);
 
 export const conversationRoutes = router;
