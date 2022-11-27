@@ -429,7 +429,7 @@ router.get(
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.get('/:id', requireAuthMiddleware, roleMiddleware, getUserById);
+router.get('/:id', requireAuthMiddleware, activateMiddleware, getUserById);
 
 /**
  * @swagger
