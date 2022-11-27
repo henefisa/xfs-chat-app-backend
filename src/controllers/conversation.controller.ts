@@ -55,3 +55,23 @@ export const GetConversations = async (
     next(error);
   }
 };
+
+export const getConversations = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+
+    const user = req.user as User;
+
+    const conversations = await conversationService.getGroups(
+      user.id,
+      req.query
+    );
+    return res.status(StatusCodes.OK).json(conversations);
+  } catch (error) {
+    next(error);
+  }
+};
