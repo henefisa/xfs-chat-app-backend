@@ -56,7 +56,7 @@ export const GetConversations = async (
   }
 };
 
-export const GetGroups = async (
+export const getConversations = async (
   req: RequestWithBody,
   res: Response,
   next: NextFunction

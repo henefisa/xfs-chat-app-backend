@@ -2,8 +2,8 @@ import { Router } from 'express';
 import {
   createConversation,
   getConversationById,
+  getConversations,
   GetConversations,
-  GetGroups,
 } from 'src/controllers/conversation.controller';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
@@ -85,7 +85,7 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   validationQueryMiddleware(GetConversationDto),
-  GetGroups
+  getConversations
 );
 
 /**
