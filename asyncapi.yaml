@@ -59,7 +59,7 @@ components:
             user:  
               type: object
               description: user
-            text:
+            message:
               type: string
               description: message
      USER_LEFT:

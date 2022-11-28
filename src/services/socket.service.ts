@@ -5,13 +5,8 @@ import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';
 import { NotFoundException } from 'src/exceptions';
 
-export const disconnect = (
-  socket: Socket,
-  conversation: string,
-  user: string
-) => {
+export const disconnect = (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
-  socket.to(conversation).emit(ESocketEvent.UserLeft, { user });
   setOffline(user);
 };
 

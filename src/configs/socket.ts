@@ -27,27 +27,25 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
       socketService.subscribe(conversationId, userId, socket);
-
-      socket.on(
-        ESocketEvent.SendMessage,
-        async ({ userId, conversationId, text }) => {
-          socketService.saveMessage(conversationId, userId, text);
-
-          const { user, message } = await socketService.getInfoMessage(
-            userId,
-            text
-          );
-
-          socket
-            .to(conversationId)
-            .emit(ESocketEvent.GetMessage, { user, message });
-        }
-      );
-
-      socket.on(ESocketEvent.Disconnect, () => {
-        socketService.disconnect(socket, conversationId, userId);
-      });
     });
+
+    socket.on(ESocketEvent.Disconnect, ({ userId }) => {
+      socketService.disconnect(socket, userId);
+    });
+
+    socket.on(
+      ESocketEvent.SendMessage,
+      async ({ userId, conversationId, text }) => {
+        socketService.saveMessage(conversationId, userId, text);
+        const { user, message } = await socketService.getInfoMessage(
+          userId,
+          text
+        );
+        socket
+          .to(conversationId)
+          .emit(ESocketEvent.GetMessage, { user, message });
+      }
+    );
 
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
       socketService.unsubscribe(room, socket);
