@@ -5,13 +5,8 @@ import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';
 import { NotFoundException } from 'src/exceptions';
 
-export const disconnect = (
-  socket: Socket,
-  conversation: string,
-  user: string
-) => {
+export const disconnect = (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
-  socket.to(conversation).emit(ESocketEvent.UserLeft, { user });
   setOffline(user);
 };
 
@@ -28,7 +23,6 @@ export const subscribe = async (
     }
 
     socket.join(conversation);
-
     socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
     socket.emit(ESocketEvent.Error, error);
@@ -64,10 +58,10 @@ export const saveMessage = (
   createMessage(conversation, senderId, text);
 };
 
-export const getInfoMessage = async (userId: string, message: string) => {
+export const getInfoMessage = async (userId: string, text: string) => {
   const user = await getOneOrThrow({ where: { id: userId } });
   return {
     user: user,
-    text: message,
+    message: text,
   };
 };
