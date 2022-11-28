@@ -5,6 +5,7 @@ import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
+import { Participants } from 'src/entities/participants.entity';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -39,9 +40,18 @@ export const getConversationsOfUser = async (
   }
 
   query
-    .leftJoin('conversation.participants', 'participants')
-    .leftJoin('participants.user', 'users')
-    .andWhere('participants.userId = :userId', { userId });
+    .leftJoinAndSelect('conversation.participants', 'participants')
+    .leftJoinAndSelect('participants.user', 'users')
+    .where(
+      'conversation.id IN' +
+        query
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where('p.userId = :userId')
+          .getQuery()
+    )
+    .setParameter('userId', userId);
 
   if (dto?.q) {
     query.andWhere(
@@ -54,19 +64,7 @@ export const getConversationsOfUser = async (
     query.andWhere('conversation.id = :id', { id: options.id });
   }
 
-  const [conv, count] = await query.getManyAndCount();
-
-  const promise = conv.map(async (conversation) => {
-    const conversations = conversationRepository
-      .createQueryBuilder('conv')
-      .where('conv.id = :id', { id: conversation.id })
-      .leftJoinAndSelect('conv.participants', 'participants')
-      .leftJoinAndSelect('participants.user', 'users');
-    const c = await conversations.getOne();
-    return c;
-  });
-
-  const conversations = await Promise.all(promise);
+  const [conversations, count] = await query.getManyAndCount();
 
   return {
     conversations,
