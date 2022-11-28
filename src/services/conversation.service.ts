@@ -5,6 +5,7 @@ import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
+import { Participants } from 'src/entities/participants.entity';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -39,13 +40,22 @@ export const getConversationsOfUser = async (
   }
 
   query
-    .leftJoin('conversation.participants', 'participants')
-    .leftJoin('participants.user', 'users')
-    .andWhere('participants.userId = :userId', { userId });
+    .leftJoinAndSelect('conversation.participants', 'participants')
+    .leftJoinAndSelect('participants.user', 'users')
+    .where(
+      'conversation.id IN' +
+        query
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where('p.userId = :userId')
+          .getQuery()
+    )
+    .setParameter('userId', userId);
 
   if (dto?.q) {
     query.andWhere(
-      '(title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q) AND participants.userId = :userId ',
+      '(title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q)',
       { q: `%${dto.q}%`, userId: userId }
     );
   }
