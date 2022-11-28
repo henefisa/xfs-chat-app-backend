@@ -50,12 +50,12 @@ export const sendMessage = (
   });
 };
 
-export const saveMessage = (
+export const saveMessage = async (
   conversation: string,
   senderId: string,
   text: string
 ) => {
-  createMessage(conversation, senderId, text);
+  await createMessage(conversation, senderId, text);
 };
 
 export const getInfoMessage = async (userId: string, text: string) => {
