@@ -43,15 +43,9 @@ export const getConversationsOfUser = async (
     .leftJoinAndSelect('conversation.participants', 'participants')
     .leftJoinAndSelect('participants.user', 'users')
     .where(
-      'conversation.id IN' +
-        query
-          .subQuery()
-          .select('p.conversationId')
-          .from(Participants, 'p')
-          .where('p.userId = :userId')
-          .getQuery()
-    )
-    .setParameter('userId', userId);
+      'conversation.id IN (SELECT "conversationId" FROM participants WHERE "userId" = :userId)',
+      { userId }
+    );
 
   if (dto?.q) {
     query.andWhere(
