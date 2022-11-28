@@ -47,10 +47,12 @@ export const GetConversations = async (
 
     const user = req.user as User;
 
-    const { conversations, count } =
-      await conversationService.getConversationsOfUser(user.id, req.query);
+    const conversations = await conversationService.getConversationsOfUser(
+      user.id,
+      req.query
+    );
 
-    return res.status(StatusCodes.OK).json({ conversations, count });
+    return res.status(StatusCodes.OK).json(conversations);
   } catch (error) {
     next(error);
   }

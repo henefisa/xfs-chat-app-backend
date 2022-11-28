@@ -54,23 +54,19 @@ export const getConversationsOfUser = async (
     query.andWhere('conversation.id = :id', { id: options.id });
   }
 
-  const c = await query.getMany();
+  const [conv, count] = await query.getManyAndCount();
 
-  const conversations: Conversation[] = [];
-  let count = 0;
-
-  for (const i of c) {
-    const conv = conversationRepository
+  const promise = conv.map(async (conversation) => {
+    const conversations = conversationRepository
       .createQueryBuilder('conv')
-      .where('conv.id = :id', { id: i.id })
+      .where('conv.id = :id', { id: conversation.id })
       .leftJoinAndSelect('conv.participants', 'participants')
       .leftJoinAndSelect('participants.user', 'users');
-    const con = await conv.getOne();
-    if (con) {
-      conversations.push(con);
-      count++;
-    }
-  }
+    const c = await conversations.getOne();
+    return c;
+  });
+
+  const conversations = await Promise.all(promise);
 
   return {
     conversations,
