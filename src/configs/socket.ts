@@ -36,7 +36,7 @@ export class ServerSocket {
     socket.on(
       ESocketEvent.SendMessage,
       async ({ userId, conversationId, text }) => {
-        socketService.saveMessage(conversationId, userId, text);
+        await socketService.saveMessage(conversationId, userId, text);
         const { user, message } = await socketService.getInfoMessage(
           userId,
           text
