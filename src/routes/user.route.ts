@@ -273,7 +273,7 @@ router.put(
 /**
  * @swagger
  * /api/users/profile:
- *  put:
+ *  patch:
  *    summary: Update user profile by the id
  *    tags: [Users]
  *    requestBody:
@@ -295,7 +295,7 @@ router.put(
  *        description: Internal server error
  */
 
-router.put(
+router.patch(
   '/profile',
   requireAuthMiddleware,
   activateMiddleware,
