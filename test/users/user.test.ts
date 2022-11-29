@@ -87,7 +87,7 @@ describe(`GET ${routes.profile}`, () => {
   });
 });
 
-describe(`PUT ${routes.profile}`, () => {
+describe(`PATCH ${routes.profile}`, () => {
   beforeAll(async () => {
     await Database.instance.seedUsers([testUser]);
   });
@@ -120,7 +120,7 @@ describe(`PUT ${routes.profile}`, () => {
 
   test('Update user profile without access token', async () => {
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .send({ username: 'newUsername' });
 
     expect(response.status).toBe(401);
@@ -131,7 +131,7 @@ describe(`PUT ${routes.profile}`, () => {
     const username = 'newUsername';
 
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ username });
 
@@ -141,7 +141,7 @@ describe(`PUT ${routes.profile}`, () => {
 
   test('Update exist username', async () => {
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ username: testUser2.username });
 
@@ -153,7 +153,7 @@ describe(`PUT ${routes.profile}`, () => {
     const fullName = 'fullName';
 
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ fullName });
 
@@ -165,7 +165,7 @@ describe(`PUT ${routes.profile}`, () => {
     const phone = '0328843993';
 
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ phone });
 
@@ -177,7 +177,7 @@ describe(`PUT ${routes.profile}`, () => {
     const email = 'test@gmail.com';
 
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ email });
 
@@ -187,7 +187,7 @@ describe(`PUT ${routes.profile}`, () => {
 
   test('Update exist email', async () => {
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ email: testUser2.email });
 
@@ -197,7 +197,7 @@ describe(`PUT ${routes.profile}`, () => {
 
   test('Update invalid email format', async () => {
     const response = await request(server)
-      .put(routes.profile)
+      .patch(routes.profile)
       .set('Authorization', `Bearer ${access_token}`)
       .send({ email: 'test123' });
 
