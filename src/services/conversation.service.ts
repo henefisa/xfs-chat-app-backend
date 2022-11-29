@@ -201,7 +201,7 @@ export const checkConversationOfTwoMember = async (
   const conversation = await query.getOne();
 
   if (!conversation) {
-    return false;
+    return null;
   }
 
   return conversation;
