@@ -4,6 +4,7 @@ import { RequestWithBody } from 'src/shares';
 import * as conversationService from 'src/services/conversation.service';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { User } from 'src/entities/user.entity';
+import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 
 export const createConversation = async (
   req: RequestWithBody<CreateConversationDto>,
@@ -71,6 +72,24 @@ export const getConversations = async (
       req.query
     );
     return res.status(StatusCodes.OK).json(conversations);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkConversationOfTwoMember = async (
+  req: RequestWithBody<CheckConversationDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const reqUser = (await req.user) as User;
+    const conversations =
+      await conversationService.checkConversationOfTwoMember(
+        req.body,
+        reqUser.id
+      );
+    return res.status(StatusCodes.CREATED).json(conversations);
   } catch (error) {
     next(error);
   }

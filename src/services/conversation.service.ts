@@ -6,6 +6,7 @@ import { CreateConversationDto } from 'src/dto/conversation/create-conversation.
 import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
 import { Participants } from 'src/entities/participants.entity';
+import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -122,4 +123,44 @@ export const getGroups = async (
   }
 
   return c;
+};
+
+export const checkConversationOfTwoMember = async (
+  dto: CheckConversationDto,
+  ownerId: string
+) => {
+  const query = await conversationRepository.createQueryBuilder('c');
+
+  query
+    .leftJoinAndSelect('c.participants', 'participants')
+    .where(
+      'c.id IN' +
+        query
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where('p.user = :userTargetId AND p.adder = :ownerId', {
+            userTargetId: dto.userTarget,
+            ownerId: ownerId,
+          })
+          .orWhere('p.user = :ownerId AND p.adder = :userTargetId', {
+            userTargetId: dto.userTarget,
+            ownerId: ownerId,
+          })
+          .getQuery()
+    );
+
+  const conversations = await query.getMany();
+
+  if (!conversations) {
+    return false;
+  }
+
+  for (const c of conversations) {
+    if (c.participants.length === 2) {
+      return c;
+    }
+  }
+
+  return false;
 };
