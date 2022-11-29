@@ -13,4 +13,7 @@ export class Conversation extends BaseEntity {
 
   @OneToMany(() => Participants, (participants) => participants.conversation)
   participants: Participants[];
+
+  @Column({ default: false, name: 'is_group' })
+  isGroup: boolean;
 }
