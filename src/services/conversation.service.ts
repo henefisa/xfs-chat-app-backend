@@ -37,7 +37,7 @@ export const createConversation = async (
       .withRepository(conversationRepository)
       .save(newConversation);
 
-    dto.members.forEach(async (member) => {
+    const promise = dto.members.map(async (member) => {
       const checked = await checkMemberExist(conversation.id, member);
       if (checked) {
         throw new ExistsException('member');
@@ -52,7 +52,10 @@ export const createConversation = async (
       await queryRunner.manager
         .withRepository(participantRepository)
         .save(participant);
+      return participant;
     });
+
+    await Promise.all(promise);
 
     await queryRunner.commitTransaction();
     return conversation;
