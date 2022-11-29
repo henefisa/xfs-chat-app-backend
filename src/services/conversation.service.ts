@@ -8,6 +8,7 @@ import { FindOneOptions } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
 import { ExistsException } from 'src/exceptions';
+import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -30,8 +31,11 @@ export const createConversation = async (
 
   try {
     const newConversation = new Conversation();
-
-    Object.assign(newConversation, dto);
+    const request = {
+      ...dto,
+      isGroup: dto.members.length > 2 ? true : false,
+    };
+    Object.assign(newConversation, request);
 
     const conversation = await queryRunner.manager
       .withRepository(conversationRepository)
@@ -168,4 +172,37 @@ export const getGroups = async (
   }
 
   return c;
+};
+
+export const checkConversationOfTwoMember = async (
+  dto: CheckConversationDto,
+  ownerId: string
+) => {
+  const query = await conversationRepository.createQueryBuilder('c');
+
+  query
+    .leftJoinAndSelect('c.participants', 'participants')
+    .where(
+      'participants.user = :userTargetId AND participants.adder = :ownerId',
+      {
+        userTargetId: dto.userTarget,
+        ownerId: ownerId,
+      }
+    )
+    .orWhere(
+      'participants.user = :ownerId AND participants.adder = :userTargetId',
+      {
+        userTargetId: dto.userTarget,
+        ownerId: ownerId,
+      }
+    )
+    .andWhere('c.isGroup = false');
+
+  const conversation = await query.getOne();
+
+  if (!conversation) {
+    return false;
+  }
+
+  return conversation;
 };
