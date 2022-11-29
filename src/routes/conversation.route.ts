@@ -161,7 +161,7 @@ router.get(
 
 /**
  * @swagger
- * /api/conversations/check:
+ * /api/conversations/check-conversation:
  *   post:
  *     summary: Check conversation for two member
  *     tags: [Conversations]
