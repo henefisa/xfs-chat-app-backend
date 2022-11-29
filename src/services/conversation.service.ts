@@ -5,26 +5,61 @@ import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
-import { addMember } from './participants.service';
+import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
+import { ExistsException } from 'src/exceptions';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
   .getRepository(Conversation);
 
+const participantRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(Participants);
+
+const dataSource = Database.instance.getDataSource('default');
 export const createConversation = async (
   dto: CreateConversationDto,
   userId: string
 ) => {
-  const newConversation = new Conversation();
+  const queryRunner = dataSource.createQueryRunner();
 
-  Object.assign(newConversation, dto);
+  await queryRunner.connect();
 
-  const conversation = await conversationRepository.save(newConversation);
+  await queryRunner.startTransaction();
 
-  await addMember(dto, conversation.id, userId);
+  try {
+    const newConversation = new Conversation();
 
-  return conversation;
+    Object.assign(newConversation, dto);
+
+    const conversation = await queryRunner.manager
+      .withRepository(conversationRepository)
+      .save(newConversation);
+
+    dto.members.forEach(async (member) => {
+      const checked = await checkMemberExist(conversation.id, member);
+      if (checked) {
+        throw new ExistsException('member');
+      }
+      const participant = new Participants();
+      const request = {
+        conversation: conversation.id,
+        user: member,
+        adder: userId,
+      };
+      Object.assign(participant, request);
+      await queryRunner.manager
+        .withRepository(participantRepository)
+        .save(participant);
+    });
+
+    await queryRunner.commitTransaction();
+    return conversation;
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    throw error;
+  }
 };
 
 export const getOne = async (options: FindOneOptions<Conversation>) => {
