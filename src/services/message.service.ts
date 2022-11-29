@@ -91,6 +91,8 @@ export const getMessages = async (
     query.andWhere('m.id = :id', { id: options.id });
   }
 
+  query.orderBy('m.createdAt', 'DESC');
+
   const [messages, count] = await query.getManyAndCount();
 
   return {
