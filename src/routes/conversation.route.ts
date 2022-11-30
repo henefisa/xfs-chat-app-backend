@@ -32,6 +32,11 @@ const router: Router = Router();
  *                   title:
  *                      type: string
  *                      description: title of conversation
+ *                   members:
+ *                      type: array
+ *                      items:
+ *                         schema:
+ *                             type: string
  *     security:
  *        - bearerAuth: []
  *     responses:
