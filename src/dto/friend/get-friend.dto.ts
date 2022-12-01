@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
 import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
 
 export class GetUserFriendDto {
@@ -11,13 +10,11 @@ export class GetUserFriendDto {
   @IsOptional()
   status?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   limit?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   offset?: number;
 }

@@ -1,18 +1,15 @@
-import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class GetConversationDto {
   @IsString()
   @IsOptional()
   q?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   limit?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   offset?: number;
 }
