@@ -31,12 +31,12 @@ export const createConversation = async (
   await queryRunner.startTransaction();
 
   try {
-    const newConversation = new Conversation();
+    const newConversation = await new Conversation();
     const request = {
       ...dto,
       isGroup: dto.members.length > 2 ? true : false,
     };
-    Object.assign(newConversation, request);
+    await Object.assign(newConversation, request);
 
     const conversation = await queryRunner.manager
       .withRepository(conversationRepository)
