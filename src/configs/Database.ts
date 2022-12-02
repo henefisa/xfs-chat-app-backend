@@ -3,7 +3,7 @@ import { join } from 'path';
 import { NotFoundException } from 'src/exceptions';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { EUserStatus } from 'src/interfaces/user.interface';
+import { EUserActiveStatus } from 'src/interfaces/user.interface';
 
 config();
 
@@ -84,7 +84,7 @@ export default class Database {
       username: string;
       password: string;
       email: string;
-      status?: EUserStatus;
+      status?: EUserActiveStatus;
     }[]
   ) {
     const dataSource = this.getDataSource('default');
@@ -96,7 +96,7 @@ export default class Database {
         `INSERT INTO users (username, password, email, status) VALUES ('${
           item.username
         }', '${password}', '${item.email}', '${
-          item.status || EUserStatus.Active
+          item.status || EUserActiveStatus.Active
         }')`
       );
     });

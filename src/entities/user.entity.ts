@@ -46,13 +46,16 @@ export class User extends BaseEntity {
 
   @Column({
     nullable: true,
-    default: EUserActiveStatus.OFFLINE,
+    default: EUserStatus.OFFLINE,
+  })
+  status: EUserStatus;
+
+  @Column({
+    enum: EUserStatus,
+    default: EUserActiveStatus.Inactive,
     name: 'user_active_status',
   })
   activeStatus: EUserActiveStatus;
-
-  @Column({ enum: EUserStatus, default: EUserStatus.Inactive })
-  status: EUserStatus;
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
   role: EUserRole;

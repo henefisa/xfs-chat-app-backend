@@ -1,7 +1,7 @@
 import { User } from 'src/entities/user.entity';
 import { GetOptions } from 'src/shares/get-options';
 
-export enum EUserStatus {
+export enum EUserActiveStatus {
   Active = 'ACTIVE',
   Inactive = 'INACTIVE',
   Deactivate = 'DEACTIVATE',
@@ -15,7 +15,7 @@ export enum EUserRole {
   USER = 'USER',
 }
 
-export enum EUserActiveStatus {
+export enum EUserStatus {
   ONLINE = 'ONLINE',
   OFFLINE = 'OFFLINE',
   BUSY = 'BUSY',
