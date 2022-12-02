@@ -114,6 +114,8 @@ export const getConversationsOfUser = async (
     query.andWhere('conversation.id = :id', { id: options.id });
   }
 
+  query.orderBy('conversation.createdAt', 'DESC');
+
   const [conversations, count] = await query.getManyAndCount();
 
   return {
