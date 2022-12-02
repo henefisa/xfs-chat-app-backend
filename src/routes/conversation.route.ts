@@ -5,9 +5,11 @@ import {
   getConversationById,
   getConversations,
   GetConversations,
+  updateConversation,
 } from 'src/controllers/conversation.controller';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
+import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import activateMiddleware from 'src/middlewares/activate.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware, {
@@ -51,6 +53,49 @@ router.post(
   activateMiddleware,
   validationMiddleware(CreateConversationDto),
   createConversation
+);
+
+/**
+ * @swagger
+ * /api/conversations/{id}:
+ *  patch:
+ *    summary: Update conversation
+ *    tags: [Conversations]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *         application/json:
+ *            schema:
+ *               type: object
+ *               properties:
+ *                    title:
+ *                       type: string
+ *                       description: title of conversation
+ *                    avatar:
+ *                       type: string
+ *                       description: key of url
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: user was updated
+ *      500:
+ *        description: Internal server error
+ */
+
+router.patch(
+  '/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationMiddleware(UpdateConversationDto),
+  updateConversation
 );
 
 /**
