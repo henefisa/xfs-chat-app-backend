@@ -82,14 +82,14 @@ export const getConversations = async (
   }
 };
 
-export const checkConversationOfTwoMember = async (
+export const getCoupleConversation = async (
   req: RequestWithBody<CheckConversationDto>,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const reqUser = req.user as User;
-    const conversation = await conversationService.checkConversationOfTwoMember(
+    const conversation = await conversationService.getCoupleConversation(
       req.body,
       reqUser.id
     );

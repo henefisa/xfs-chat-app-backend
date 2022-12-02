@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  checkConversationOfTwoMember,
+  getCoupleConversation,
   createConversation,
   getConversationById,
   getConversations,
@@ -236,7 +236,7 @@ router.post(
   '/check-conversation',
   requireAuthMiddleware,
   activateMiddleware,
-  checkConversationOfTwoMember
+  getCoupleConversation
 );
 
 export const conversationRoutes = router;

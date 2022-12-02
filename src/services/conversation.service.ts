@@ -231,3 +231,41 @@ export const updateConversation = async (
 
   return conversationRepository.save(conversation);
 };
+
+export const getCoupleConversation = async (
+  dto: CheckConversationDto,
+  ownerId: string
+) => {
+  const query = await conversationRepository.createQueryBuilder('c');
+
+  query
+    .leftJoinAndSelect('c.participants', 'participants')
+    .leftJoinAndSelect('participants.user', 'users')
+    .where('c.isGroup = false')
+    .andWhere(
+      'c.id IN' +
+        query
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where((subQuery) => {
+            subQuery
+              .where('p.user = :userTargetId AND p.adder = :ownerId', {
+                userTargetId: dto.userTarget,
+                ownerId: ownerId,
+              })
+              .orWhere('p.user = :ownerId AND p.adder = :userTargetId', {
+                userTargetId: dto.userTarget,
+                ownerId: ownerId,
+              });
+          })
+          .getQuery()
+    );
+
+  const conversation = await query.getOne();
+  if (!conversation) {
+    return undefined;
+  }
+
+  return conversation;
+};
