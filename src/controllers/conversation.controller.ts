@@ -5,6 +5,7 @@ import { RequestWithBody } from 'src/shares';
 import * as conversationService from 'src/services/conversation.service';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { User } from 'src/entities/user.entity';
+import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 
 export const createConversation = async (
   req: RequestWithBody<CreateConversationDto>,
@@ -93,6 +94,28 @@ export const checkConversationOfTwoMember = async (
       reqUser.id
     );
     return res.status(StatusCodes.OK).json(conversation);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateConversation = async (
+  req: RequestWithBody<UpdateConversationDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+
+    const user = req.user as User;
+
+    const updated = await conversationService.updateConversation(
+      req.body,
+      req.params.id,
+      user.id
+    );
+
+    return res.status(StatusCodes.OK).json(updated);
   } catch (error) {
     next(error);
   }

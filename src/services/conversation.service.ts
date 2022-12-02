@@ -7,8 +7,9 @@ import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
-import { ExistsException } from 'src/exceptions';
+import { ExistsException, NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
+import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -207,4 +208,26 @@ export const checkConversationOfTwoMember = async (
   }
 
   return conversation;
+};
+
+export const updateConversation = async (
+  dto: UpdateConversationDto,
+  conversationId: string,
+  userId: string
+) => {
+  const conversation = await getOne({ where: { id: conversationId } });
+
+  if (!conversation) {
+    throw new NotFoundException('conversation');
+  }
+
+  const check = await checkMemberExist(conversationId, userId);
+
+  if (!check) {
+    throw new NotFoundException('member');
+  }
+
+  Object.assign(conversation, dto);
+
+  return conversationRepository.save(conversation);
 };
