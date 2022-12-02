@@ -115,15 +115,15 @@ export const getFriends = async (
 
   query.orderBy('friends.createdAt', 'DESC');
 
-  const [f, count] = await query.getManyAndCount();
+  const [listFriend, count] = await query.getManyAndCount();
 
-  const promise = f.map((friend) => {
-    const q = userFriendRepository.createQueryBuilder('f');
+  const promise = listFriend.map((friend) => {
+    const query = userFriendRepository.createQueryBuilder('f');
     if (friend.owner.id === id) {
-      q.leftJoinAndSelect('f.userTarget', 'users').where('f.id = :id', {
+      query.leftJoinAndSelect('f.userTarget', 'users').where('f.id = :id', {
         id: friend.id,
       });
-      return q.getOne();
+      return query.getOne();
     }
     return friend;
   });
