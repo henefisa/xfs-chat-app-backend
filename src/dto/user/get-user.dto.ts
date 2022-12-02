@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
 import { EUserStatus } from 'src/interfaces/user.interface';
 
 export class GetUserDto {
@@ -11,13 +10,11 @@ export class GetUserDto {
   @IsOptional()
   status?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   limit?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  @Type(() => Number)
   offset?: number;
 }
