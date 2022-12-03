@@ -93,7 +93,12 @@ export const getFriends = async (
     query.skip(offset).take(limit);
   }
 
-  query.leftJoinAndSelect('friends.owner', 'users');
+  query.leftJoinAndSelect('friends.owner', 'user_request');
+  query.leftJoinAndSelect('friends.userTarget', 'user_target');
+
+  query.andWhere('(friends.userTargetId = :id OR friends.ownerId = :id )', {
+    id: id,
+  });
 
   if (dto?.q) {
     query.andWhere('(full_name ILIKE :q OR username ILIKE :q)', {
@@ -115,20 +120,7 @@ export const getFriends = async (
 
   query.orderBy('friends.createdAt', 'DESC');
 
-  const [listFriend, count] = await query.getManyAndCount();
-
-  const promise = listFriend.map((friend) => {
-    const query = userFriendRepository.createQueryBuilder('f');
-    if (friend.owner.id === id) {
-      query.leftJoinAndSelect('f.userTarget', 'users').where('f.id = :id', {
-        id: friend.id,
-      });
-      return query.getOne();
-    }
-    return friend;
-  });
-
-  const friends = await Promise.all(promise);
+  const [friends, count] = await query.getManyAndCount();
 
   return {
     friends,
