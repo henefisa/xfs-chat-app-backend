@@ -93,7 +93,7 @@ export default class Database {
       const password = await bcrypt.hash(item.password, await bcrypt.genSalt());
 
       return dataSource.query(
-        `INSERT INTO users (username, password, email, status) VALUES ('${
+        `INSERT INTO users (username, password, email, user_active_status ) VALUES ('${
           item.username
         }', '${password}', '${item.email}', '${
           item.status || EUserActiveStatus.Active
