@@ -55,8 +55,8 @@ export const getUsers = async (
   const query = userRepository
     .createQueryBuilder('u')
     .andWhere('u.id != :userId', { userId })
-    .andWhere('u.status = :status', {
-      status: EUserStatus.Active,
+    .andWhere('u.activeStatus = :status', {
+      status: EUserActiveStatus.Active,
     });
 
   if (!options?.unlimited) {
@@ -279,13 +279,15 @@ export const Deactivate = async (id: string) => {
     where: { id: id },
   });
 
-  user.status = EUserStatus.Deactivate;
+  user.activeStatus = EUserActiveStatus.Deactivate;
 
   return userRepository.save(user);
 };
 
-export const checkActivateValidation = async (status: EUserStatus) => {
-  if ([EUserStatus.Deactivate, EUserStatus.Inactive].includes(status)) {
+export const checkActivateValidation = async (status: EUserActiveStatus) => {
+  if (
+    [EUserActiveStatus.Deactivate, EUserActiveStatus.Inactive].includes(status)
+  ) {
     return false;
   }
 
@@ -297,7 +299,7 @@ export const setOnline = async (userId: string) => {
     where: { id: userId },
   });
 
-  user.activeStatus = EUserActiveStatus.ONLINE;
+  user.status = EUserStatus.ONLINE;
 
   return userRepository.save(user);
 };
@@ -307,7 +309,7 @@ export const setOffline = async (userId: string) => {
     where: { id: userId },
   });
 
-  user.activeStatus = EUserActiveStatus.OFFLINE;
+  user.status = EUserStatus.OFFLINE;
 
   return userRepository.save(user);
 };

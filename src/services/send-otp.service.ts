@@ -2,10 +2,10 @@ import redis from 'src/configs/Redis';
 import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
 import nodemailer from 'nodemailer';
-import { EUserStatus } from 'src/interfaces/user.interface';
 import Database from 'src/configs/Database';
 import { User } from 'src/entities/user.entity';
 import { getOneOrThrow } from './user.service';
+import { EUserActiveStatus } from 'src/interfaces/user.interface';
 
 config();
 
@@ -57,7 +57,7 @@ export const checkOtp = async (email: string, code: string) => {
 
   const user = await getOneOrThrow({ where: { email: email } });
 
-  user.status = EUserStatus.Active;
+  user.activeStatus = EUserActiveStatus.Active;
 
   await userRepository.save(user);
 
