@@ -1,17 +1,12 @@
-import { setOffline } from './user.service';
+import { setOffline, getOneOrThrow } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Socket } from 'socket.io';
 import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';
 import { NotFoundException } from 'src/exceptions';
 
-export const disconnect = (
-  socket: Socket,
-  conversation: string,
-  user: string
-) => {
+export const disconnect = (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
-  socket.to(conversation).emit(ESocketEvent.UserLeft, { user });
   setOffline(user);
 };
 
@@ -28,7 +23,6 @@ export const subscribe = async (
     }
 
     socket.join(conversation);
-
     socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
     socket.emit(ESocketEvent.Error, error);
@@ -56,10 +50,18 @@ export const sendMessage = (
   });
 };
 
-export const saveMessage = (
+export const saveMessage = async (
   conversation: string,
   senderId: string,
   text: string
 ) => {
-  createMessage(conversation, senderId, text);
+  await createMessage(conversation, senderId, text);
+};
+
+export const getInfoMessage = async (userId: string, text: string) => {
+  const user = await getOneOrThrow({ where: { id: userId } });
+  return {
+    user: user,
+    message: text,
+  };
 };

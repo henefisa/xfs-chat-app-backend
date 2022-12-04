@@ -26,10 +26,10 @@ components:
       payload:
         type: object
         properties:
-            conversation:
+            conversationId:
               type: string
               description: id of conversation
-            user:
+            userId:
               type: string
               description: id of user
      UNSUBSCRIBE:
@@ -43,13 +43,13 @@ components:
       payload:
         type: object       
         properties:
-            user:
+            userId:
               type: string
               description: id of user
-            conversation:
+            conversationId:
               type: string
               description: id of conversation
-            message: 
+            text: 
               type: string
               description: text
      GET_MESSAGE:
@@ -57,9 +57,9 @@ components:
         type: object
         properties:
             user:  
-              type: string
-              description: id of user
-            text:
+              type: object
+              description: user
+            message:
               type: string
               description: message
      USER_LEFT:

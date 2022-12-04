@@ -36,7 +36,7 @@ export const getParticipants = async (
       req.params.id,
       reqUser.id
     );
-    return res.status(StatusCodes.CREATED).json({ participants, count });
+    return res.status(StatusCodes.OK).json({ participants, count });
   } catch (error) {
     next(error);
   }

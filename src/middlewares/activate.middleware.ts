@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenException, UnauthorizedException } from 'src/exceptions';
-import { EUserStatus } from 'src/interfaces/user.interface';
+import { EUserActiveStatus } from 'src/interfaces/user.interface';
 import { getOne } from 'src/services/user.service';
 import { verifyToken } from './check-roles.middleware';
 
@@ -15,7 +15,11 @@ export default async function activateMiddleware(
     if (!user) {
       throw new UnauthorizedException();
     }
-    if ([EUserStatus.Deactivate, EUserStatus.Inactive].includes(user.status)) {
+    if (
+      [EUserActiveStatus.Deactivate, EUserActiveStatus.Inactive].includes(
+        user.activeStatus
+      )
+    ) {
       throw new ForbiddenException();
     }
 
