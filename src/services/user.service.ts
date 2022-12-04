@@ -109,14 +109,9 @@ export const getUsers = async (
     const conversation = conversationRepository
       .createQueryBuilder('c')
       .leftJoin(Participants, 'p', 'p.conversationId = c.id')
-      .where('(p.userId = :userId AND p.adderId = :adder)', {
-        userId,
-        adder: user.id,
-      })
-      .orWhere('(p.adder = :userId AND p.userId = :adder)', {
-        userId,
-        adder: user.id,
-      })
+      .where('(p.userId = :userId AND p.adderId = :adder)')
+      .orWhere('(p.adder = :userId AND p.userId = :adder)')
+      .setParameters({ userId, adder: user.id })
       .andWhere('c.is_group = false');
 
     return {
