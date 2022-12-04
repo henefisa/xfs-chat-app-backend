@@ -1,3 +1,4 @@
+import { Participants } from './../entities/participants.entity';
 import { FindOneOptions } from 'typeorm';
 import Database from 'src/configs/Database';
 import { UserFriend } from 'src/entities/user-friend.entity';
@@ -9,10 +10,14 @@ import {
 import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import { NotFoundException } from 'src/exceptions';
+import { Conversation } from 'src/entities/conversation.entity';
 
 const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
+const conversationRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(Conversation);
 
 export const getFriendRequest = async (
   userTargetId: string,
@@ -93,7 +98,12 @@ export const getFriends = async (
     query.skip(offset).take(limit);
   }
 
-  query.leftJoinAndSelect('friends.owner', 'users');
+  query.leftJoinAndSelect('friends.owner', 'user_request');
+  query.leftJoinAndSelect('friends.userTarget', 'user_target');
+
+  query.andWhere('(friends.userTargetId = :id OR friends.ownerId = :id )', {
+    id: id,
+  });
 
   if (dto?.q) {
     query.andWhere('(full_name ILIKE :q OR username ILIKE :q)', {
@@ -117,8 +127,50 @@ export const getFriends = async (
 
   const [friends, count] = await query.getManyAndCount();
 
+  const promises = friends.map(async (friend) => {
+    console.log('friend user target: ' + friend.userTarget.id);
+    console.log('friend owner: ' + friend.owner.id);
+
+    const secondQuery = conversationRepository.createQueryBuilder('c');
+    secondQuery.where('c.isGroup = false').andWhere(
+      'c.id IN' +
+        secondQuery
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where((subQuery) => {
+            subQuery
+              .where('p.user = :userTargetId AND p.adder = :ownerId', {
+                userTargetId: friend.owner.id,
+                ownerId: friend.userTarget.id,
+              })
+              .orWhere('p.user = :ownerId AND p.adder = :userTargetId', {
+                userTargetId: friend.owner.id,
+                ownerId: friend.userTarget.id,
+              });
+          })
+          .getQuery()
+    );
+
+    const conversation = await secondQuery.getOne();
+
+    if (!conversation) {
+      return {
+        ...friend,
+        conversation: null,
+      };
+    }
+
+    return {
+      ...friend,
+      conversation: conversation,
+    };
+  });
+
+  const p = await Promise.all(promises);
+
   return {
-    friends,
+    p,
     count,
   };
 };

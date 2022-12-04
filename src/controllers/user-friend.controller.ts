@@ -40,12 +40,12 @@ export const getFriends = async (
 
     const reqUser = req.user as User;
 
-    const { friends, count } = await userFriendService.getFriends(
+    const { p, count } = await userFriendService.getFriends(
       reqUser.id,
       req.query
     );
     return res.status(StatusCodes.OK).json({
-      friends,
+      p,
       count,
     });
   } catch (error) {
