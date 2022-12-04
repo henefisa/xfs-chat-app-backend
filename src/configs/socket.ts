@@ -21,6 +21,10 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
+    console.log(socket.id + ' has connected to server');
+
+    socket.join('public');
+
     socket.on(ESocketEvent.Online, ({ userId }) => {
       setOnline(userId);
     });
@@ -49,6 +53,14 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
       socketService.unsubscribe(room, socket);
+    });
+
+    socket.on('video-offer', (data) => {
+      socket.to('public').emit('video-offer', data);
+    });
+
+    socket.on('video-answer', (data) => {
+      socket.to('public').emit('video-answer', data);
     });
   }
   public start() {
