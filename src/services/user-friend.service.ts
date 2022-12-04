@@ -128,9 +128,6 @@ export const getFriends = async (
   const [friends, count] = await query.getManyAndCount();
 
   const promises = friends.map(async (friend) => {
-    console.log('friend user target: ' + friend.userTarget.id);
-    console.log('friend owner: ' + friend.owner.id);
-
     const secondQuery = conversationRepository.createQueryBuilder('c');
     secondQuery.where('c.isGroup = false').andWhere(
       'c.id IN' +
