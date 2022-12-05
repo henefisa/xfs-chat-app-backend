@@ -19,6 +19,8 @@ import {
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
 import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
+import { Participants } from 'src/entities/participants.entity';
+import { Conversation } from 'src/entities/conversation.entity';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -27,6 +29,10 @@ const userRepository = Database.instance
 const userFriendRepository = Database.instance
   .getDataSource('default')
   .getRepository(UserFriend);
+
+const conversationRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(Conversation);
 
 export const getOneOrThrow = async (options: FindOneOptions<User>) => {
   const user = await userRepository.findOne(options);
@@ -100,9 +106,18 @@ export const getUsers = async (
       .addSelect('userTarget.id')
       .orderBy('uf.createdAt', 'DESC');
 
+    const conversation = conversationRepository
+      .createQueryBuilder('c')
+      .leftJoin(Participants, 'p', 'p.conversationId = c.id')
+      .where('(p.userId = :userId AND p.adderId = :adder)')
+      .orWhere('(p.adder = :userId AND p.userId = :adder)')
+      .setParameters({ userId, adder: user.id })
+      .andWhere('c.is_group = false');
+
     return {
       ...user,
       friendStatus: await friendStatus.getOne(),
+      conversation: await conversation.getOne(),
     };
   });
 
