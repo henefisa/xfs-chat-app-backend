@@ -88,6 +88,8 @@ export const getUsers = async (
 
   const users = await query.getMany();
 
+  const userWithFriendAndConversation: User[] = [];
+
   const promises = users.map(async (user) => {
     const friendStatus = userFriendRepository
       .createQueryBuilder('uf')
@@ -106,6 +108,14 @@ export const getUsers = async (
       .addSelect('userTarget.id')
       .orderBy('uf.createdAt', 'DESC');
 
+    const friend = await friendStatus.getOne();
+
+    if (dto?.friendStatus) {
+      if (friend?.status !== dto.friendStatus) {
+        return null;
+      }
+    }
+
     const conversation = conversationRepository
       .createQueryBuilder('c')
       .leftJoin(Participants, 'p', 'p.conversationId = c.id')
@@ -114,24 +124,22 @@ export const getUsers = async (
       .setParameters({ userId, adder: user.id })
       .andWhere('c.is_group = false');
 
-    return {
+    const userWithFriend = {
       ...user,
-      friendStatus: await friendStatus.getOne(),
+      friendStatus: friend,
       conversation: await conversation.getOne(),
     };
+
+    userWithFriendAndConversation.push(userWithFriend);
+
+    return userWithFriend;
   });
 
-  let usersWithFriendStatus = await Promise.all(promises);
-  if (dto?.friendStatus) {
-    usersWithFriendStatus = usersWithFriendStatus.filter(
-      (user) => user.friendStatus?.status === dto.friendStatus
-    );
-  }
-  const count = usersWithFriendStatus.length;
+  await Promise.all(promises);
 
   return {
-    users: usersWithFriendStatus,
-    count,
+    users: userWithFriendAndConversation,
+    count: userWithFriendAndConversation.length,
   };
 };
 
