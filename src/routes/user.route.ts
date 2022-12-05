@@ -452,6 +452,12 @@ router.get('/:id', requireAuthMiddleware, activateMiddleware, getUserById);
  *         required: false
  *         description: status of user
  *       - in: query
+ *         name: friendStatus
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: status of friend
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer

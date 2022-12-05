@@ -86,7 +86,7 @@ export const getUsers = async (
     query.andWhere('u.id = :id', { id: options.id });
   }
 
-  const [users, count] = await query.getManyAndCount();
+  const users = await query.getMany();
 
   const promises = users.map(async (user) => {
     const friendStatus = userFriendRepository
@@ -121,7 +121,13 @@ export const getUsers = async (
     };
   });
 
-  const usersWithFriendStatus = await Promise.all(promises);
+  let usersWithFriendStatus = await Promise.all(promises);
+  if (dto?.friendStatus) {
+    usersWithFriendStatus = usersWithFriendStatus.filter(
+      (user) => user.friendStatus?.status === dto.friendStatus
+    );
+  }
+  const count = usersWithFriendStatus.length;
 
   return {
     users: usersWithFriendStatus,
