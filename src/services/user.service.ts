@@ -63,7 +63,17 @@ export const getUsers = async (
     .andWhere('u.id != :userId', { userId })
     .andWhere('u.activeStatus = :status', {
       status: EUserActiveStatus.Active,
+    })
+    .leftJoin(UserFriend, 'f', 'f.ownerId = u.id OR f.userTargetId = u.id');
+
+  if (dto?.friendStatus) {
+    query.andWhere('(f.userTargetId = :userId OR f.ownerId = :userId )', {
+      userId,
     });
+    query.andWhere(' (f.status = :s OR f.status = :s)', {
+      s: dto.friendStatus,
+    });
+  }
 
   if (!options?.unlimited) {
     query.skip(offset).take(limit);
@@ -106,6 +116,8 @@ export const getUsers = async (
       .addSelect('userTarget.id')
       .orderBy('uf.createdAt', 'DESC');
 
+    const friend = await friendStatus.getOne();
+
     const conversation = conversationRepository
       .createQueryBuilder('c')
       .leftJoin(Participants, 'p', 'p.conversationId = c.id')
@@ -116,16 +128,16 @@ export const getUsers = async (
 
     return {
       ...user,
-      friendStatus: await friendStatus.getOne(),
+      friendStatus: friend,
       conversation: await conversation.getOne(),
     };
   });
 
-  const usersWithFriendStatus = await Promise.all(promises);
+  const userWithFriendStatus = await Promise.all(promises);
 
   return {
-    users: usersWithFriendStatus,
-    count,
+    users: userWithFriendStatus,
+    count: count,
   };
 };
 
