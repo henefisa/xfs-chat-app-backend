@@ -63,7 +63,19 @@ export const getUsers = async (
     .andWhere('u.id != :userId', { userId })
     .andWhere('u.activeStatus = :status', {
       status: EUserActiveStatus.Active,
+    })
+    .leftJoin(UserFriend, 'f_owner', 'f_owner.ownerId = u.id')
+    .leftJoin(UserFriend, 'f_target', 'f_target.userTargetId = u.id');
+
+  if (dto?.friendStatus) {
+    query.andWhere(
+      '(f_owner.userTargetId = :userId OR f_target.ownerId = :userId )',
+      { userId }
+    );
+    query.andWhere(' (f_owner.status = :s OR f_target.status = :s)', {
+      s: dto.friendStatus,
     });
+  }
 
   if (!options?.unlimited) {
     query.skip(offset).take(limit);
@@ -86,9 +98,7 @@ export const getUsers = async (
     query.andWhere('u.id = :id', { id: options.id });
   }
 
-  const users = await query.getMany();
-
-  const userWithFriendAndConversation: User[] = [];
+  const [users, count] = await query.getManyAndCount();
 
   const promises = users.map(async (user) => {
     const friendStatus = userFriendRepository
@@ -110,12 +120,6 @@ export const getUsers = async (
 
     const friend = await friendStatus.getOne();
 
-    if (dto?.friendStatus) {
-      if (friend?.status !== dto.friendStatus) {
-        return null;
-      }
-    }
-
     const conversation = conversationRepository
       .createQueryBuilder('c')
       .leftJoin(Participants, 'p', 'p.conversationId = c.id')
@@ -124,22 +128,18 @@ export const getUsers = async (
       .setParameters({ userId, adder: user.id })
       .andWhere('c.is_group = false');
 
-    const userWithFriend = {
+    return {
       ...user,
       friendStatus: friend,
       conversation: await conversation.getOne(),
     };
-
-    userWithFriendAndConversation.push(userWithFriend);
-
-    return userWithFriend;
   });
 
-  await Promise.all(promises);
+  const userWithFriendStatus = await Promise.all(promises);
 
   return {
-    users: userWithFriendAndConversation,
-    count: userWithFriendAndConversation.length,
+    users: userWithFriendStatus,
+    count: count,
   };
 };
 
