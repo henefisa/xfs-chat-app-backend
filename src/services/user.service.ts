@@ -64,15 +64,13 @@ export const getUsers = async (
     .andWhere('u.activeStatus = :status', {
       status: EUserActiveStatus.Active,
     })
-    .leftJoin(UserFriend, 'f_owner', 'f_owner.ownerId = u.id')
-    .leftJoin(UserFriend, 'f_target', 'f_target.userTargetId = u.id');
+    .leftJoin(UserFriend, 'f', 'f.ownerId = u.id OR f.userTargetId = u.id');
 
   if (dto?.friendStatus) {
-    query.andWhere(
-      '(f_owner.userTargetId = :userId OR f_target.ownerId = :userId )',
-      { userId }
-    );
-    query.andWhere(' (f_owner.status = :s OR f_target.status = :s)', {
+    query.andWhere('(f.userTargetId = :userId OR f.ownerId = :userId )', {
+      userId,
+    });
+    query.andWhere(' (f.status = :s OR f.status = :s)', {
       s: dto.friendStatus,
     });
   }
