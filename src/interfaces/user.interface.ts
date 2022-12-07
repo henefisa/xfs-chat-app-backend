@@ -23,7 +23,6 @@ export enum EUserStatus {
 
 export enum EGroupRole {
   ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
 }
 
 export type GetUserOptions = GetOptions<User>;
