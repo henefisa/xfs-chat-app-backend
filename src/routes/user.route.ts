@@ -138,6 +138,51 @@ const router: Router = Router();
  *            example:
  *              username: khangkhang
  *              password: "123"
+ *       saveNotification:
+ *            type: object
+ *            required:
+ *              - recipient
+ *              - type
+ *              - status
+ *            properties:
+ *              recipient:
+ *                type: string
+ *              type:
+ *                type: string
+ *              status:
+ *                type: string
+ *            example:
+ *              recipient: "7b6b892b-ddbf-477b-97e6-c8758f975b39"
+ *              status: "NOT_SEEN"
+ *              type: "FRIEND_REQUEST"
+ *       notification:
+ *            type: object
+ *            required:
+ *              - recipient
+ *              - type
+ *              - status
+ *            properties:
+ *              id:
+ *                type: string
+ *              sender:
+ *                type: string
+ *              recipient:
+ *                type: string
+ *              type:
+ *                type: string
+ *              status:
+ *                type: string
+ *              createdAt:
+ *                type: string
+ *              updatedAt:
+ *                type: string
+ *            example:
+ *              recipient: "7b6b892b-ddbf-477b-97e6-c8758f975b39"
+ *              sender: "9e7e8a4b-9486-4049-b7ce-10c4107f4eb6"
+ *              status: "NOT_SEEN"
+ *              type: "FRIEND_REQUEST"
+ *              createdAt: "2022-11-22T13:19:07.018Z"
+ *              updatedAt: "2022-11-22T13:19:07.018Z"
  *       token:
  *             type: object
  *             properties:
