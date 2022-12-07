@@ -10,6 +10,7 @@ import {
   hideMessageDto,
 } from 'src/dto/message';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
+import { getOneOrThrow } from './user.service';
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -24,6 +25,7 @@ export const createMessage = async (
   sender: string,
   text: string
 ) => {
+  const user = await getOneOrThrow({ where: { id: sender } });
   const message = new Message();
 
   const request = {
@@ -34,7 +36,10 @@ export const createMessage = async (
 
   Object.assign(message, request);
 
-  return messageRepository.save(message);
+  return {
+    user: user,
+    message: await messageRepository.save(message),
+  };
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {

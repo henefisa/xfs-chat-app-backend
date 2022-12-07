@@ -1,4 +1,4 @@
-import { getOneOrThrow, setOnline } from 'src/services/user.service';
+import { setOnline } from 'src/services/user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
@@ -37,8 +37,11 @@ export class ServerSocket {
     socket.on(
       ESocketEvent.SendMessage,
       async ({ userId, conversationId, text }) => {
-        const message = await createMessage(conversationId, userId, text);
-        const user = await getOneOrThrow({ where: { id: userId } });
+        const { user, message } = await createMessage(
+          conversationId,
+          userId,
+          text
+        );
         socket
           .to(conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
