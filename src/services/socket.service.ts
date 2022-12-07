@@ -1,7 +1,6 @@
-import { setOffline, getOneOrThrow } from './user.service';
+import { setOffline } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Socket } from 'socket.io';
-import { createMessage } from './message.service';
 import { checkMemberExist } from './participants.service';
 import { NotFoundException } from 'src/exceptions';
 
@@ -48,17 +47,4 @@ export const sendMessage = (
     senderId,
     text,
   });
-};
-
-export const saveMessage = async (
-  conversation: string,
-  senderId: string,
-  text: string
-) => {
-  return createMessage(conversation, senderId, text);
-};
-
-export const getInfoSender = async (userId: string) => {
-  const user = await getOneOrThrow({ where: { id: userId } });
-  return user;
 };
