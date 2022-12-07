@@ -1,5 +1,5 @@
+import { ENotificationType } from 'src/interfaces/notification.interface';
 import Database from 'src/configs/Database';
-import { SaveNotificationDto } from 'src/dto/notification/save-notification.dto';
 import { Notification } from 'src/entities/notification.entity';
 
 const notificationRepository = Database.instance
@@ -8,19 +8,20 @@ const notificationRepository = Database.instance
 
 export const saveNotification = async (
   senderId: string,
-  dto: SaveNotificationDto
+  recipientId: string,
+  type?: ENotificationType | string
 ) => {
   const notification = new Notification();
 
   const request = {
-    ...dto,
+    type: type || ENotificationType.FriendRequest,
     sender: senderId,
-    recipient: dto.recipient,
+    recipient: recipientId,
   };
 
   console.log(request);
 
   Object.assign(notification, request);
 
-  return notificationRepository.save(notification);
+  return await notificationRepository.save(notification);
 };
