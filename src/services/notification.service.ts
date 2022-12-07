@@ -19,8 +19,6 @@ export const saveNotification = async (
     recipient: recipientId,
   };
 
-  console.log(request);
-
   Object.assign(notification, request);
 
   return await notificationRepository.save(notification);
