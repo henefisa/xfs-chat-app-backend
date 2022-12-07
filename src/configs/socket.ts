@@ -4,6 +4,7 @@ import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import { config } from 'dotenv';
+import { createMessage } from 'src/services/message.service';
 
 config();
 
@@ -36,8 +37,8 @@ export class ServerSocket {
     socket.on(
       ESocketEvent.SendMessage,
       async ({ userId, conversationId, text }) => {
-        await socketService.saveMessage(conversationId, userId, text);
-        const { user, message } = await socketService.getInfoMessage(
+        const { user, message } = await createMessage(
+          conversationId,
           userId,
           text
         );
