@@ -10,6 +10,7 @@ import { Participants } from 'src/entities/participants.entity';
 import { ExistsException, NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
+import { EGroupRole } from 'src/interfaces/user.interface';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -42,6 +43,10 @@ export const createConversation = async (
       .withRepository(conversationRepository)
       .save(newConversation);
 
+    if (!dto.members.includes(userId)) {
+      throw new NotFoundException('user');
+    }
+
     const promise = dto.members.map(async (member) => {
       const checked = await checkMemberExist(conversation.id, member);
       if (checked) {
@@ -54,6 +59,11 @@ export const createConversation = async (
         adder: userId,
       };
       Object.assign(participant, request);
+
+      if (member === userId && conversation.isGroup) {
+        participant.role = EGroupRole.ADMIN;
+      }
+
       await queryRunner.manager
         .withRepository(participantRepository)
         .save(participant);
