@@ -4,11 +4,16 @@ import {
   addMember,
   setAdmin,
   getParticipants,
+  deleteParticipant,
 } from 'src/controllers/participants.controller';
-import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
-import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
+import adminGroupMiddleware from 'src/middlewares/admin-group.middleware';
+import {
+  AddParticipantDto,
+  DeleteParticipantDto,
+  SetAdminDto,
+} from 'src/dto/participant';
 
 const router: Router = Router();
 
@@ -84,8 +89,47 @@ router.post(
   '/set-admin/:id',
   requireAuthMiddleware,
   activateMiddleware,
+  adminGroupMiddleware,
   validationMiddleware(SetAdminDto),
   setAdmin
+);
+
+/**
+ * @swagger
+ * /api/participants/{id}:
+ *   delete:
+ *     summary: delete participant
+ *     tags: [Participant]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: conversation id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *                userId:
+ *                   type: string
+ *                   description: id of user
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: successfully
+ */
+router.delete(
+  '/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  adminGroupMiddleware,
+  validationMiddleware(DeleteParticipantDto),
+  deleteParticipant
 );
 
 /**

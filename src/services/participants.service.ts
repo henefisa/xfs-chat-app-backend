@@ -1,14 +1,19 @@
-import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 import Database from 'src/configs/Database';
-import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
+import {
+  AddParticipantDto,
+  DeleteParticipantDto,
+  SetAdminDto,
+} from 'src/dto/participant';
 import { Participants } from 'src/entities/participants.entity';
 import {
   NotFoundException,
   ExistsException,
   NotExistException,
+  ForbiddenException,
 } from 'src/exceptions';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { Equal, FindOneOptions } from 'typeorm';
+import * as conversationService from 'src/services/conversation.service';
 
 const participantRepository = Database.instance
   .getDataSource('default')
@@ -19,6 +24,18 @@ export const addMember = async (
   conversationId: string,
   adderId: string
 ) => {
+  const conversation = await conversationService.getOne({
+    where: { id: conversationId },
+  });
+
+  if (!conversation) {
+    throw new NotFoundException('conversation');
+  }
+
+  if (!conversation.isGroup) {
+    throw new ForbiddenException();
+  }
+
   const participants = dto.members.map(async (member) => {
     const checked = await checkMemberExist(conversationId, member);
     if (checked) {
@@ -94,11 +111,38 @@ export const setGroupAdmin = async (
     where: { user: Equal(dto.userId), conversation: Equal(conversationId) },
   });
 
+  const conversation = await conversationService.getOne({
+    where: { id: conversationId },
+  });
+
+  if (!conversation) {
+    throw new NotFoundException('conversation');
+  }
+
   if (!participant) {
     throw new NotFoundException('participant');
+  }
+
+  if (!conversation.isGroup) {
+    throw new ForbiddenException();
   }
 
   participant.role = EGroupRole.ADMIN;
 
   return participantRepository.save(participant);
+};
+
+export const deleteParticipant = async (
+  dto: DeleteParticipantDto,
+  conversationId: string
+) => {
+  const participant = await getOne({
+    where: { user: Equal(dto.userId), conversation: Equal(conversationId) },
+  });
+
+  if (!participant) {
+    throw new NotFoundException('participant');
+  }
+
+  return participantRepository.delete(participant.id);
 };

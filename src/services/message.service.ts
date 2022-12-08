@@ -1,9 +1,7 @@
 import { GetMessageOptions } from 'src/interfaces/message.interface';
 import Database from 'src/configs/Database';
-import { Message } from 'src/entities/message.entity';
 import { Equal, FindOneOptions } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
-import { MessageHided } from 'src/entities/message-hided.entity';
 import {
   deleteMessageDto,
   GetMessageDto,
@@ -11,6 +9,7 @@ import {
 } from 'src/dto/message';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { getOneOrThrow } from './user.service';
+import { Message, MessageHided } from 'src/entities';
 
 const messageRepository = Database.instance
   .getDataSource('default')

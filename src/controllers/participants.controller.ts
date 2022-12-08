@@ -1,9 +1,12 @@
 import { NextFunction, Response, Request } from 'express';
-import { AddParticipantDto } from 'src/dto/participant/add-participant.dto';
 import { StatusCodes } from 'http-status-codes';
+import {
+  AddParticipantDto,
+  DeleteParticipantDto,
+  SetAdminDto,
+} from 'src/dto/participant';
 import { User } from 'src/entities/user.entity';
 import * as participantServices from 'src/services/participants.service';
-import { SetAdminDto } from 'src/dto/participant/set-admin.dto';
 import { RequestWithBody } from 'src/shares';
 
 export const addMember = async (
@@ -54,6 +57,20 @@ export const setAdmin = async (
       req.params.id
     );
     return res.status(StatusCodes.CREATED).json(added);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteParticipant = async (
+  req: RequestWithBody<DeleteParticipantDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    await participantServices.deleteParticipant(req.body, req.params.id);
+    return res.status(StatusCodes.NO_CONTENT).json({});
   } catch (error) {
     next(error);
   }
