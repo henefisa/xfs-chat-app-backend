@@ -4,6 +4,7 @@ dotenv.config();
 
 import Database from './configs/Database';
 import 'reflect-metadata';
+import './configs/Peer';
 const port = process.env.PORT || 8000;
 
 Database.instance.initialize();
