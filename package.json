@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "build": "NODE_ENV=production tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "postinstall": "husky install",
     "start": "nodemon -r tsconfig-paths/register src/index.ts",
     "typeorm": "typeorm-ts-node-esm",

@@ -38,13 +38,13 @@ if (process.env.NODE_ENV === 'production') {
   new ServerSocket(httpsServer).start();
 
   httpsServer.listen(port, () => {
-    console.log(`Server is listen on port ${port}`);
+    console.log(`HTTPS server is listen on port ${port}`);
   });
 } else {
   const httpServer = http.createServer(server);
   new ServerSocket(httpServer).start();
 
   httpServer.listen(port, () => {
-    console.log(`Server is listen on port ${port}`);
+    console.log(`HTTP server is listen on port ${port}`);
   });
 }
