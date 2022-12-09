@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { CreateUserDto } from 'src/dto/user';
+import { AdminUpdateUserDto } from 'src/dto/user/admin-update-user.dto';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
@@ -23,7 +24,7 @@ export const createUser = async (
 };
 
 export const updateUser = async (
-  req: RequestWithBody<UpdateUserDto>,
+  req: RequestWithBody<AdminUpdateUserDto>,
   res: Response,
   next: NextFunction
 ) => {
@@ -44,7 +45,7 @@ export const deleteUser = async (
   try {
     res.setHeader('Content-Type', 'application/json');
     await userService.deleteUser(req.params.id);
-    return res.status(StatusCodes.NO_CONTENT);
+    return res.status(StatusCodes.NO_CONTENT).json({});
   } catch (error) {
     next(error);
   }

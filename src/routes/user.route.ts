@@ -23,6 +23,7 @@ import validationMiddleware, {
   validationQueryMiddleware,
 } from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
+import { AdminUpdateUserDto } from 'src/dto/user/admin-update-user.dto';
 
 const router: Router = Router();
 /**
@@ -255,7 +256,7 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/users:
+ * /api/users/admin:
  *   post:
  *     summary: Create a new user
  *     tags: [Users]
@@ -279,7 +280,7 @@ const router: Router = Router();
  */
 
 router.post(
-  '/',
+  '/admin',
   requireAuthMiddleware,
   roleMiddleware,
   validationMiddleware(CreateUserDto),
@@ -349,7 +350,7 @@ router.patch(
 );
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users/admin/{id}:
  *  put:
  *    summary: Update user by the id
  *    tags: [Users]
@@ -365,7 +366,28 @@ router.patch(
  *      content:
  *        application/json:
  *          schema:
- *            $ref: '#/components/schemas/User'
+ *            type: object
+ *            properties:
+ *                username:
+ *                  type: string
+ *                  description: username
+ *                fullName:
+ *                  type: string
+ *                  description: full name
+ *                description:
+ *                  type: string
+ *                location:
+ *                  type: string
+ *                avatar:
+ *                  type: string
+ *                email:
+ *                  type: string
+ *                phone:
+ *                  type: string
+ *                role:
+ *                  type: string
+ *                activeStatus:
+ *                  type: string
  *    security:
  *          - bearerAuth: []
  *    responses:
@@ -380,10 +402,10 @@ router.patch(
  */
 
 router.put(
-  '/:id',
+  '/admin/:id',
   requireAuthMiddleware,
   roleMiddleware,
-  validationMiddleware(UpdateUserDto),
+  validationMiddleware(AdminUpdateUserDto),
   updateUser
 );
 
@@ -409,7 +431,7 @@ router.delete(
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users/admin/{id}:
  *   delete:
  *     summary: Delete user by id
  *     tags: [Users]
@@ -427,7 +449,7 @@ router.delete(
  *         description: User deleted
  */
 
-router.delete('/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
+router.delete('/admin/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
 
 /**
  * @swagger
@@ -453,7 +475,7 @@ router.get(
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users/admin/{id}:
  *   get:
  *     summary: Get user by id
  *     tags: [Users]
@@ -474,7 +496,12 @@ router.get(
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.get('/:id', requireAuthMiddleware, activateMiddleware, getUserById);
+router.get(
+  '/admin/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  getUserById
+);
 
 /**
  * @swagger
