@@ -15,7 +15,7 @@ import 'src/configs/Redis';
 config();
 
 const port = process.env.PORT || 8000;
-const swaggerHost = process.env.SWAGGER_HOST || 'localhost';
+const swaggerHost = process.env.SWAGGER_HOST || '18.142.254.133.sslip.io';
 
 const options = {
   definition: {
@@ -25,7 +25,7 @@ const options = {
       version: '1.0.0',
       description: 'API',
     },
-    servers: [{ url: `http://${swaggerHost}:${port}` }],
+    servers: [{ url: `https://${swaggerHost}:${port}` }],
     components: {
       securitySchemes: {
         bearerAuth: {
