@@ -1,11 +1,7 @@
 import { Router } from 'express';
 import {
-  createUser,
-  deleteUser,
-  updateUser,
   updateProfileUser,
   getAllUser,
-  getUserById,
   getUserProfile,
   updatePasswordUser,
   checkUsernameExist,
@@ -14,16 +10,14 @@ import {
   selfDeactivate,
 } from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
-import { CreateUserDto, UpdateUserDto } from 'src/dto/user';
+import { UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
-import roleMiddleware from 'src/middlewares/check-roles.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware, {
   validationQueryMiddleware,
 } from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
-import { AdminUpdateUserDto } from 'src/dto/user/admin-update-user.dto';
 
 const router: Router = Router();
 /**
@@ -256,39 +250,6 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/users/admin:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/createUser'
- *     security:
- *        - bearerAuth: []
- *     responses:
- *       200:
- *         description: user was successfully created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/createUser'
- *       500:
- *         description: Internal server error
- */
-
-router.post(
-  '/admin',
-  requireAuthMiddleware,
-  roleMiddleware,
-  validationMiddleware(CreateUserDto),
-  createUser
-);
-
-/**
- * @swagger
  * /api/users/password:
  *  put:
  *    summary: Update user password by the id
@@ -348,66 +309,6 @@ router.patch(
   validationMiddleware(UpdateUserDto),
   updateProfileUser
 );
-/**
- * @swagger
- * /api/users/admin/{id}:
- *  put:
- *    summary: Update user by the id
- *    tags: [Users]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: user id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *                username:
- *                  type: string
- *                  description: username
- *                fullName:
- *                  type: string
- *                  description: full name
- *                description:
- *                  type: string
- *                location:
- *                  type: string
- *                avatar:
- *                  type: string
- *                email:
- *                  type: string
- *                phone:
- *                  type: string
- *                role:
- *                  type: string
- *                activeStatus:
- *                  type: string
- *    security:
- *          - bearerAuth: []
- *    responses:
- *      200:
- *        description: user was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *      500:
- *        description: Internal server error
- */
-
-router.put(
-  '/admin/:id',
-  requireAuthMiddleware,
-  roleMiddleware,
-  validationMiddleware(AdminUpdateUserDto),
-  updateUser
-);
 
 /**
  * @swagger
@@ -431,28 +332,6 @@ router.delete(
 
 /**
  * @swagger
- * /api/users/admin/{id}:
- *   delete:
- *     summary: Delete user by id
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: user id
- *     security:
- *          - bearerAuth: []
- *     responses:
- *       204:
- *         description: User deleted
- */
-
-router.delete('/admin/:id', roleMiddleware, requireAuthMiddleware, deleteUser);
-
-/**
- * @swagger
  * /api/users/profile:
  *    get:
  *      summary: returns profile of user
@@ -471,36 +350,6 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   getUserProfile
-);
-
-/**
- * @swagger
- * /api/users/admin/{id}:
- *   get:
- *     summary: Get user by id
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: user id
- *     security:
- *          - bearerAuth: []
- *     responses:
- *       200:
- *         description: user description by id
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- */
-router.get(
-  '/admin/:id',
-  requireAuthMiddleware,
-  activateMiddleware,
-  getUserById
 );
 
 /**

@@ -1,55 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
-import { CreateUserDto } from 'src/dto/user';
-import { AdminUpdateUserDto } from 'src/dto/user/admin-update-user.dto';
 import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
-
-export const createUser = async (
-  req: RequestWithBody<CreateUserDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    const user = await userService.createUser(req.body);
-    return res.status(StatusCodes.CREATED).json(user);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const updateUser = async (
-  req: RequestWithBody<AdminUpdateUserDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    const updated = await userService.updateUser(req.body, req.params.id);
-    return res.status(StatusCodes.CREATED).json(updated);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    await userService.deleteUser(req.params.id);
-    return res.status(StatusCodes.NO_CONTENT).json({});
-  } catch (error) {
-    next(error);
-  }
-};
 
 export const selfDeleteUser = async (
   req: Request,
@@ -61,22 +17,6 @@ export const selfDeleteUser = async (
     await userService.deleteUser(user.id);
 
     return res.status(StatusCodes.NO_CONTENT);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getUserById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    const user = await userService.getOne({
-      where: { id: req.params.id },
-    });
-    return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     next(error);
   }
