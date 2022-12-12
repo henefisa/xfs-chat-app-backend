@@ -6,6 +6,7 @@ import Database from 'src/configs/Database';
 import { User } from 'src/entities/user.entity';
 import { getOneOrThrow } from './user.service';
 import { EUserActiveStatus } from 'src/interfaces/user.interface';
+import { ForbiddenException } from 'src/exceptions';
 
 config();
 
@@ -56,6 +57,10 @@ export const checkOtp = async (email: string, code: string) => {
   redis.del(email);
 
   const user = await getOneOrThrow({ where: { email: email } });
+
+  if (user.activeStatus === EUserActiveStatus.Banned) {
+    throw new ForbiddenException();
+  }
 
   user.activeStatus = EUserActiveStatus.Active;
 

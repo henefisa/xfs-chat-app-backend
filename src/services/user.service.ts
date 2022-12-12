@@ -1,26 +1,28 @@
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
+import { AdminUpdateRoleUserDto } from 'src/dto/admin';
 import { LoginDto } from 'src/dto/auth';
-import { CreateUserDto, GetUserDto, UpdateUserDto } from 'src/dto/user';
-import { UpdatePasswordUserDto } from 'src/dto/user/update-password-user.dto';
-import { User } from 'src/entities/user.entity';
-import { UserFriend } from 'src/entities/user-friend.entity';
-import { ExistsException } from 'src/exceptions/exists.exception';
 import {
+  CreateUserDto,
+  GetUserDto,
+  UpdatePasswordUserDto,
+  UpdateUserDto,
+} from 'src/dto/user';
+import { Conversation, Participants, User, UserFriend } from 'src/entities';
+import {
+  ExistsException,
   NotExistException,
   NotFoundException,
-} from 'src/exceptions/not-found.exception';
-import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
+  UnauthorizedException,
+} from 'src/exceptions';
 import {
   EUserActiveStatus,
+  EUserFriendRequestStatus,
   EUserStatus,
   GetUserOptions,
-} from 'src/interfaces/user.interface';
+} from 'src/interfaces';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { FindOneOptions, Not } from 'typeorm';
-import { EUserFriendRequestStatus } from 'src/interfaces/user-friend.interface';
-import { Participants } from 'src/entities/participants.entity';
-import { Conversation } from 'src/entities/conversation.entity';
 
 const userRepository = Database.instance
   .getDataSource('default')
@@ -238,7 +240,10 @@ export const createUser = async (dto: CreateUserDto) => {
   return userRepository.save(user);
 };
 
-export const updateUser = async (dto: UpdateUserDto, id: string) => {
+export const updateRoleUser = async (
+  id: string,
+  dto?: AdminUpdateRoleUserDto
+) => {
   const user = await getOneOrThrow({
     where: { id: id },
   });
@@ -247,17 +252,10 @@ export const updateUser = async (dto: UpdateUserDto, id: string) => {
     throw new NotExistException('user');
   }
 
-  if (dto.email) {
-    await checkEmailExists(dto.email, user.id);
-  }
-  if (dto.username) {
-    await checkUsernameExists(dto.username, user.id);
-  }
-  if (dto.phone) {
-    await checkPhoneExists(dto.phone, user.id);
+  if (dto?.role) {
+    user.role = dto.role;
   }
 
-  Object.assign(user, dto);
   return userRepository.save(user);
 };
 
@@ -313,7 +311,11 @@ export const Deactivate = async (id: string) => {
 
 export const checkActivateValidation = async (status: EUserActiveStatus) => {
   if (
-    [EUserActiveStatus.Deactivate, EUserActiveStatus.Inactive].includes(status)
+    [
+      EUserActiveStatus.Deactivate,
+      EUserActiveStatus.Inactive,
+      EUserActiveStatus.Banned,
+    ].includes(status)
   ) {
     return false;
   }
@@ -337,6 +339,64 @@ export const setOffline = async (userId: string) => {
   });
 
   user.status = EUserStatus.OFFLINE;
+
+  return userRepository.save(user);
+};
+
+export const getAllUsers = async (
+  dto?: GetUserDto,
+  options?: GetUserOptions
+) => {
+  const query = userRepository.createQueryBuilder('u');
+
+  const { offset, limit } = getLimitAndOffset({
+    limit: dto?.limit,
+    offset: dto?.offset,
+  });
+
+  if (!options?.unlimited) {
+    query.skip(offset).take(limit);
+  }
+
+  if (dto?.q) {
+    query.andWhere(
+      '(full_name ILIKE :q OR username ILIKE :q OR phone ILIKE :q) ',
+      {
+        q: `%${dto.q}%`,
+      }
+    );
+  }
+
+  if (dto?.status) {
+    query.andWhere('status = :s', { s: dto.status });
+  }
+
+  if (options?.id) {
+    query.andWhere('u.id = :id', { id: options.id });
+  }
+
+  query.orderBy('u.createdAt', 'DESC');
+
+  const [users, count] = await query.getManyAndCount();
+
+  return {
+    users,
+    count,
+  };
+};
+
+export const banUser = async (userId: string) => {
+  const user = await getOneOrThrow({ where: { id: userId } });
+
+  user.activeStatus = EUserActiveStatus.Banned;
+
+  return userRepository.save(user);
+};
+
+export const unbannedUser = async (userId: string) => {
+  const user = await getOneOrThrow({ where: { id: userId } });
+
+  user.activeStatus = EUserActiveStatus.Active;
 
   return userRepository.save(user);
 };

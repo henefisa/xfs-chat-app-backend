@@ -6,6 +6,7 @@ import { userFriendRoutes } from './user-friend.route';
 import { conversationRoutes } from './conversation.route';
 import { uploadRoutes } from './upload.route';
 import { participantRoutes } from './participant.route';
+import { adminRoutes } from './admin.route';
 
 const router: Router = Router();
 
@@ -16,5 +17,6 @@ router.use('/friends', userFriendRoutes);
 router.use('/conversations', conversationRoutes);
 router.use('/participants', participantRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/admin', adminRoutes);
 
 export const MainRoutes = router;

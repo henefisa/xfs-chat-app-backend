@@ -16,9 +16,11 @@ export default async function activateMiddleware(
       throw new UnauthorizedException();
     }
     if (
-      [EUserActiveStatus.Deactivate, EUserActiveStatus.Inactive].includes(
-        user.activeStatus
-      )
+      [
+        EUserActiveStatus.Deactivate,
+        EUserActiveStatus.Inactive,
+        EUserActiveStatus.Banned,
+      ].includes(user.activeStatus)
     ) {
       throw new ForbiddenException();
     }
