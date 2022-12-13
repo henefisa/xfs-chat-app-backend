@@ -1,15 +1,7 @@
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { RefreshTokenDto } from 'src/dto/auth/refresh-token.dto';
 import validationMiddleware from 'src/middlewares/validation.middleware';
-import {
-  checkActivate,
-  checkOtpRegister,
-  getRefreshToken,
-  login,
-  logout,
-  register,
-  sendOtpRegister,
-} from 'src/controllers/auth.controller';
+import * as authController from 'src/controllers/auth.controller';
 import { Router } from 'express';
 import { LoginDto, OtpDto } from 'src/dto/auth';
 import { RegisterDto } from 'src/dto/auth/register.dto';
@@ -39,7 +31,7 @@ const router: Router = Router();
  *       401:
  *         description: UnAuthentication
  */
-router.post('/login', validationMiddleware(LoginDto), login);
+router.post('/login', validationMiddleware(LoginDto), authController.login);
 
 /**
  * @swagger
@@ -64,7 +56,11 @@ router.post('/login', validationMiddleware(LoginDto), login);
  *         description: Some server error
  */
 
-router.post('/register', validationMiddleware(RegisterDto), register);
+router.post(
+  '/register',
+  validationMiddleware(RegisterDto),
+  authController.register
+);
 
 /**
  * @swagger
@@ -103,7 +99,7 @@ router.post('/register', validationMiddleware(RegisterDto), register);
 router.post(
   '/refresh-token',
   validationMiddleware(RefreshTokenDto),
-  getRefreshToken
+  authController.getRefreshToken
 );
 
 /**
@@ -121,7 +117,7 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/send-otp', requireAuthMiddleware, sendOtpRegister);
+router.post('/send-otp', requireAuthMiddleware, authController.sendOtpRegister);
 
 /**
  * @swagger
@@ -152,7 +148,7 @@ router.post(
   '/check-otp',
   requireAuthMiddleware,
   validationMiddleware(OtpDto),
-  checkOtpRegister
+  authController.checkOtpRegister
 );
 
 /**
@@ -178,7 +174,7 @@ router.post(
  *         description: Internal server error
  */
 
-router.post('/logout', validationMiddleware(LogoutDto), logout);
+router.post('/logout', validationMiddleware(LogoutDto), authController.logout);
 
 /**
  * @swagger
@@ -195,6 +191,10 @@ router.post('/logout', validationMiddleware(LogoutDto), logout);
  *         description: Internal server error
  */
 
-router.get('/check-activate', requireAuthMiddleware, checkActivate);
+router.get(
+  '/check-activate',
+  requireAuthMiddleware,
+  authController.checkActivate
+);
 
 export const authRoutes = router;

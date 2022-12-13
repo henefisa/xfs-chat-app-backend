@@ -7,15 +7,9 @@ import validationMiddleware, {
   validationQueryMiddleware,
 } from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
-import {
-  banUser,
-  createUser,
-  getAllUser,
-  getUserById,
-  unbannedUser,
-  updateRoleUser,
-} from 'src/controllers/admin.controller';
+import * as adminController from 'src/controllers/admin.controller';
 import { AdminUpdateRoleUserDto } from 'src/dto/admin';
+import { CountMessageDto } from 'src/dto/message';
 
 const router: Router = Router();
 
@@ -50,7 +44,7 @@ router.post(
   roleMiddleware,
   activateMiddleware,
   validationMiddleware(CreateUserDto),
-  createUser
+  adminController.createUser
 );
 
 /**
@@ -88,7 +82,7 @@ router.patch(
   roleMiddleware,
   activateMiddleware,
   validationMiddleware(AdminUpdateRoleUserDto),
-  updateRoleUser
+  adminController.updateRoleUser
 );
 
 /**
@@ -119,7 +113,7 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   roleMiddleware,
-  getUserById
+  adminController.getUserById
 );
 
 /**
@@ -173,7 +167,7 @@ router.get(
   activateMiddleware,
   roleMiddleware,
   validationQueryMiddleware(GetUserDto),
-  getAllUser
+  adminController.getAllUser
 );
 
 /**
@@ -201,7 +195,7 @@ router.post(
   requireAuthMiddleware,
   activateMiddleware,
   roleMiddleware,
-  banUser
+  adminController.banUser
 );
 
 /**
@@ -229,7 +223,42 @@ router.post(
   requireAuthMiddleware,
   activateMiddleware,
   roleMiddleware,
-  unbannedUser
+  adminController.unbannedUser
+);
+
+/**
+ * @swagger
+ * /api/admin/user/statistics/{id}:
+ *    get:
+ *      summary: returns amount of messages
+ *      tags: [Admins]
+ *      parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: id of user
+ *       - in: query
+ *         name: conversationId
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: count with conversation
+ *      security:
+ *         - bearerAuth: []
+ *      responses:
+ *          200:
+ *            description: the list of user
+ */
+
+router.get(
+  'user/statistics/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  roleMiddleware,
+  validationQueryMiddleware(CountMessageDto),
+  adminController.userStatistics
 );
 
 export const adminRoutes = router;
