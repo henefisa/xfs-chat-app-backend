@@ -1,14 +1,5 @@
 import { Router } from 'express';
-import {
-  updateProfileUser,
-  getAllUser,
-  getUserProfile,
-  updatePasswordUser,
-  checkUsernameExist,
-  checkEmailExist,
-  selfDeleteUser,
-  selfDeactivate,
-} from 'src/controllers/user.controller';
+import * as userController from 'src/controllers/user.controller';
 import { CheckEmailExistsDto, CheckUsernameExistsDto } from 'src/dto/auth';
 import { UpdateUserDto } from 'src/dto/user';
 import { GetUserDto } from 'src/dto/user/get-user.dto';
@@ -274,7 +265,7 @@ router.put(
   requireAuthMiddleware,
   activateMiddleware,
   validationMiddleware(UpdatePasswordUserDto),
-  updatePasswordUser
+  userController.updatePasswordUser
 );
 
 /**
@@ -307,7 +298,7 @@ router.patch(
   requireAuthMiddleware,
   activateMiddleware,
   validationMiddleware(UpdateUserDto),
-  updateProfileUser
+  userController.updateProfileUser
 );
 
 /**
@@ -327,7 +318,7 @@ router.delete(
   '/delete',
   requireAuthMiddleware,
   activateMiddleware,
-  selfDeleteUser
+  userController.selfDeleteUser
 );
 
 /**
@@ -349,7 +340,7 @@ router.get(
   '/profile',
   requireAuthMiddleware,
   activateMiddleware,
-  getUserProfile
+  userController.getUserProfile
 );
 
 /**
@@ -408,7 +399,7 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   validationQueryMiddleware(GetUserDto),
-  getAllUser
+  userController.getAllUser
 );
 
 /**
@@ -433,7 +424,7 @@ router.get(
 router.post(
   '/check-username-exists',
   validationMiddleware(CheckUsernameExistsDto),
-  checkUsernameExist
+  userController.checkUsernameExist
 );
 
 /**
@@ -457,7 +448,7 @@ router.post(
 router.post(
   '/check-email-exists',
   validationMiddleware(CheckEmailExistsDto),
-  checkEmailExist
+  userController.checkEmailExist
 );
 
 /**
@@ -475,6 +466,10 @@ router.post(
  *         description: Some server error
  */
 
-router.post('/deactivate', requireAuthMiddleware, selfDeactivate);
+router.post(
+  '/deactivate',
+  requireAuthMiddleware,
+  userController.selfDeactivate
+);
 
 export const userRoutes = router;

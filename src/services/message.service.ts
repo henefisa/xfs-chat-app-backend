@@ -3,6 +3,7 @@ import Database from 'src/configs/Database';
 import { Equal, FindOneOptions } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
 import {
+  CountMessageDto,
   deleteMessageDto,
   GetMessageDto,
   hideMessageDto,
@@ -126,4 +127,19 @@ export const checkSenderValid = async (senderId: string, messageId: string) => {
   }
 
   return message;
+};
+
+export const countMessagesOfUser = async (
+  userId: string,
+  dto?: CountMessageDto
+) => {
+  const query = messageRepository
+    .createQueryBuilder('m')
+    .where('m.senderId = :userId', { userId });
+
+  if (dto?.conversationId) {
+    query.andWhere('(m.conversationId = :id)', { id: dto.conversationId });
+  }
+
+  return query.getCount();
 };

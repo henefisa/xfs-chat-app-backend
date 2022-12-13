@@ -1,12 +1,5 @@
 import { Router } from 'express';
-import {
-  checkConversationOfTwoMember,
-  createConversation,
-  getConversationById,
-  getConversations,
-  GetConversations,
-  updateConversation,
-} from 'src/controllers/conversation.controller';
+import * as conversationController from 'src/controllers/conversation.controller';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
@@ -52,7 +45,7 @@ router.post(
   requireAuthMiddleware,
   activateMiddleware,
   validationMiddleware(CreateConversationDto),
-  createConversation
+  conversationController.createConversation
 );
 
 /**
@@ -95,7 +88,7 @@ router.patch(
   requireAuthMiddleware,
   activateMiddleware,
   validationMiddleware(UpdateConversationDto),
-  updateConversation
+  conversationController.updateConversation
 );
 
 /**
@@ -136,7 +129,7 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   validationQueryMiddleware(GetConversationDto),
-  getConversations
+  conversationController.getConversations
 );
 
 /**
@@ -165,7 +158,7 @@ router.get(
   '/:id',
   requireAuthMiddleware,
   activateMiddleware,
-  getConversationById
+  conversationController.getConversationById
 );
 
 /**
@@ -206,7 +199,7 @@ router.get(
   requireAuthMiddleware,
   activateMiddleware,
   validationQueryMiddleware(GetConversationDto),
-  GetConversations
+  conversationController.GetConversations
 );
 
 /**
@@ -236,7 +229,7 @@ router.post(
   '/check-conversation',
   requireAuthMiddleware,
   activateMiddleware,
-  checkConversationOfTwoMember
+  conversationController.checkConversationOfTwoMember
 );
 
 export const conversationRoutes = router;

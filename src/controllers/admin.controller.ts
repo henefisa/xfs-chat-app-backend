@@ -3,6 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import { CreateUserDto } from 'src/dto/user';
 import { RequestWithBody } from 'src/shares';
 import * as userService from 'src/services/user.service';
+import * as messageService from 'src/services/message.service';
+import * as conversationSevice from 'src/services/conversation.service';
 import { AdminUpdateRoleUserDto } from 'src/dto/admin';
 
 export const createUser = async (
@@ -89,6 +91,41 @@ export const unbannedUser = async (
     const banned = await userService.unbannedUser(req.params.id);
 
     return res.status(StatusCodes.OK).json(banned);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const countMessagesOfUser = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const count = await messageService.countMessagesOfUser(
+      req.params.id,
+      req.query
+    );
+
+    return res.status(StatusCodes.OK).json(count);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const countConversationsOfUser = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    const count = await conversationSevice.countConversationsOfUser(
+      req.params.id
+    );
+
+    return res.status(StatusCodes.OK).json(count);
   } catch (error) {
     next(error);
   }
