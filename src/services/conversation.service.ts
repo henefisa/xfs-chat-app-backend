@@ -31,10 +31,12 @@ export const createConversation = async (
   await queryRunner.startTransaction();
 
   try {
-    const checked = await checkCoupleConversationExists(dto.members);
+    const currentConversation = await checkCoupleConversationExists(
+      dto.members
+    );
 
-    if (checked) {
-      throw new ExistsException('conversation');
+    if (currentConversation) {
+      return currentConversation;
     }
 
     const newConversation = new Conversation();
@@ -242,5 +244,6 @@ export const checkCoupleConversationExists = async (members: string[]) => {
   if (!conversation) {
     return false;
   }
-  return true;
+
+  return conversation;
 };
