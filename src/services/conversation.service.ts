@@ -250,6 +250,16 @@ export const updateConversation = async (
   return conversationRepository.save(conversation);
 };
 
+export const countConversationsOfUser = async (userId: string) => {
+  const query = conversationRepository
+    .createQueryBuilder('conversation')
+    .leftJoin(Participants, 'p', 'p.conversationId = conversation.id')
+    .where('(p.userId = :userId AND p.adderId = :adder)')
+    .orWhere('(p.adder = :userId AND p.userId = :adder)')
+    .setParameters({ userId, adder: userId });
+  return query.getCount();
+};
+
 export const checkCoupleConversationExists = async (members: string[]) => {
   if (members.length > 2) {
     return false;
