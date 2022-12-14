@@ -1,4 +1,3 @@
-import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { RequestWithBody } from 'src/shares';
@@ -77,23 +76,6 @@ export const getConversations = async (
       req.query
     );
     return res.status(StatusCodes.OK).json(conversations);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const checkConversationOfTwoMember = async (
-  req: RequestWithBody<CheckConversationDto>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const reqUser = req.user as User;
-    const conversation = await conversationService.checkConversationOfTwoMember(
-      req.body,
-      reqUser.id
-    );
-    return res.status(StatusCodes.OK).json(conversation);
   } catch (error) {
     next(error);
   }

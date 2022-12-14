@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import {
-  checkConversationOfTwoMember,
   createConversation,
   getConversationById,
   getConversations,
@@ -207,36 +206,6 @@ router.get(
   activateMiddleware,
   validationQueryMiddleware(GetConversationDto),
   GetConversations
-);
-
-/**
- * @swagger
- * /api/conversations/check-conversation:
- *   post:
- *     summary: Check conversation for two member
- *     tags: [Conversations]
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *                   userTarget:
- *                      type: string
- *                      description: userId of member
- *     security:
- *        - bearerAuth: []
- *     responses:
- *       200:
- *         description: A conversation of two member or false
- */
-
-router.post(
-  '/check-conversation',
-  requireAuthMiddleware,
-  activateMiddleware,
-  checkConversationOfTwoMember
 );
 
 export const conversationRoutes = router;
