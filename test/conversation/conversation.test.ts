@@ -119,7 +119,7 @@ describe(`POST ${routes.conversations}`, () => {
       .send({ members: [user_id_1, user_id_2] });
 
     expect(response.status).toBe(201);
-    expect(response.body.is_group).toBe(false);
+    expect(response.body.isGroup).toBe(false);
   });
 
   test('create conversation group', async () => {
@@ -129,16 +129,6 @@ describe(`POST ${routes.conversations}`, () => {
       .send({ members: [user_id_1, user_id_2, user_id_3] });
 
     expect(response.status).toBe(201);
-    expect(response.body.is_group).toBe(true);
-  });
-
-  test('create duplicate conversation ', async () => {
-    const response = await request(server)
-      .post(routes.conversations)
-      .set('Authorization', `Bearer ${access_token_2}`)
-      .send({ members: [user_id_1, user_id_2] });
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toBe(`conversation_is_exists`);
+    expect(response.body.isGroup).toBe(true);
   });
 });
