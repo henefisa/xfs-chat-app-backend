@@ -21,7 +21,7 @@ export const createConversation = async (
       req.body,
       user.id
     );
-    return res.status(StatusCodes.OK).json(newConversation);
+    return res.status(StatusCodes.CREATED).json(newConversation);
   } catch (error) {
     next(error);
   }
