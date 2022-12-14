@@ -96,7 +96,7 @@ export const unbannedUser = async (
   }
 };
 
-export const userStatistics = async (
+export const getStatistics = async (
   req: RequestWithBody,
   res: Response,
   next: NextFunction

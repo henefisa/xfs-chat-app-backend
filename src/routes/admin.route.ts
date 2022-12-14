@@ -258,7 +258,7 @@ router.get(
   activateMiddleware,
   roleMiddleware,
   validationQueryMiddleware(CountMessageDto),
-  adminController.userStatistics
+  adminController.getStatistics
 );
 
 export const adminRoutes = router;
