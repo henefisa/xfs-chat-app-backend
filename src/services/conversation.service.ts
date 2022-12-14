@@ -32,7 +32,15 @@ export const createConversation = async (
   await queryRunner.startTransaction();
 
   try {
+    const currentConversation = await checkCoupleConversationExists(
+      dto.members
+    );
+
+    if (currentConversation) {
+      return currentConversation;
+    }
     const newConversation = new Conversation();
+
     const request = {
       ...dto,
       isGroup: dto.members.length > 2 ? true : false,
@@ -240,4 +248,34 @@ export const updateConversation = async (
   Object.assign(conversation, dto);
 
   return conversationRepository.save(conversation);
+};
+
+export const checkCoupleConversationExists = async (members: string[]) => {
+  if (members.length > 2) {
+    return false;
+  }
+  const query = await conversationRepository.createQueryBuilder('c');
+  query
+    .leftJoinAndSelect('c.participants', 'participants')
+    .where(
+      'participants.user = :userTargetId AND participants.adder = :ownerId',
+      {
+        userTargetId: members[0],
+        ownerId: members[1],
+      }
+    )
+    .orWhere(
+      'participants.user = :ownerId AND participants.adder = :userTargetId',
+      {
+        userTargetId: members[0],
+        ownerId: members[1],
+      }
+    )
+    .andWhere('c.isGroup = false');
+  const conversation = await query.getOne();
+  if (!conversation) {
+    return false;
+  }
+
+  return conversation;
 };
