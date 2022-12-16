@@ -120,3 +120,21 @@ export const updateConversation = async (
     next(error);
   }
 };
+
+export const archiveConversation = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+
+    const user = req.user as User;
+
+    const archived = await conversationService.archive(user.id, req.params.id);
+
+    return res.status(StatusCodes.OK).json(archived);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -11,6 +11,7 @@ import { ExistsException, NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import { EGroupRole } from 'src/interfaces/user.interface';
+import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -19,6 +20,10 @@ const conversationRepository = Database.instance
 const participantRepository = Database.instance
   .getDataSource('default')
   .getRepository(Participants);
+
+const conversationArchivedRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(ConversationArchive);
 
 const dataSource = Database.instance.getDataSource('default');
 export const createConversation = async (
@@ -118,6 +123,15 @@ export const getConversationsOfUser = async (
           .select('p.conversationId')
           .from(Participants, 'p')
           .where('p.userId = :userId')
+          .getQuery()
+    )
+    .andWhere(
+      'conversation.id NOT IN' +
+        query
+          .subQuery()
+          .select('archive.conversationId')
+          .from(ConversationArchive, 'archive')
+          .where('archive.userId = :userId')
           .getQuery()
     )
     .setParameter('userId', userId);
@@ -288,4 +302,15 @@ export const checkCoupleConversationExists = async (members: string[]) => {
   }
 
   return conversation;
+};
+
+export const archive = async (userId: string, conversationId: string) => {
+  const conversationArchived = new ConversationArchive();
+  const request = {
+    conversation: conversationId,
+    user: userId,
+  };
+  Object.assign(conversationArchived, request);
+
+  return conversationArchivedRepository.save(conversationArchived);
 };
