@@ -232,4 +232,33 @@ router.post(
   conversationController.checkConversationOfTwoMember
 );
 
+/**
+ * @swagger
+ * /api/conversations/archive/{id}:
+ *  get:
+ *    summary: archive conversation by the id
+ *    tags: [Conversations]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: conversations id
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: successful
+ *      500:
+ *        description: Internal server error
+ */
+
+router.get(
+  '/archive/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  conversationController.archiveConversation
+);
+
 export const conversationRoutes = router;
