@@ -261,4 +261,33 @@ router.get(
   conversationController.archiveConversation
 );
 
+/**
+ * @swagger
+ * /api/conversations/delete-conversation/{id}:
+ *  get:
+ *    summary: delete conversation by the id
+ *    tags: [Conversations]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: conversations id
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: successful
+ *      500:
+ *        description: Internal server error
+ */
+
+router.get(
+  '/delete-conversation/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  conversationController.deleteConversation
+);
+
 export const conversationRoutes = router;
