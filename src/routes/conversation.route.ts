@@ -231,5 +231,32 @@ router.post(
   activateMiddleware,
   conversationController.checkConversationOfTwoMember
 );
+/**
+ * @swagger
+ * /api/conversations/delete-conversation/{id}:
+ *  delete:
+ *    summary: delete conversation by the id
+ *    tags: [Conversations]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: conversations id
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: object conversation delete
+ *      500:
+ *        description: Internal server error
+ */
+router.delete(
+  '/delete-conversation/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  conversationController.deleteConversation
+);
 
 export const conversationRoutes = router;

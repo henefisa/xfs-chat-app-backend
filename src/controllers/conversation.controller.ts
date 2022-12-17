@@ -120,3 +120,20 @@ export const updateConversation = async (
     next(error);
   }
 };
+
+export const deleteConversation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    const deleted = await conversationService.deleteConversation(
+      user.id,
+      req.params.id
+    );
+    return res.status(StatusCodes.CREATED).json(deleted);
+  } catch (error) {
+    next(error);
+  }
+};

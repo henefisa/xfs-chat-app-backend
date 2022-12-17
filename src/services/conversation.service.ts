@@ -11,10 +11,15 @@ import { ExistsException, NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import { EGroupRole } from 'src/interfaces/user.interface';
+import { ConversationalDeletion } from 'src/entities/conversational_deletion.entity';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
   .getRepository(Conversation);
+
+const conversationDeletedRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(ConversationalDeletion);
 
 const participantRepository = Database.instance
   .getDataSource('default')
@@ -111,6 +116,11 @@ export const getConversationsOfUser = async (
   query
     .leftJoinAndSelect('conversation.participants', 'participants')
     .leftJoinAndSelect('participants.user', 'users')
+    .leftJoinAndSelect(
+      ConversationalDeletion,
+      'conversationDeleted',
+      'conversation.id = conversationDeleted.conversationId'
+    )
     .where(
       'conversation.id IN' +
         query
@@ -118,6 +128,15 @@ export const getConversationsOfUser = async (
           .select('p.conversationId')
           .from(Participants, 'p')
           .where('p.userId = :userId')
+          .getQuery()
+    )
+    .andWhere(
+      'conversation.id NOT IN' +
+        query
+          .subQuery()
+          .select('c.conversationId')
+          .from(ConversationalDeletion, 'c')
+          .where('c.userId = :userId')
           .getQuery()
     )
     .setParameter('userId', userId);
@@ -288,4 +307,18 @@ export const checkCoupleConversationExists = async (members: string[]) => {
   }
 
   return conversation;
+};
+
+export const deleteConversation = async (
+  userId: string,
+  conversationId: string
+) => {
+  const conversationDeletion = new ConversationalDeletion();
+  const request = {
+    user: userId,
+    conversation: conversationId,
+  };
+
+  Object.assign(conversationDeletion, request);
+  return await conversationDeletedRepository.save(conversationDeletion);
 };
