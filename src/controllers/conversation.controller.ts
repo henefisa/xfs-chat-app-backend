@@ -138,3 +138,22 @@ export const archiveConversation = async (
     next(error);
   }
 };
+
+export const deleteConversation = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+
+    const conversationDeletion = await conversationService.deleteConversation(
+      req.params.id,
+      user.id
+    );
+
+    return res.status(StatusCodes.OK).json(conversationDeletion);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -4,7 +4,7 @@ import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
 import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
-import { FindOneOptions } from 'typeorm';
+import { FindOneOptions, Equal } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
 import { ExistsException, NotFoundException } from 'src/exceptions';
@@ -12,6 +12,7 @@ import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dt
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { ConversationArchive } from 'src/entities/conversation-archived.entity';
+import moment from 'moment';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -305,12 +306,46 @@ export const checkCoupleConversationExists = async (members: string[]) => {
 };
 
 export const archive = async (userId: string, conversationId: string) => {
+  const conversationArchived = createObjectConversationArchived(
+    userId,
+    conversationId
+  );
+  return conversationArchivedRepository.save(conversationArchived);
+};
+
+export const getConversationArchived = async (
+  options: FindOneOptions<ConversationArchive>
+) => {
+  return conversationArchivedRepository.findOne(options);
+};
+
+export const createObjectConversationArchived = (
+  userId: string,
+  conversationId: string
+) => {
   const conversationArchived = new ConversationArchive();
   const request = {
     conversation: conversationId,
     user: userId,
   };
   Object.assign(conversationArchived, request);
+  return conversationArchived;
+};
 
-  return conversationArchivedRepository.save(conversationArchived);
+export const deleteConversation = async (
+  conversationId: string,
+  userId: string
+) => {
+  let conversationArchived = await getConversationArchived({
+    where: { conversation: Equal(conversationId), user: Equal(userId) },
+  });
+  if (!conversationArchived) {
+    conversationArchived = createObjectConversationArchived(
+      userId,
+      conversationId
+    );
+  }
+  const now: moment.Moment = moment();
+  conversationArchived.deleteAt = now;
+  return await conversationArchivedRepository.save(conversationArchived);
 };
