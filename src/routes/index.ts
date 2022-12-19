@@ -7,6 +7,7 @@ import { conversationRoutes } from './conversation.route';
 import { uploadRoutes } from './upload.route';
 import { participantRoutes } from './participant.route';
 import { adminRoutes } from './admin.route';
+import { resetPasswordRoutes } from './reset-password.route';
 
 const router: Router = Router();
 
@@ -18,5 +19,6 @@ router.use('/conversations', conversationRoutes);
 router.use('/participants', participantRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/admin', adminRoutes);
+router.use('/reset-password', resetPasswordRoutes);
 
 export const MainRoutes = router;

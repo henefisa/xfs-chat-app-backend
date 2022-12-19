@@ -6,6 +6,11 @@ import { UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import * as userService from 'src/services/user.service';
 import { RequestWithBody } from 'src/shares';
+import * as sendLinkService from 'src/services/reset-password.service';
+import { config } from 'dotenv';
+import { SendLinkDto } from 'src/dto/user';
+
+config();
 
 export const selfDeleteUser = async (
   req: Request,
@@ -135,6 +140,41 @@ export const selfDeactivate = async (
     const user = req.user as User;
     await userService.Deactivate(user.id);
     return res.status(StatusCodes.NO_CONTENT).json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendLink = async (
+  req: RequestWithBody<SendLinkDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    await sendLinkService.sendLink(
+      req.body.email,
+      process.env.BASE_HOST || 'https://18.142.254.133.sslip.io:8000/api'
+    );
+    return res.status(StatusCodes.OK).json({});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: RequestWithBody<UpdatePasswordUserDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.setHeader('Content-Type', 'application/json');
+    await sendLinkService.resetPassword(
+      req.params.id,
+      req.query.code as string,
+      req.body.password
+    );
+    return res.status(StatusCodes.OK).json({});
   } catch (error) {
     next(error);
   }
