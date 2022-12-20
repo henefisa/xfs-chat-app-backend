@@ -1,3 +1,4 @@
+import { getSignedUrl } from 'src/services/s3.service';
 import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Conversation } from './conversation.entity';
@@ -9,7 +10,22 @@ export class Message extends BaseEntity {
   @Column({ nullable: true })
   message: string;
 
-  @Column({ nullable: true })
+  @Column({
+    nullable: true,
+    transformer: {
+      from(value: string) {
+        if (value) {
+          return getSignedUrl(value);
+        }
+
+        return value;
+      },
+
+      to(value: string) {
+        return value;
+      },
+    },
+  })
   attachment: string;
 
   @Column({ default: false, name: 'is_pin' })

@@ -36,11 +36,12 @@ export class ServerSocket {
 
     socket.on(
       ESocketEvent.SendMessage,
-      async ({ userId, conversationId, text }) => {
+      async ({ userId, conversationId, text, attachment }) => {
         const { user, message } = await createMessage(
           conversationId,
           userId,
-          text
+          text,
+          attachment
         );
         socket
           .to(conversationId)
