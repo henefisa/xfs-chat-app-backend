@@ -13,6 +13,13 @@ import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { getOneOrThrow } from './user.service';
 import { Message, MessageHided } from 'src/entities';
 import { checkConversationArchive } from './conversation.service';
+import { Emotion } from 'src/entities/emotion.entity';
+import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
+import { NotExistException } from 'src/exceptions';
+
+const emotionRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(Emotion);
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -162,4 +169,55 @@ export const countMessagesOfUser = async (
   }
 
   return query.getCount();
+};
+
+export const createObjectExpressFeeling = (
+  messageId: string,
+  type: string,
+  userId: string
+) => {
+  const emotion = new Emotion();
+
+  const request = {
+    type: type,
+    message: messageId,
+    user: userId,
+  };
+
+  Object.assign(emotion, request);
+  return emotion;
+};
+
+export const getEmotions = async (messageId: string) => {
+  const emotions = await emotionRepository.findOne({
+    where: {
+      message: Equal(messageId),
+    },
+  });
+
+  if (!emotions) {
+    throw new NotExistException('emotions');
+  }
+
+  return emotions;
+};
+
+export const expressFeeling = async (
+  dto: ExpressFeelingDto,
+  userId: string
+) => {
+  let emotion = await emotionRepository.findOne({
+    where: {
+      message: Equal(dto.messageId),
+      user: Equal(userId),
+    },
+  });
+
+  if (!emotion) {
+    emotion = createObjectExpressFeeling(dto.messageId, dto.type, userId);
+  }
+
+  emotion.type = dto.type;
+
+  return emotionRepository.save(emotion);
 };

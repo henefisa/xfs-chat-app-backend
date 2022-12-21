@@ -10,7 +10,7 @@ import { ForbiddenException } from 'src/exceptions';
 
 config();
 
-const transporter = nodemailer.createTransport({
+export const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
     user: process.env.EMAIL,

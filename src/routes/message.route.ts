@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { hideMessage } from 'src/controllers/hide-message.controller';
 import { deleteMessage, getMessages } from 'src/controllers/message.controller';
+import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
 import { GetMessageDto } from 'src/dto/message';
 import activateMiddleware from 'src/middlewares/activate.middleware';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import { validationQueryMiddleware } from 'src/middlewares/validation.middleware';
+import * as EmotionControllers from 'src/controllers/emotion.controller';
 
 const router: Router = Router();
 
@@ -98,6 +100,59 @@ router.get(
   activateMiddleware,
   validationQueryMiddleware(GetMessageDto),
   getMessages
+);
+
+/**
+ * @swagger
+ * /api/messages/express-feeling:
+ *   post:
+ *     summary: express feeling
+ *     tags: [Messages]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/expressFeeling'
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: expressed feeling
+ */
+router.post(
+  '/express-feeling',
+  requireAuthMiddleware,
+  activateMiddleware,
+  validationQueryMiddleware(ExpressFeelingDto),
+  EmotionControllers.expressFeeling
+);
+
+/**
+ * @swagger
+ * /api/messages/emotions/{id}:
+ *   get:
+ *     summary: get emotions in message
+ *     tags: [Messages]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: message id
+ *     security:
+ *          - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: emotions
+ */
+
+router.get(
+  '/emotions/:id',
+  requireAuthMiddleware,
+  activateMiddleware,
+  EmotionControllers.getEmotions
 );
 
 export const messageRoutes = router;
