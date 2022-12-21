@@ -7,7 +7,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 export class ConversationArchive extends BaseEntity {
   @Column({
     name: 'delete_at',
-    type: 'timestamp with time zone',
+    type: 'timestamptz',
     default: null,
     transformer: {
       from(value) {

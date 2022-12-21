@@ -12,7 +12,7 @@ import {
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { getOneOrThrow } from './user.service';
 import { Message, MessageHided } from 'src/entities';
-import { checkConversationDelete } from './conversation.service';
+import { checkConversationArchive } from './conversation.service';
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -87,7 +87,7 @@ export const getMessages = async (
     offset: dto?.offset,
   });
 
-  const conversationArchive = await checkConversationDelete(conversation, id);
+  const conversationArchive = await checkConversationArchive(conversation, id);
 
   if (!options?.unlimited) {
     query.skip(offset).take(limit);

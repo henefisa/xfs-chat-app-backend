@@ -337,7 +337,7 @@ export const deleteConversation = async (
   conversationId: string,
   userId: string
 ) => {
-  let conversationArchived = await checkConversationDelete(
+  let conversationArchived = await checkConversationArchive(
     conversationId,
     userId
   );
@@ -348,14 +348,13 @@ export const deleteConversation = async (
       conversationId
     );
   }
-  const now: moment.Moment = moment();
 
-  conversationArchived.deleteAt = now;
+  conversationArchived.deleteAt = moment();
 
-  return await conversationArchivedRepository.save(conversationArchived);
+  return conversationArchivedRepository.save(conversationArchived);
 };
 
-export const checkConversationDelete = async (
+export const checkConversationArchive = async (
   conversationId: string,
   userId: string
 ) => {
