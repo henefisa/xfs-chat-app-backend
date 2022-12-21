@@ -28,10 +28,10 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
       socketService.subscribe(conversationId, userId, socket);
-    });
 
-    socket.on(ESocketEvent.Disconnect, ({ userId }) => {
-      socketService.disconnect(socket, userId);
+      socket.on(ESocketEvent.Disconnect, () => {
+        socketService.disconnect(socket, userId);
+      });
     });
 
     socket.on(
