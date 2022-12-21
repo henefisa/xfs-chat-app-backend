@@ -7,7 +7,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 export class ConversationArchive extends BaseEntity {
   @Column({
     name: 'delete_at',
-    type: 'timestamp without time zone',
+    type: 'timestamp with time zone',
     default: null,
     transformer: {
       from(value) {
@@ -25,4 +25,7 @@ export class ConversationArchive extends BaseEntity {
 
   @ManyToOne(() => User)
   user: User;
+
+  @Column({ name: 'is_hided', default: true })
+  isHided: boolean;
 }

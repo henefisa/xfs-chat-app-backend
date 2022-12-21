@@ -1,3 +1,4 @@
+import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import { GetMessageOptions } from 'src/interfaces/message.interface';
 import Database from 'src/configs/Database';
 import { Equal, FindOneOptions } from 'typeorm';
@@ -11,6 +12,7 @@ import {
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { getOneOrThrow } from './user.service';
 import { Message, MessageHided } from 'src/entities';
+import { checkConversationDelete } from './conversation.service';
 
 const messageRepository = Database.instance
   .getDataSource('default')
@@ -85,6 +87,8 @@ export const getMessages = async (
     offset: dto?.offset,
   });
 
+  const conversationArchive = await checkConversationDelete(conversation, id);
+
   if (!options?.unlimited) {
     query.skip(offset).take(limit);
   }
@@ -92,6 +96,17 @@ export const getMessages = async (
   query
     .andWhere('m.conversation = :conversation', { conversation: conversation })
     .leftJoinAndSelect('m.sender', 'users');
+
+  if (conversationArchive && conversationArchive.deleteAt.isValid()) {
+    query
+      .leftJoinAndSelect('m.conversation', 'c')
+      .leftJoinAndSelect(
+        ConversationArchive,
+        'conversationArchive',
+        'conversationArchive.conversation = c.id'
+      )
+      .andWhere('m.createdAt > conversationArchive.deleteAt');
+  }
 
   if (dto?.q) {
     query.andWhere('m.message ILIKE :q', { q: dto.q });
