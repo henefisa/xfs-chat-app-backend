@@ -1,3 +1,4 @@
+import { Emotion } from 'src/entities/emotion.entity';
 import { getSignedUrl } from 'src/services/s3.service';
 import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
@@ -42,4 +43,7 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => MessageHided, (messageHided) => messageHided.message)
   messageHided: MessageHided[];
+
+  @OneToMany(() => Emotion, (emotion) => emotion.message)
+  emoticons: Emotion[];
 }

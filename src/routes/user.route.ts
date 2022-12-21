@@ -105,6 +105,19 @@ const router: Router = Router();
  *            example:
  *              conversation: "fbbb20b9-c25e-430b-9222-7acf59b0aa23"
  *              message: "Hello world!"
+ *       expressFeeling:
+ *            type: object
+ *            required:
+ *              - messageId
+ *              - type
+ *            properties:
+ *              messageId:
+ *                type: string
+ *              type:
+ *                type: string
+ *            example:
+ *              messageId: "8729cdc9-0598-47af-9b95-851f8a490a06"
+ *              type: "FUN"
  *       addParticipant:
  *            type: object
  *            required:
