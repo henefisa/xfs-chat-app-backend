@@ -44,7 +44,7 @@ export class ServerSocket {
           attachment
         );
         socket
-          .to(conversationId)
+          .in(conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
       }
     );
