@@ -43,7 +43,7 @@ export class ServerSocket {
           text,
           attachment
         );
-        socket
+        this.io
           .in(conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
       }
