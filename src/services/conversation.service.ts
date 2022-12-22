@@ -133,6 +133,7 @@ export const getConversationsOfUser = async (
           .select('archive.conversationId')
           .from(ConversationArchive, 'archive')
           .where('archive.userId = :userId')
+          .andWhere('archive.isHided = true')
           .getQuery()
     )
     .setParameter('userId', userId);
@@ -336,16 +337,33 @@ export const deleteConversation = async (
   conversationId: string,
   userId: string
 ) => {
-  let conversationArchived = await getConversationArchived({
-    where: { conversation: Equal(conversationId), user: Equal(userId) },
-  });
+  let conversationArchived = await checkConversationArchive(
+    conversationId,
+    userId
+  );
+
   if (!conversationArchived) {
     conversationArchived = createObjectConversationArchived(
       userId,
       conversationId
     );
   }
-  const now: moment.Moment = moment();
-  conversationArchived.deleteAt = now;
-  return await conversationArchivedRepository.save(conversationArchived);
+
+  conversationArchived.deleteAt = moment();
+
+  return conversationArchivedRepository.save(conversationArchived);
+};
+
+export const checkConversationArchive = async (
+  conversationId: string,
+  userId: string
+) => {
+  const conversationArchived = await getConversationArchived({
+    where: { conversation: Equal(conversationId), user: Equal(userId) },
+  });
+
+  if (!conversationArchived) {
+    return false;
+  }
+  return conversationArchived;
 };
