@@ -1,8 +1,16 @@
 import { setOffline } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { checkMemberExist } from './participants.service';
 import { NotFoundException } from 'src/exceptions';
+import { SendMessageDto } from 'src/dto/message';
+import { validate } from 'class-validator';
+import { HttpException } from 'src/shares/http-exception';
+import { StatusCodes } from 'http-status-codes';
+import {
+  buildError,
+  IValidationError,
+} from 'src/middlewares/validation.middleware';
 
 export const disconnect = (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
@@ -12,7 +20,8 @@ export const disconnect = (socket: Socket, user: string) => {
 export const subscribe = async (
   conversation: string,
   user: string,
-  socket: Socket
+  socket: Socket,
+  io: Server
 ) => {
   try {
     const checked = await checkMemberExist(conversation, user);
@@ -22,29 +31,30 @@ export const subscribe = async (
     }
 
     socket.join(conversation);
-    socket.to(conversation).emit(ESocketEvent.UserJoin, { user });
+    io.in(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {
-    socket.emit(ESocketEvent.Error, error);
+    io.emit(ESocketEvent.Error, error);
   }
 };
 
-export const unsubscribe = (room: string, socket: Socket) => {
+export const unsubscribe = (room: string, socket: Socket, io: Server) => {
   try {
     socket.leave(room);
-    socket.to(room).emit(ESocketEvent.UserLeft, socket.id);
+    io.in(room).emit(ESocketEvent.UserLeft, socket.id);
   } catch (error) {
-    socket.emit(ESocketEvent.Error, error);
+    io.emit(ESocketEvent.Error, error);
   }
 };
 
-export const sendMessage = (
-  room: string,
-  socket: Socket,
-  senderId: string,
-  text: string
-) => {
-  socket.to(room).emit(ESocketEvent.GetMessage, {
-    senderId,
-    text,
-  });
+export const validateData = async (data: SendMessageDto) => {
+  const data1 = Object.assign(new SendMessageDto(), data);
+  const errors = await validate(data1, { whitelist: true });
+  const result: IValidationError[] = [];
+  if (errors.length > 0) {
+    throw new HttpException(
+      StatusCodes.BAD_REQUEST,
+      'Input data validation failed',
+      buildError(errors, result)
+    );
+  }
 };

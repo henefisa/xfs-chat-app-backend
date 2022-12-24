@@ -33,7 +33,7 @@ export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
-  attachment?: string
+  attachment: string
 ) => {
   const user = await getOneOrThrow({ where: { id: sender } });
   const message = new Message();
@@ -46,9 +46,7 @@ export const createMessage = async (
 
   Object.assign(message, request);
 
-  if (attachment) {
-    message.attachment = attachment;
-  }
+  message.attachment = attachment;
 
   return {
     user: user,
