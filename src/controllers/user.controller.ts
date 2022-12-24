@@ -154,7 +154,7 @@ export const sendLink = async (
     res.setHeader('Content-Type', 'application/json');
     await sendLinkService.sendLink(
       req.body.email,
-      process.env.BASE_HOST || 'https://18.142.254.133.sslip.io:8000/api'
+      process.env.CLIENT_HOST || 'https://18.142.254.133.sslip.io'
     );
     return res.status(StatusCodes.OK).json({});
   } catch (error) {
