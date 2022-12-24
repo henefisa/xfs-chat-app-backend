@@ -12,7 +12,10 @@ import {
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
 import { getOneOrThrow } from './user.service';
 import { Message, MessageHided } from 'src/entities';
-import { checkConversationArchive } from './conversation.service';
+import {
+  checkConversationArchive,
+  getConversationArchived,
+} from './conversation.service';
 import { Emotion } from 'src/entities/emotion.entity';
 import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
 import { NotExistException } from 'src/exceptions';
@@ -28,6 +31,10 @@ const messageRepository = Database.instance
 const messageHidedRepository = Database.instance
   .getDataSource('default')
   .getRepository(MessageHided);
+
+const conversationArchivedRepository = Database.instance
+  .getDataSource('default')
+  .getRepository(ConversationArchive);
 
 export const createMessage = async (
   conversation: string,
@@ -48,6 +55,15 @@ export const createMessage = async (
 
   if (attachment) {
     message.attachment = attachment;
+  }
+
+  const conversationArchived = await getConversationArchived({
+    where: { conversation: Equal(conversation) },
+  });
+
+  if (conversationArchived?.isHided) {
+    conversationArchived.isHided = false;
+    await conversationArchivedRepository.save(conversationArchived);
   }
 
   return {
