@@ -323,11 +323,12 @@ export const checkActivateValidation = async (status: EUserActiveStatus) => {
   return true;
 };
 
-export const setOnline = async (userId: string) => {
+export const setOnline = async (userId: string, peerId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
 
+  user.peerId = peerId;
   user.status = EUserStatus.ONLINE;
 
   return userRepository.save(user);
@@ -337,7 +338,7 @@ export const setOffline = async (userId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-
+  user.peerId = '';
   user.status = EUserStatus.OFFLINE;
 
   return userRepository.save(user);

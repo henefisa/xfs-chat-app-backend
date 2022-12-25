@@ -59,4 +59,7 @@ export class User extends BaseEntity {
 
   @Column({ enum: EUserRole, default: EUserRole.USER })
   role: EUserRole;
+
+  @Column({ nullable: true })
+  peerId: string;
 }

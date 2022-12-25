@@ -22,8 +22,8 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    socket.on(ESocketEvent.Online, ({ userId }) => {
-      setOnline(userId);
+    socket.on(ESocketEvent.Online, ({ userId, peerId }) => {
+      setOnline(userId, peerId);
     });
 
     socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
