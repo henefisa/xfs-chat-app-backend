@@ -42,11 +42,10 @@ export const createMessage = async (
     sender: sender,
     message: text,
     conversation: conversation,
+    attachment,
   };
 
   Object.assign(message, request);
-
-  message.attachment = attachment;
 
   return {
     user: user,

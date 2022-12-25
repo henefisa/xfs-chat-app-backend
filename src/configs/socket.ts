@@ -7,7 +7,7 @@ import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 
 config();
-let _io: Server;
+let socketIo: Server;
 
 export class ServerSocket {
   public static instance: ServerSocket;
@@ -28,7 +28,7 @@ export class ServerSocket {
     });
 
     socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
-      socketService.subscribe(conversationId, userId, socket, _io);
+      socketService.subscribe(conversationId, userId, socket, socketIo);
 
       socket.on(ESocketEvent.Disconnect, () => {
         socketService.disconnect(socket, userId);
@@ -44,21 +44,21 @@ export class ServerSocket {
           data.text,
           data.attachment
         );
-        _io
+        socketIo
           .in(data.conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
       } catch (error) {
         console.log(error);
-        _io.emit(ESocketEvent.Error, error);
+        socketIo.emit(ESocketEvent.Error, error);
       }
     });
 
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
-      socketService.unsubscribe(room, socket, _io);
+      socketService.unsubscribe(room, socket, socketIo);
     });
   }
   public start() {
-    _io = this.io;
+    socketIo = this.io;
     this.io.on(ESocketEvent.Connection, this.listeners);
     console.info('Socket IO started.');
   }

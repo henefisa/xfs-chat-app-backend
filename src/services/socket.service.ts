@@ -47,8 +47,8 @@ export const unsubscribe = (room: string, socket: Socket, io: Server) => {
 };
 
 export const validateData = async (data: SendMessageDto) => {
-  const data1 = Object.assign(new SendMessageDto(), data);
-  const errors = await validate(data1, { whitelist: true });
+  const message = Object.assign(new SendMessageDto(), data);
+  const errors = await validate(message, { whitelist: true });
   const result: IValidationError[] = [];
   if (errors.length > 0) {
     throw new HttpException(
