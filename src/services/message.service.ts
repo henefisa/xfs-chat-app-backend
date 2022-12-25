@@ -36,40 +36,56 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
+const dataSource = Database.instance.getDataSource('default');
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
-  attachment?: string
+  attachment: string
 ) => {
-  const user = await getOneOrThrow({ where: { id: sender } });
-  const message = new Message();
+  const queryRunner = dataSource.createQueryRunner();
 
-  const request = {
-    sender: sender,
-    message: text,
-    conversation: conversation,
-  };
+  await queryRunner.connect();
 
-  Object.assign(message, request);
+  await queryRunner.startTransaction();
 
-  if (attachment) {
-    message.attachment = attachment;
+  try {
+    const user = await getOneOrThrow({ where: { id: sender } });
+    const message = new Message();
+
+    const request = {
+      sender: sender,
+      message: text,
+      conversation: conversation,
+      attachment,
+    };
+
+    Object.assign(message, request);
+
+    const newMessage = await queryRunner.manager
+      .withRepository(messageRepository)
+      .save(message);
+
+    const conversationArchived = await getConversationArchived({
+      where: { conversation: Equal(conversation) },
+    });
+
+    if (conversationArchived?.isHided) {
+      conversationArchived.isHided = false;
+      await queryRunner.manager
+        .withRepository(conversationArchivedRepository)
+        .save(conversationArchived);
+    }
+
+    await queryRunner.commitTransaction();
+    return {
+      user: user,
+      message: newMessage,
+    };
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    throw error;
   }
-
-  const conversationArchived = await getConversationArchived({
-    where: { conversation: Equal(conversation) },
-  });
-
-  if (conversationArchived?.isHided) {
-    conversationArchived.isHided = false;
-    await conversationArchivedRepository.save(conversationArchived);
-  }
-
-  return {
-    user: user,
-    message: await messageRepository.save(message),
-  };
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
