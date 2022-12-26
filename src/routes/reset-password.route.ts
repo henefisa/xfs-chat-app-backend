@@ -26,6 +26,38 @@ const router: Router = Router();
  */
 router.post('/', validationMiddleware(SendLinkDto), sendLink);
 
+/**
+ * @swagger
+ * /api/reset-password/{id}:
+ *   post:
+ *     summary: reset password
+ *     tags: [ResetPassword]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: user id
+ *       - in: query
+ *         name: code
+ *         schema:
+ *            type: string
+ *         required: true
+ *         description: code in email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: successfully
+ */
 router.post('/:id', validationMiddleware(UpdatePasswordUserDto), resetPassword);
 
 export const resetPasswordRoutes = router;

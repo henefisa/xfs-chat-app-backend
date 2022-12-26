@@ -24,7 +24,10 @@ export const sendLink = async (email: string, host: string) => {
 
   transporter.sendMail(mainOptions);
 
-  redis.set(getResetPasswordKey(user.id), code);
+  const key = getResetPasswordKey(user.id);
+
+  redis.set(key, code);
+  redis.expire(key, 10 * 60);
 };
 
 export const resetPassword = async (
