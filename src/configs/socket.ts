@@ -36,7 +36,6 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       try {
-        console.log(ServerSocket.io);
         await socketService.validateData(data);
         const { user, message } = await createMessage(
           data.conversationId,
