@@ -12,9 +12,9 @@ import {
   IValidationError,
 } from 'src/middlewares/validation.middleware';
 
-export const disconnect = (socket: Socket, user: string) => {
+export const disconnect = async (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
-  setOffline(user);
+  await setOffline(user);
 };
 
 export const subscribe = async (

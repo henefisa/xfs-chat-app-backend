@@ -7,15 +7,14 @@ import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 
 config();
-let socketIo: Server;
 
 export class ServerSocket {
   public static instance: ServerSocket;
-  public io: Server;
+  public static io: Server;
 
   constructor(server: HttpServer) {
     ServerSocket.instance = this;
-    this.io = new Server(server, {
+    ServerSocket.io = new Server(server, {
       cors: {
         origin: '*',
       },
@@ -23,20 +22,21 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    socket.on(ESocketEvent.Online, ({ userId }) => {
-      setOnline(userId);
+    socket.on(ESocketEvent.Online, async ({ userId }) => {
+      await setOnline(userId);
     });
 
     socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
-      socketService.subscribe(conversationId, userId, socket, socketIo);
+      socketService.subscribe(conversationId, userId, socket, ServerSocket.io);
 
-      socket.on(ESocketEvent.Disconnect, () => {
-        socketService.disconnect(socket, userId);
+      socket.on(ESocketEvent.Disconnect, async () => {
+        await socketService.disconnect(socket, userId);
       });
     });
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       try {
+        console.log(ServerSocket.io);
         await socketService.validateData(data);
         const { user, message } = await createMessage(
           data.conversationId,
@@ -44,22 +44,21 @@ export class ServerSocket {
           data.text,
           data.attachment
         );
-        socketIo
+        ServerSocket.io
           .in(data.conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
       } catch (error) {
         console.log(error);
-        socketIo.emit(ESocketEvent.Error, error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
 
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
-      socketService.unsubscribe(room, socket, socketIo);
+      socketService.unsubscribe(room, socket, ServerSocket.io);
     });
   }
   public start() {
-    socketIo = this.io;
-    this.io.on(ESocketEvent.Connection, this.listeners);
+    ServerSocket.io.on(ESocketEvent.Connection, this.listeners);
     console.info('Socket IO started.');
   }
 }
