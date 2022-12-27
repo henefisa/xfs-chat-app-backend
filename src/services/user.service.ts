@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import Database from 'src/configs/Database';
+import redis from 'src/configs/Redis';
 import { AdminUpdateRoleUserDto } from 'src/dto/admin';
 import { LoginDto } from 'src/dto/auth';
 import {
@@ -22,6 +23,7 @@ import {
   GetUserOptions,
 } from 'src/interfaces';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
+import { getPeerIdKey } from 'src/utils/redis';
 import { FindOneOptions, Not } from 'typeorm';
 
 const userRepository = Database.instance
@@ -323,11 +325,12 @@ export const checkActivateValidation = async (status: EUserActiveStatus) => {
   return true;
 };
 
-export const setOnline = async (userId: string) => {
+export const setOnline = async (userId: string, peerId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-
+  const key = getPeerIdKey(user.id);
+  redis.set(key, Array.prototype.push(peerId));
   user.status = EUserStatus.ONLINE;
 
   return userRepository.save(user);
@@ -337,7 +340,7 @@ export const setOffline = async (userId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-
+  redis.del(getPeerIdKey(user.id));
   user.status = EUserStatus.OFFLINE;
 
   return userRepository.save(user);
