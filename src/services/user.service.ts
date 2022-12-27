@@ -325,23 +325,47 @@ export const checkActivateValidation = async (status: EUserActiveStatus) => {
   return true;
 };
 
+const addPeerId = async (key: string, peerId: string) => {
+  const id = await redis.get(key);
+  if (!id) {
+    const data = [peerId].toString();
+    return redis.set(key, data);
+  }
+  const arrId = id.split(',');
+  const data = [...arrId, peerId].toString();
+  return redis.set(key, data);
+};
+
+const setPeerIdOffline = async (key: string, peerId: string) => {
+  const id = await redis.get(key);
+  if (!id) {
+    return [];
+  }
+  const arrId = id.split(',');
+  return arrId.filter((id) => id !== peerId);
+};
+
 export const setOnline = async (userId: string, peerId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
   const key = getPeerIdKey(user.id);
-  redis.set(key, Array.prototype.push(peerId));
+  await addPeerId(key, peerId);
   user.status = EUserStatus.ONLINE;
-
   return userRepository.save(user);
 };
 
-export const setOffline = async (userId: string) => {
+export const setOffline = async (userId: string, peerId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-  redis.del(getPeerIdKey(user.id));
-  user.status = EUserStatus.OFFLINE;
+  const key = getPeerIdKey(user.id);
+  const data = await setPeerIdOffline(key, peerId);
+  if (data.length === 0) {
+    user.status = EUserStatus.OFFLINE;
+    await redis.del(key);
+  }
+  await redis.set(key, data.toString());
 
   return userRepository.save(user);
 };

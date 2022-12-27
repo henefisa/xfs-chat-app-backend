@@ -27,6 +27,9 @@ export class ServerSocket {
     socket.on(ESocketEvent.Online, async ({ userId, peerId }) => {
       try {
         await setOnline(userId, peerId);
+        socket.on(ESocketEvent.Disconnect, async () => {
+          await socketService.disconnect(socket, userId, peerId);
+        });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
@@ -35,7 +38,7 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.CallToId, async ({ userId }) => {
       try {
-        const peerId = redis.get(getPeerIdKey(userId));
+        const peerId = await redis.get(getPeerIdKey(userId));
         ServerSocket.io.emit(ESocketEvent.GetPeerId, { peerId });
       } catch (error) {
         console.log(error);
@@ -51,10 +54,6 @@ export class ServerSocket {
           socket,
           ServerSocket.io
         );
-
-        socket.on(ESocketEvent.Disconnect, async () => {
-          await socketService.disconnect(socket, userId);
-        });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
