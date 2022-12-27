@@ -11,7 +11,10 @@ export interface IValidationError {
   message: string;
 }
 
-const buildError = (errors: ValidationError[], result: IValidationError[]) => {
+export const buildError = (
+  errors: ValidationError[],
+  result: IValidationError[]
+) => {
   errors.forEach((el) => {
     if (el.children) {
       buildError(el.children, result);

@@ -1,12 +1,20 @@
 import { IsOptional, IsString } from 'class-validator';
 import { IsNotBlank } from 'src/decorators';
 
-export class sendMessageDto {
+export class SendMessageDto {
   @IsString()
-  @IsOptional()
-  message: string;
+  @IsNotBlank()
+  conversationId: string;
 
   @IsString()
   @IsNotBlank()
-  conversation: string;
+  userId: string;
+
+  @IsString()
+  @IsNotBlank()
+  text: string;
+
+  @IsString()
+  @IsOptional()
+  attachment: string;
 }
