@@ -46,9 +46,9 @@ export class ServerSocket {
       }
     });
 
-    socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
+    socket.on(ESocketEvent.Subscribe, async ({ conversationId, userId }) => {
       try {
-        socketService.subscribe(
+        await socketService.subscribe(
           conversationId,
           userId,
           socket,
