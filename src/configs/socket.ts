@@ -5,6 +5,8 @@ import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
+import redis from './Redis';
+import { getPeerIdKey } from 'src/utils/redis';
 
 config();
 
@@ -22,16 +24,40 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    socket.on(ESocketEvent.Online, async ({ userId }) => {
-      await setOnline(userId);
+    socket.on(ESocketEvent.Online, async ({ userId, peerId }) => {
+      try {
+        await setOnline(userId, peerId);
+        socket.on(ESocketEvent.Disconnect, async () => {
+          await socketService.disconnect(socket, userId, peerId);
+        });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
     });
 
-    socket.on(ESocketEvent.Subscribe, ({ conversationId, userId }) => {
-      socketService.subscribe(conversationId, userId, socket, ServerSocket.io);
+    socket.on(ESocketEvent.CallToId, async ({ userId }) => {
+      try {
+        const peerId = await redis.get(getPeerIdKey(userId));
+        ServerSocket.io.emit(ESocketEvent.GetPeerId, { peerId });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
 
-      socket.on(ESocketEvent.Disconnect, async () => {
-        await socketService.disconnect(socket, userId);
-      });
+    socket.on(ESocketEvent.Subscribe, async ({ conversationId, userId }) => {
+      try {
+        await socketService.subscribe(
+          conversationId,
+          userId,
+          socket,
+          ServerSocket.io
+        );
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
     });
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
@@ -53,7 +79,12 @@ export class ServerSocket {
     });
 
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
-      socketService.unsubscribe(room, socket, ServerSocket.io);
+      try {
+        socketService.unsubscribe(room, socket, ServerSocket.io);
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
     });
   }
   public start() {

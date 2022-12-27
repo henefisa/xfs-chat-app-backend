@@ -4,3 +4,6 @@ export const getRefreshTokenKey = (name: string) => {
 export const getResetPasswordKey = (name: string) => {
   return 'reset-password-' + name;
 };
+export const getPeerIdKey = (name: string) => {
+  return 'peer-id-' + name;
+};
