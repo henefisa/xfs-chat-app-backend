@@ -36,56 +36,41 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-const dataSource = Database.instance.getDataSource('default');
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
   attachment: string
 ) => {
-  const queryRunner = dataSource.createQueryRunner();
+  const user = await getOneOrThrow({ where: { id: sender } });
+  const message = new Message();
 
-  await queryRunner.connect();
+  const request = {
+    sender: sender,
+    message: text,
+    conversation: conversation,
+    attachment,
+  };
 
-  await queryRunner.startTransaction();
+  Object.assign(message, request);
 
-  try {
-    const user = await getOneOrThrow({ where: { id: sender } });
-    const message = new Message();
+  await unarchive(conversation);
 
-    const request = {
-      sender: sender,
-      message: text,
-      conversation: conversation,
-      attachment,
-    };
+  return {
+    user: user,
+    message: await messageRepository.save(message),
+  };
+};
 
-    Object.assign(message, request);
-
-    const newMessage = await queryRunner.manager
-      .withRepository(messageRepository)
-      .save(message);
-
-    const conversationArchived = await getConversationArchived({
-      where: { conversation: Equal(conversation) },
-    });
-
-    if (conversationArchived?.isHided) {
-      conversationArchived.isHided = false;
-      await queryRunner.manager
-        .withRepository(conversationArchivedRepository)
-        .save(conversationArchived);
-    }
-
-    await queryRunner.commitTransaction();
-    return {
-      user: user,
-      message: newMessage,
-    };
-  } catch (error) {
-    await queryRunner.rollbackTransaction();
-    throw error;
+export const unarchive = async (conversationId: string) => {
+  const conversationArchived = await getConversationArchived({
+    where: { conversation: Equal(conversationId) },
+  });
+  if (!conversationArchived || !conversationArchived.isHided) {
+    return;
   }
+  conversationArchived.isHided = false;
+  await conversationArchivedRepository.save(conversationArchived);
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
