@@ -1,7 +1,7 @@
 import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import { GetMessageOptions } from 'src/interfaces/message.interface';
 import Database from 'src/configs/Database';
-import { Equal, FindOneOptions } from 'typeorm';
+import { Equal, FindOneOptions, QueryRunner } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
 import {
   CountMessageDto,
@@ -36,33 +36,55 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
+const dataSource = Database.instance.getDataSource('default');
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
   attachment: string
 ) => {
-  const user = await getOneOrThrow({ where: { id: sender } });
-  const message = new Message();
+  const queryRunner = dataSource.createQueryRunner();
 
-  const request = {
-    sender: sender,
-    message: text,
-    conversation: conversation,
-    attachment,
-  };
+  await queryRunner.connect();
 
-  Object.assign(message, request);
+  await queryRunner.startTransaction();
 
-  await unarchive(conversation);
+  try {
+    const user = await getOneOrThrow({ where: { id: sender } });
+    const message = new Message();
 
-  return {
-    user: user,
-    message: await messageRepository.save(message),
-  };
+    const request = {
+      sender: sender,
+      message: text,
+      conversation: conversation,
+      attachment,
+    };
+
+    Object.assign(message, request);
+
+    const newMessage = await queryRunner.manager
+      .withRepository(messageRepository)
+      .save(message);
+
+    await unarchive(conversation, queryRunner);
+
+    await queryRunner.commitTransaction();
+    return {
+      user: user,
+      message: newMessage,
+    };
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    throw error;
+  } finally {
+    await queryRunner.release();
+  }
 };
 
-export const unarchive = async (conversationId: string) => {
+export const unarchive = async (
+  conversationId: string,
+  queryRunner: QueryRunner
+) => {
   const conversationArchived = await getConversationArchived({
     where: { conversation: Equal(conversationId) },
   });
@@ -70,7 +92,9 @@ export const unarchive = async (conversationId: string) => {
     return;
   }
   conversationArchived.isHided = false;
-  await conversationArchivedRepository.save(conversationArchived);
+  await queryRunner.manager
+    .withRepository(conversationArchivedRepository)
+    .save(conversationArchived);
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
