@@ -1,7 +1,7 @@
 import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import { GetMessageOptions } from 'src/interfaces/message.interface';
 import Database from 'src/configs/Database';
-import { Equal, FindOneOptions } from 'typeorm';
+import { Equal, FindOneOptions, QueryRunner } from 'typeorm';
 import { InvalidSenderException } from 'src/exceptions/invalid.exception';
 import {
   CountMessageDto,
@@ -66,16 +66,7 @@ export const createMessage = async (
       .withRepository(messageRepository)
       .save(message);
 
-    const conversationArchived = await getConversationArchived({
-      where: { conversation: Equal(conversation) },
-    });
-
-    if (conversationArchived?.isHided) {
-      conversationArchived.isHided = false;
-      await queryRunner.manager
-        .withRepository(conversationArchivedRepository)
-        .save(conversationArchived);
-    }
+    await unarchive(conversation, queryRunner);
 
     await queryRunner.commitTransaction();
     return {
@@ -85,7 +76,25 @@ export const createMessage = async (
   } catch (error) {
     await queryRunner.rollbackTransaction();
     throw error;
+  } finally {
+    await queryRunner.release();
   }
+};
+
+export const unarchive = async (
+  conversationId: string,
+  queryRunner: QueryRunner
+) => {
+  const conversationArchived = await getConversationArchived({
+    where: { conversation: Equal(conversationId) },
+  });
+  if (!conversationArchived || !conversationArchived.isHided) {
+    return;
+  }
+  conversationArchived.isHided = false;
+  await queryRunner.manager
+    .withRepository(conversationArchivedRepository)
+    .save(conversationArchived);
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
