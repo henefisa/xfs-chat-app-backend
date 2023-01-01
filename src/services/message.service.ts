@@ -19,6 +19,7 @@ import {
 import { Emotion } from 'src/entities/emotion.entity';
 import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
 import { NotExistException } from 'src/exceptions';
+import * as transactionService from 'src/services/transaction.service';
 
 const emotionRepository = Database.instance
   .getDataSource('default')
@@ -36,49 +37,36 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-const dataSource = Database.instance.getDataSource('default');
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
   attachment: string
 ) => {
-  const queryRunner = dataSource.createQueryRunner();
+  const queryRunner = await transactionService.startConnect();
+  const user = await getOneOrThrow({ where: { id: sender } });
+  const message = new Message();
 
-  await queryRunner.connect();
+  const request = {
+    sender: sender,
+    message: text,
+    conversation: conversation,
+    attachment,
+  };
 
-  await queryRunner.startTransaction();
+  Object.assign(message, request);
 
-  try {
-    const user = await getOneOrThrow({ where: { id: sender } });
-    const message = new Message();
-
-    const request = {
-      sender: sender,
-      message: text,
-      conversation: conversation,
-      attachment,
-    };
-
-    Object.assign(message, request);
-
-    const newMessage = await queryRunner.manager
-      .withRepository(messageRepository)
-      .save(message);
-
-    await unarchive(conversation, queryRunner);
-
-    await queryRunner.commitTransaction();
-    return {
-      user: user,
-      message: newMessage,
-    };
-  } catch (error) {
-    await queryRunner.rollbackTransaction();
-    throw error;
-  } finally {
-    await queryRunner.release();
-  }
+  const newMessage = await transactionService.save(
+    messageRepository,
+    message,
+    queryRunner
+  );
+  await unarchive(conversation, queryRunner);
+  await transactionService.commitTransaction(queryRunner);
+  return {
+    user: user,
+    message: newMessage,
+  };
 };
 
 export const unarchive = async (
@@ -92,9 +80,11 @@ export const unarchive = async (
     return;
   }
   conversationArchived.isHided = false;
-  await queryRunner.manager
-    .withRepository(conversationArchivedRepository)
-    .save(conversationArchived);
+  await transactionService.save(
+    conversationArchivedRepository,
+    conversationArchived,
+    queryRunner
+  );
 };
 
 export const deleteMessage = async (dto: deleteMessageDto, id: string) => {
