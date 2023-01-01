@@ -93,6 +93,7 @@ export const getOne = async (options: FindOneOptions<Conversation>) => {
 export const getConversationsOfUser = async (
   userId: string,
   dto?: GetConversationDto,
+  group?: boolean,
   options?: GetConversationOptions
 ) => {
   const { limit, offset } = getLimitAndOffset({
@@ -137,6 +138,10 @@ export const getConversationsOfUser = async (
     );
   }
 
+  if (group) {
+    query.andWhere('conversation.is_group = true');
+  }
+
   if (options?.id) {
     query.andWhere('conversation.id = :id', { id: options.id });
   }
@@ -150,57 +155,6 @@ export const getConversationsOfUser = async (
     count,
   };
 };
-
-export const getGroups = async (
-  userId: string,
-  dto?: GetConversationDto,
-  options?: GetConversationOptions
-) => {
-  const { limit, offset } = getLimitAndOffset({
-    limit: dto?.limit,
-    offset: dto?.offset,
-  });
-
-  const query = conversationRepository.createQueryBuilder('conversation');
-
-  if (!options?.unlimited) {
-    query.skip(offset).take(limit);
-  }
-
-  query
-    .leftJoinAndSelect('conversation.participants', 'participants')
-    .leftJoinAndSelect('participants.user', 'users')
-    .where(
-      'conversation.id IN' +
-        query
-          .subQuery()
-          .select('p.conversationId')
-          .from(Participants, 'p')
-          .where('p.userId = :userId')
-          .getQuery()
-    )
-    .setParameter('userId', userId)
-    .andWhere('conversation.is_group = true');
-
-  if (dto?.q) {
-    query.andWhere(
-      '(title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q)',
-      { q: `%${dto.q}%` }
-    );
-  }
-
-  if (options?.id) {
-    query.andWhere('conversation.id = :id', { id: options.id });
-  }
-
-  const [conversations, count] = await query.getManyAndCount();
-
-  return {
-    conversations,
-    count,
-  };
-};
-
 export const checkConversationOfTwoMember = async (
   dto: CheckConversationDto,
   ownerId: string
