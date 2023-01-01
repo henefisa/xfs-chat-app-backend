@@ -145,7 +145,7 @@ export const getMessages = async (
     .andWhere('m.conversation = :conversation', { conversation: conversation })
     .leftJoinAndSelect('m.sender', 'users');
 
-  if (conversationArchive && conversationArchive.deleteAt.isValid()) {
+  if (conversationArchive && conversationArchive.deleteAt !== null) {
     query
       .leftJoinAndSelect('m.conversation', 'c')
       .leftJoinAndSelect(

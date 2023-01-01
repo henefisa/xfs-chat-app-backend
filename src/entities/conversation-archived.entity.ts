@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Conversation, User } from 'src/entities';
 import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne } from 'typeorm';
@@ -8,17 +7,9 @@ export class ConversationArchive extends BaseEntity {
   @Column({
     name: 'delete_at',
     type: 'timestamptz',
-    default: null,
-    transformer: {
-      from(value) {
-        return moment(value);
-      },
-      to(value) {
-        return value;
-      },
-    },
+    nullable: true,
   })
-  deleteAt: moment.Moment;
+  deleteAt: string;
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;

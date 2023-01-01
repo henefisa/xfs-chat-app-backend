@@ -349,7 +349,8 @@ export const deleteConversation = async (
     );
   }
 
-  conversationArchived.deleteAt = moment();
+  conversationArchived.deleteAt = moment().toISOString();
+  conversationArchived.isHided = true;
 
   return conversationArchivedRepository.save(conversationArchived);
 };
