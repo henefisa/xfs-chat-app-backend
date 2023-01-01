@@ -72,11 +72,11 @@ export const getConversations = async (
 
     const user = req.user as User;
 
-    const conversations = await conversationService.getGroups(
+    const { conversations, count } = await conversationService.getGroups(
       user.id,
       req.query
     );
-    return res.status(StatusCodes.OK).json(conversations);
+    return res.status(StatusCodes.OK).json({ conversations, count });
   } catch (error) {
     next(error);
   }
