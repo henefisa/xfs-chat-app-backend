@@ -1,4 +1,6 @@
 import Database from 'src/configs/Database';
+import { Conversation, Message, Participants } from 'src/entities';
+import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import { QueryRunner, Repository } from 'typeorm';
 
 const dataSource = Database.instance.getDataSource('default');
@@ -14,8 +16,10 @@ export const startConnect = async () => {
 };
 
 export const save = async (
-  repository: Repository<object>,
-  request: object,
+  repository: Repository<
+    Conversation | Participants | ConversationArchive | Message
+  >,
+  request: Conversation | Participants | ConversationArchive | Message,
   queryRunner: QueryRunner
 ) => {
   try {
