@@ -5,11 +5,11 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 @Entity('conversation_archived')
 export class ConversationArchive extends BaseEntity {
   @Column({
-    name: 'delete_at',
+    name: 'deleted_at',
     type: 'timestamptz',
     nullable: true,
   })
-  deleteAt: string;
+  deletedAt: string;
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;
