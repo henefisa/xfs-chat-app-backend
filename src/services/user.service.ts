@@ -23,7 +23,7 @@ import {
   GetUserOptions,
 } from 'src/interfaces';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import { getPeerIdKey } from 'src/utils/redis';
+import { getOnlineIdKey } from 'src/utils/redis';
 import { FindOneOptions, Not } from 'typeorm';
 
 const userRepository = Database.instance
@@ -325,49 +325,49 @@ export const checkActivateValidation = async (status: EUserActiveStatus) => {
   return true;
 };
 
-const addPeerId = async (key: string, peerId: string) => {
+export const setRedisArray = async (key: string, data: string) => {
   const id = await redis.get(key);
   if (!id) {
-    const data = [peerId].toString();
-    return redis.set(key, data);
+    const arrToString = [data].toString();
+    return redis.set(key, arrToString);
   }
   const arrId = id.split(',');
-  const data = [...arrId, peerId].toString();
-  return redis.set(key, data);
+  const arrToString = [...arrId, data].toString();
+  return redis.set(key, arrToString);
 };
 
-const setPeerIdOffline = async (key: string, peerId: string) => {
+const setIdOffline = async (key: string, data: string) => {
   const id = await redis.get(key);
   if (!id) {
     return [];
   }
   const arrId = id.split(',');
-  return arrId.filter((id) => id !== peerId);
+  return arrId.filter((id) => id !== data);
 };
 
-export const setOnline = async (userId: string, peerId: string) => {
+export const setOnline = async (userId: string, socketId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-  const key = getPeerIdKey(user.id);
-  await addPeerId(key, peerId);
+  const key = getOnlineIdKey(user.id);
+  await setRedisArray(key, socketId);
   user.status = EUserStatus.ONLINE;
   return userRepository.save(user);
 };
 
-export const setOffline = async (userId: string, peerId: string) => {
+export const setOffline = async (userId: string, socketId: string) => {
   const user = await getOneOrThrow({
     where: { id: userId },
   });
-  const key = getPeerIdKey(user.id);
-  const data = await setPeerIdOffline(key, peerId);
+  const key = getOnlineIdKey(user.id);
+  const data = await setIdOffline(key, socketId);
   if (data.length === 0) {
     user.status = EUserStatus.OFFLINE;
     await redis.del(key);
+    return await userRepository.save(user);
   }
   await redis.set(key, data.toString());
-
-  return userRepository.save(user);
+  return;
 };
 
 export const getAllUsers = async (
