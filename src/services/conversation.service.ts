@@ -7,7 +7,7 @@ import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions, Equal } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
-import { ExistsException, NotFoundException } from 'src/exceptions';
+import { NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import { EGroupRole } from 'src/interfaces/user.interface';
@@ -56,10 +56,6 @@ export const createConversation = async (
   }
 
   const promise = dto.members.map(async (member) => {
-    const checked = await checkMemberExist(newConversation.id, member);
-    if (checked) {
-      throw new ExistsException('member');
-    }
     const participant = new Participants();
     const request = {
       conversation: newConversation.id,
@@ -72,12 +68,11 @@ export const createConversation = async (
       participant.role = EGroupRole.ADMIN;
     }
 
-    await transactionService.save(
+    return transactionService.save(
       participantRepository,
       participant,
       queryRunner
     );
-    return participant;
   });
 
   await Promise.all(promise);
