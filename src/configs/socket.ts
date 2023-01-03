@@ -1,4 +1,4 @@
-import { setOnline, setRedisArray } from 'src/services/user.service';
+import { addIdOnline, setOnline } from 'src/services/user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
@@ -42,10 +42,11 @@ export class ServerSocket {
         try {
           const id = getRoomToCall(conversationId);
           await socketService.subscribe(id, userId, socket, ServerSocket.io);
-          await setRedisArray(id, peerId);
+          await addIdOnline(id, peerId);
           const allPeerIdOfRoom = await redis.get(id);
-          const arrPeerId = allPeerIdOfRoom?.split(',');
-          ServerSocket.io.emit(ESocketEvent.GetPeerId, { arrPeerId });
+          ServerSocket.io
+            .in(id)
+            .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
         } catch (error) {
           console.log(error);
           ServerSocket.io.emit(ESocketEvent.Error, error);

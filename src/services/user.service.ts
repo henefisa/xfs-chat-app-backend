@@ -325,14 +325,14 @@ export const checkActivateValidation = async (status: EUserActiveStatus) => {
   return true;
 };
 
-export const setRedisArray = async (key: string, data: string) => {
+export const addIdOnline = async (key: string, data: string) => {
   const id = await redis.get(key);
   if (!id) {
-    const arrToString = [data].toString();
+    const arrToString = JSON.stringify([data]);
     return redis.set(key, arrToString);
   }
-  const arrId = id.split(',');
-  const arrToString = [...arrId, data].toString();
+  const arrId = JSON.parse(id);
+  const arrToString = JSON.stringify([...arrId, data]);
   return redis.set(key, arrToString);
 };
 
@@ -341,8 +341,8 @@ const setIdOffline = async (key: string, data: string) => {
   if (!id) {
     return [];
   }
-  const arrId = id.split(',');
-  return arrId.filter((id) => id !== data);
+  const arrId = JSON.parse(id);
+  return arrId.filter((id: string) => id !== data);
 };
 
 export const setOnline = async (userId: string, socketId: string) => {
@@ -350,7 +350,7 @@ export const setOnline = async (userId: string, socketId: string) => {
     where: { id: userId },
   });
   const key = getOnlineIdKey(user.id);
-  await setRedisArray(key, socketId);
+  await addIdOnline(key, socketId);
   user.status = EUserStatus.ONLINE;
   return userRepository.save(user);
 };
@@ -366,8 +366,7 @@ export const setOffline = async (userId: string, socketId: string) => {
     await redis.del(key);
     return await userRepository.save(user);
   }
-  await redis.set(key, data.toString());
-  return;
+  await redis.set(key, JSON.stringify(data));
 };
 
 export const getAllUsers = async (
