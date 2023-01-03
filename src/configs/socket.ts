@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 import redis from './Redis';
 import { getPeerIdKey } from 'src/utils/redis';
+import { NotFoundException } from 'src/exceptions';
 
 config();
 
@@ -63,12 +64,17 @@ export class ServerSocket {
     socket.on(ESocketEvent.SendMessage, async (data) => {
       try {
         await socketService.validateData(data);
-        const { user, message } = await createMessage(
+        const inforMessage = await createMessage(
           data.conversationId,
           data.userId,
           data.text,
           data.attachment
         );
+        if (!inforMessage) {
+          throw new NotFoundException('message');
+        }
+        const user = inforMessage.user;
+        const message = inforMessage.message;
         ServerSocket.io
           .in(data.conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });

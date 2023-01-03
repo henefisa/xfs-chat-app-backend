@@ -4,7 +4,7 @@ import { GetConversationDto } from 'src/dto/conversation/get-conversation.dto';
 import Database from 'src/configs/Database';
 import { CreateConversationDto } from 'src/dto/conversation/create-conversation.dto';
 import { Conversation } from 'src/entities/conversation.entity';
-import { FindOneOptions, Equal } from 'typeorm';
+import { FindOneOptions, Equal, QueryRunner } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
 import { NotFoundException } from 'src/exceptions';
@@ -13,7 +13,7 @@ import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import moment from 'moment';
-import * as transactionService from 'src/services/transaction.service';
+import createConnection from 'src/services/transaction.service';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -27,58 +27,66 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
+let queryRunner: QueryRunner;
+
 export const createConversation = async (
   dto: CreateConversationDto,
   userId: string
 ) => {
-  const queryRunner = await transactionService.startConnect();
-  const currentConversation = await checkCoupleConversationExists(dto.members);
-
-  if (currentConversation) {
-    return currentConversation;
+  if (!queryRunner || queryRunner.isReleased) {
+    queryRunner = await createConnection();
   }
-  const newConversation = new Conversation();
+  try {
+    const currentConversation = await checkCoupleConversationExists(
+      dto.members
+    );
 
-  const request = {
-    ...dto,
-    isGroup: dto.members.length > 2 ? true : false,
-  };
-  Object.assign(newConversation, request);
+    if (currentConversation) {
+      return currentConversation;
+    }
+    const newConversation = new Conversation();
 
-  const conversation = await transactionService.save(
-    conversationRepository,
-    newConversation,
-    queryRunner
-  );
-
-  if (!dto.members.includes(userId)) {
-    throw new NotFoundException('user');
-  }
-
-  const promise = dto.members.map(async (member) => {
-    const participant = new Participants();
     const request = {
-      conversation: newConversation.id,
-      user: member,
-      adder: userId,
+      ...dto,
+      isGroup: dto.members.length > 2 ? true : false,
     };
-    Object.assign(participant, request);
+    Object.assign(newConversation, request);
 
-    if (member === userId && newConversation.isGroup) {
-      participant.role = EGroupRole.ADMIN;
+    const conversation = await queryRunner.manager
+      .withRepository(conversationRepository)
+      .save(newConversation);
+
+    if (!dto.members.includes(userId)) {
+      throw new NotFoundException('user');
     }
 
-    return transactionService.save(
-      participantRepository,
-      participant,
-      queryRunner
-    );
-  });
+    const promise = dto.members.map(async (member) => {
+      const participant = new Participants();
+      const request = {
+        conversation: newConversation.id,
+        user: member,
+        adder: userId,
+      };
+      Object.assign(participant, request);
 
-  await Promise.all(promise);
+      if (member === userId && newConversation.isGroup) {
+        participant.role = EGroupRole.ADMIN;
+      }
 
-  await transactionService.commitTransaction(queryRunner);
-  return conversation;
+      return queryRunner.manager
+        .withRepository(participantRepository)
+        .save(participant);
+    });
+
+    await Promise.all(promise);
+
+    await queryRunner.commitTransaction();
+    return conversation;
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+  } finally {
+    await queryRunner.release();
+  }
 };
 
 export const getOne = async (options: FindOneOptions<Conversation>) => {
