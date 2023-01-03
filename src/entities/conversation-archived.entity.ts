@@ -6,8 +6,9 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 @Entity('conversation_archived')
 export class ConversationArchive extends BaseEntity {
   @Column({
-    name: 'delete_at',
+    name: 'deleted_at',
     type: 'timestamptz',
+    nullable: true,
     default: null,
     transformer: {
       from(value) {
@@ -18,7 +19,7 @@ export class ConversationArchive extends BaseEntity {
       },
     },
   })
-  deleteAt: moment.Moment;
+  deletedAt: string;
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;
