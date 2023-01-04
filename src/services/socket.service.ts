@@ -1,8 +1,6 @@
 import { setOffline } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Server, Socket } from 'socket.io';
-import { checkMemberExist } from './participants.service';
-import { NotFoundException } from 'src/exceptions';
 import { SendMessageDto } from 'src/dto/message';
 import { validate } from 'class-validator';
 import { HttpException } from 'src/shares/http-exception';
@@ -12,13 +10,9 @@ import {
   IValidationError,
 } from 'src/middlewares/validation.middleware';
 
-export const disconnect = async (
-  socket: Socket,
-  user: string,
-  peerId: string
-) => {
+export const disconnect = async (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
-  await setOffline(user, peerId);
+  await setOffline(user, socket.id);
 };
 
 export const subscribe = async (
@@ -28,12 +22,6 @@ export const subscribe = async (
   io: Server
 ) => {
   try {
-    const checked = await checkMemberExist(conversation, user);
-
-    if (!checked) {
-      throw new NotFoundException('member');
-    }
-
     socket.join(conversation);
     io.in(conversation).emit(ESocketEvent.UserJoin, { user });
   } catch (error) {

@@ -10,5 +10,5 @@ export enum ESocketEvent {
   UserJoin = 'USER_JOIN',
   Online = 'ONLINE',
   GetPeerId = 'GET_PEER_ID',
-  CallToId = 'CALL_TO_ID',
+  JoinRoomCall = 'JOIN_ROOM_CALL',
 }

@@ -1,4 +1,4 @@
-import { setOnline } from 'src/services/user.service';
+import { addIdOnline, setOnline } from 'src/services/user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
@@ -6,7 +6,7 @@ import { Server, Socket } from 'socket.io';
 import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 import redis from './Redis';
-import { getPeerIdKey } from 'src/utils/redis';
+import { getRoomToCall } from 'src/utils/redis';
 
 config();
 
@@ -24,11 +24,11 @@ export class ServerSocket {
   }
 
   public listeners(socket: Socket) {
-    socket.on(ESocketEvent.Online, async ({ userId, peerId }) => {
+    socket.on(ESocketEvent.Online, async ({ userId }) => {
       try {
-        await setOnline(userId, peerId);
+        await setOnline(userId, socket.id);
         socket.on(ESocketEvent.Disconnect, async () => {
-          await socketService.disconnect(socket, userId, peerId);
+          await socketService.disconnect(socket, userId);
         });
       } catch (error) {
         console.log(error);
@@ -36,15 +36,23 @@ export class ServerSocket {
       }
     });
 
-    socket.on(ESocketEvent.CallToId, async ({ userId }) => {
-      try {
-        const peerId = await redis.get(getPeerIdKey(userId));
-        ServerSocket.io.emit(ESocketEvent.GetPeerId, { peerId });
-      } catch (error) {
-        console.log(error);
-        ServerSocket.io.emit(ESocketEvent.Error, error);
+    socket.on(
+      ESocketEvent.JoinRoomCall,
+      async ({ userId, peerId, conversationId }) => {
+        try {
+          const id = getRoomToCall(conversationId);
+          await socketService.subscribe(id, userId, socket, ServerSocket.io);
+          await addIdOnline(id, peerId);
+          const allPeerIdOfRoom = await redis.get(id);
+          ServerSocket.io
+            .in(id)
+            .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
+        } catch (error) {
+          console.log(error);
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
       }
-    });
+    );
 
     socket.on(ESocketEvent.Subscribe, async ({ conversationId, userId }) => {
       try {
