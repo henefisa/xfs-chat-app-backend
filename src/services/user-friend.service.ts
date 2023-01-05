@@ -6,7 +6,7 @@ import {
   EUserFriendRequestStatus,
   GetUserFriendsOptions,
 } from 'src/interfaces/user-friend.interface';
-import { FriendRequestDto, GetUserFriendDto } from 'src/dto/friend';
+import { GetUserFriendDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import { NotFoundException } from 'src/exceptions';
 
@@ -56,8 +56,8 @@ export const cancelRequest = async (dto: FriendActionDto, id: string) => {
   return userFriendRepository.save(friendRequest);
 };
 
-export const friendRequest = async (id: string, dto: FriendRequestDto) => {
-  const friendRequest = await getFriendRequest(id, dto.userTarget);
+export const friendRequest = async (id: string, userTarget: string) => {
+  const friendRequest = await getFriendRequest(id, userTarget);
 
   if (friendRequest) {
     return friendRequest;
@@ -66,7 +66,7 @@ export const friendRequest = async (id: string, dto: FriendRequestDto) => {
   const friend = new UserFriend();
 
   const request = {
-    userTarget: dto.userTarget,
+    userTarget: userTarget,
     owner: id,
   };
   Object.assign(friend, request);

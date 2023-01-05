@@ -6,42 +6,11 @@ import {
   getFriends,
 } from 'src/controllers/user-friend.controller';
 import { Router } from 'express';
-import { sendFriendRequest } from 'src/controllers/user-friend.controller';
-import { FriendRequestDto } from 'src/dto/friend';
 import { FriendActionDto } from 'src/dto/friend/friend-actions-request.dto';
 import requireAuthMiddleware from 'src/middlewares/require-auth.middleware';
 import validationMiddleware from 'src/middlewares/validation.middleware';
 import activateMiddleware from 'src/middlewares/activate.middleware';
 const router: Router = Router();
-
-/**
- * @swagger
- * /api/friends:
- *   post:
- *     summary: send friend request
- *     tags: [Friends]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/sendRequest'
- *     security:
- *          - bearerAuth: []
- *     responses:
- *       200:
- *         description: send request successfully
- *       500:
- *         description: Internal server error
- */
-
-router.post(
-  '/',
-  requireAuthMiddleware,
-  activateMiddleware,
-  validationMiddleware(FriendRequestDto),
-  sendFriendRequest
-);
 
 /**
  * @swagger

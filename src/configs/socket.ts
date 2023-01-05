@@ -6,7 +6,7 @@ import { Server, Socket } from 'socket.io';
 import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 import redis from './Redis';
-import { getRoomToCall } from 'src/utils/redis';
+import { getOnlineIdKey, getRoomToCall } from 'src/utils/redis';
 
 config();
 
@@ -89,6 +89,27 @@ export class ServerSocket {
     socket.on(ESocketEvent.Unsubscribe, ({ room }) => {
       try {
         socketService.unsubscribe(room, socket, ServerSocket.io);
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
+    socket.on(ESocketEvent.FriendRequest, async (data) => {
+      try {
+        const { id, userTarget } = data;
+        const user = await socketService.handleFriendRequest(
+          ServerSocket.io,
+          id,
+          userTarget
+        );
+        const arrString = await redis.get(getOnlineIdKey(userTarget));
+        const arraySocketId = JSON.parse(arrString || '[]');
+        arraySocketId.forEach((socketId: string) => {
+          ServerSocket.io
+            .to(socketId)
+            .emit(ESocketEvent.GetFriendRequest, { user });
+        });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
