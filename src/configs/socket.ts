@@ -7,6 +7,8 @@ import { config } from 'dotenv';
 import { createMessage } from 'src/services/message.service';
 import redis from './Redis';
 import { getRoomToCall } from 'src/utils/redis';
+import createConnection from 'src/services/transaction.service';
+import { NotFoundException } from 'src/exceptions';
 
 config();
 
@@ -70,13 +72,20 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       try {
+        const queryRunner = await createConnection();
         await socketService.validateData(data);
-        const { user, message } = await createMessage(
+        const inforMessage = await createMessage(
           data.conversationId,
           data.userId,
           data.text,
-          data.attachment
+          data.attachment,
+          queryRunner
         );
+        if (!inforMessage) {
+          throw new NotFoundException('message');
+        }
+        const user = inforMessage.user;
+        const message = inforMessage.message;
         ServerSocket.io
           .in(data.conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
