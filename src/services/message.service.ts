@@ -19,7 +19,6 @@ import {
 import { Emotion } from 'src/entities/emotion.entity';
 import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
 import { NotExistException } from 'src/exceptions';
-import createConnection from 'src/services/transaction.service';
 
 const emotionRepository = Database.instance
   .getDataSource('default')
@@ -37,43 +36,46 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-let queryRunner: QueryRunner;
-
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
-  attachment: string
+  attachment: string,
+  queryRunner?: QueryRunner
 ) => {
-  if (!queryRunner || queryRunner.isReleased) {
-    queryRunner = await createConnection();
-  }
-  try {
-    const user = await getOneOrThrow({ where: { id: sender } });
-    const message = new Message();
+  const user = await getOneOrThrow({ where: { id: sender } });
+  const message = new Message();
 
-    const request = {
-      sender: sender,
-      message: text,
-      conversation: conversation,
-      attachment,
-    };
+  const request = {
+    sender: sender,
+    message: text,
+    conversation: conversation,
+    attachment,
+  };
 
-    Object.assign(message, request);
-
-    const newMessage = await queryRunner.manager
-      .withRepository(messageRepository)
-      .save(message);
-    await unarchive(conversation, queryRunner);
-    await queryRunner.commitTransaction();
+  Object.assign(message, request);
+  if (queryRunner) {
+    try {
+      const newMessage = await queryRunner.manager
+        .withRepository(messageRepository)
+        .save(message);
+      await unarchive(conversation, queryRunner);
+      await queryRunner.commitTransaction();
+      return {
+        user: user,
+        message: newMessage,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+  } else {
+    const newMessage = await messageRepository.save(message);
     return {
       user: user,
       message: newMessage,
     };
-  } catch (error) {
-    await queryRunner.rollbackTransaction();
-  } finally {
-    await queryRunner.release();
   }
 };
 

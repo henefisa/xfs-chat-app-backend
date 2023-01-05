@@ -8,6 +8,7 @@ import { createMessage } from 'src/services/message.service';
 import redis from './Redis';
 import { getPeerIdKey } from 'src/utils/redis';
 import { NotFoundException } from 'src/exceptions';
+import createConnection from 'src/services/transaction.service';
 
 config();
 
@@ -63,12 +64,14 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       try {
+        const queryRunner = await createConnection();
         await socketService.validateData(data);
         const inforMessage = await createMessage(
           data.conversationId,
           data.userId,
           data.text,
-          data.attachment
+          data.attachment,
+          queryRunner
         );
         if (!inforMessage) {
           throw new NotFoundException('message');

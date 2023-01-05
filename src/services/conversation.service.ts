@@ -27,15 +27,11 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-let queryRunner: QueryRunner;
-
 export const createConversation = async (
   dto: CreateConversationDto,
   userId: string
 ) => {
-  if (!queryRunner || queryRunner.isReleased) {
-    queryRunner = await createConnection();
-  }
+  const queryRunner = await createConnection();
   try {
     const currentConversation = await checkCoupleConversationExists(
       dto.members
