@@ -55,28 +55,21 @@ export const createMessage = async (
 
   Object.assign(message, request);
   if (queryRunner) {
-    try {
-      const newMessage = await queryRunner.manager
-        .withRepository(messageRepository)
-        .save(message);
-      await unarchive(conversation, queryRunner);
-      await queryRunner.commitTransaction();
-      return {
-        user: user,
-        message: newMessage,
-      };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
-  } else {
-    const newMessage = await messageRepository.save(message);
+    const newMessage = await queryRunner.manager
+      .withRepository(messageRepository)
+      .save(message);
+    await unarchive(conversation, queryRunner);
+    await queryRunner.commitTransaction();
     return {
       user: user,
       message: newMessage,
     };
   }
+  const newMessage = await messageRepository.save(message);
+  return {
+    user: user,
+    message: newMessage,
+  };
 };
 
 export const unarchive = async (

@@ -71,8 +71,8 @@ export class ServerSocket {
     });
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
+      const queryRunner = await createConnection();
       try {
-        const queryRunner = await createConnection();
         await socketService.validateData(data);
         const inforMessage = await createMessage(
           data.conversationId,
@@ -91,7 +91,10 @@ export class ServerSocket {
           .emit(ESocketEvent.GetMessage, { user, message });
       } catch (error) {
         console.log(error);
+        await queryRunner.rollbackTransaction();
         ServerSocket.io.emit(ESocketEvent.Error, error);
+      } finally {
+        await queryRunner.release();
       }
     });
 
