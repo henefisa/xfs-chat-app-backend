@@ -36,49 +36,40 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-const dataSource = Database.instance.getDataSource('default');
 export const createMessage = async (
   conversation: string,
   sender: string,
   text: string,
-  attachment: string
+  attachment: string,
+  queryRunner?: QueryRunner
 ) => {
-  const queryRunner = dataSource.createQueryRunner();
+  const user = await getOneOrThrow({ where: { id: sender } });
+  const message = new Message();
 
-  await queryRunner.connect();
+  const request = {
+    sender: sender,
+    message: text,
+    conversation: conversation,
+    attachment,
+  };
 
-  await queryRunner.startTransaction();
-
-  try {
-    const user = await getOneOrThrow({ where: { id: sender } });
-    const message = new Message();
-
-    const request = {
-      sender: sender,
-      message: text,
-      conversation: conversation,
-      attachment,
-    };
-
-    Object.assign(message, request);
-
+  Object.assign(message, request);
+  if (queryRunner) {
     const newMessage = await queryRunner.manager
       .withRepository(messageRepository)
       .save(message);
-
     await unarchive(conversation, queryRunner);
-
     await queryRunner.commitTransaction();
     return {
       user: user,
       message: newMessage,
     };
-  } catch (error) {
-    await queryRunner.rollbackTransaction();
-    throw error;
-  } finally {
-    await queryRunner.release();
   }
+  const newMessage = await messageRepository.save(message);
+  return {
+    user: user,
+    message: newMessage,
+  };
 };
 
 export const unarchive = async (

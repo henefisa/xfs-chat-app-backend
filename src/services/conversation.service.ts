@@ -7,12 +7,13 @@ import { Conversation } from 'src/entities/conversation.entity';
 import { FindOneOptions, Equal } from 'typeorm';
 import { checkMemberExist } from './participants.service';
 import { Participants } from 'src/entities/participants.entity';
-import { ExistsException, NotFoundException } from 'src/exceptions';
+import { NotFoundException } from 'src/exceptions';
 import { CheckConversationDto } from 'src/dto/conversation/check-conversation.dto';
 import { UpdateConversationDto } from 'src/dto/conversation/update-conversation.dto';
 import { EGroupRole } from 'src/interfaces/user.interface';
 import { ConversationArchive } from 'src/entities/conversation-archived.entity';
 import moment from 'moment';
+import createConnection from 'src/services/transaction.service';
 
 const conversationRepository = Database.instance
   .getDataSource('default')
@@ -26,17 +27,11 @@ const conversationArchivedRepository = Database.instance
   .getDataSource('default')
   .getRepository(ConversationArchive);
 
-const dataSource = Database.instance.getDataSource('default');
 export const createConversation = async (
   dto: CreateConversationDto,
   userId: string
 ) => {
-  const queryRunner = dataSource.createQueryRunner();
-
-  await queryRunner.connect();
-
-  await queryRunner.startTransaction();
-
+  const queryRunner = await createConnection();
   try {
     const currentConversation = await checkCoupleConversationExists(
       dto.members
@@ -62,26 +57,21 @@ export const createConversation = async (
     }
 
     const promise = dto.members.map(async (member) => {
-      const checked = await checkMemberExist(conversation.id, member);
-      if (checked) {
-        throw new ExistsException('member');
-      }
       const participant = new Participants();
       const request = {
-        conversation: conversation.id,
+        conversation: newConversation.id,
         user: member,
         adder: userId,
       };
       Object.assign(participant, request);
 
-      if (member === userId && conversation.isGroup) {
+      if (member === userId && newConversation.isGroup) {
         participant.role = EGroupRole.ADMIN;
       }
 
-      await queryRunner.manager
+      return queryRunner.manager
         .withRepository(participantRepository)
         .save(participant);
-      return participant;
     });
 
     await Promise.all(promise);
@@ -90,7 +80,8 @@ export const createConversation = async (
     return conversation;
   } catch (error) {
     await queryRunner.rollbackTransaction();
-    throw error;
+  } finally {
+    await queryRunner.release();
   }
 };
 
@@ -101,6 +92,7 @@ export const getOne = async (options: FindOneOptions<Conversation>) => {
 export const getConversationsOfUser = async (
   userId: string,
   dto?: GetConversationDto,
+  group?: boolean,
   options?: GetConversationOptions
 ) => {
   const { limit, offset } = getLimitAndOffset({
@@ -145,6 +137,10 @@ export const getConversationsOfUser = async (
     );
   }
 
+  if (group) {
+    query.andWhere('conversation.is_group = true');
+  }
+
   if (options?.id) {
     query.andWhere('conversation.id = :id', { id: options.id });
   }
@@ -158,59 +154,6 @@ export const getConversationsOfUser = async (
     count,
   };
 };
-
-export const getGroups = async (
-  userId: string,
-  dto?: GetConversationDto,
-  options?: GetConversationOptions
-) => {
-  const { limit, offset } = getLimitAndOffset({
-    limit: dto?.limit,
-    offset: dto?.offset,
-  });
-
-  const query = conversationRepository.createQueryBuilder('conversation');
-
-  if (!options?.unlimited) {
-    query.skip(offset).take(limit);
-  }
-
-  query
-    .leftJoin('conversation.participants', 'participants')
-    .leftJoin('participants.user', 'users')
-    .addGroupBy('conversation.id')
-    .having('COUNT(participants.userId) > 2');
-
-  if (dto?.q) {
-    query.andWhere(
-      '(title ILIKE :q  OR username ILIKE :q OR full_name ILIKE :q)',
-      { q: `%${dto.q}%` }
-    );
-  }
-
-  if (options?.id) {
-    query.andWhere('conversation.id = :id', { id: options.id });
-  }
-
-  const conversations = await query.getMany();
-
-  const c: Conversation[] = [];
-
-  for (const i of conversations) {
-    const conv = conversationRepository
-      .createQueryBuilder('conv')
-      .leftJoin('conv.participants', 'participants')
-      .where('conv.id = :id', { id: i.id })
-      .andWhere('participants.userId = :userId', { userId: userId });
-    const con = await conv.getOne();
-    if (con) {
-      c.push(con);
-    }
-  }
-
-  return c;
-};
-
 export const checkConversationOfTwoMember = async (
   dto: CheckConversationDto,
   ownerId: string
