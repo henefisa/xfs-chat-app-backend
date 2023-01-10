@@ -109,16 +109,11 @@ export class ServerSocket {
     });
 
     socket.on(ENotificationType.FriendRequest, ({ ownerId, userTargetId }) => {
-      try {
-        socketService.handleEmitEventFriendRequest(
-          ownerId,
-          userTargetId,
-          ServerSocket.io
-        );
-      } catch (error) {
-        console.log(error);
-        ServerSocket.io.emit(ESocketEvent.Error, error);
-      }
+      socketService.handleEmitEventFriendRequest(
+        ownerId,
+        userTargetId,
+        ServerSocket.io
+      );
     });
   }
   public start() {
