@@ -336,7 +336,7 @@ export const addIdOnline = async (key: string, data: string) => {
   return redis.set(key, arrToString);
 };
 
-const setIdOffline = async (key: string, data: string) => {
+export const setIdOffline = async (key: string, data: string) => {
   const id = await redis.get(key);
   if (!id) {
     return [];

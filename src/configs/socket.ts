@@ -1,4 +1,8 @@
-import { addIdOnline, setOnline } from 'src/services/user.service';
+import {
+  addIdOnline,
+  setIdOffline,
+  setOnline,
+} from 'src/services/user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import * as socketService from 'src/services/socket.service';
 import { Server as HttpServer } from 'http';
@@ -46,6 +50,25 @@ export class ServerSocket {
           await socketService.subscribe(id, userId, socket, ServerSocket.io);
           await addIdOnline(id, peerId);
           const allPeerIdOfRoom = await redis.get(id);
+          ServerSocket.io
+            .in(id)
+            .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
+        } catch (error) {
+          console.log(error);
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
+      }
+    );
+
+    socket.on(
+      ESocketEvent.LeaveRoomCall,
+      async ({ peerId, conversationId }) => {
+        try {
+          const id = getRoomToCall(conversationId);
+          await setIdOffline(id, peerId);
+          const allPeerIdOfRoom = await redis.get(id);
+          socket.leave(id);
+          ServerSocket.io.in(id).emit(ESocketEvent.UserLeft, socket.id);
           ServerSocket.io
             .in(id)
             .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
