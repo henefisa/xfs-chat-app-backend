@@ -1,4 +1,4 @@
-import { setOffline } from './user.service';
+import { getOne, setOffline } from './user.service';
 import { ESocketEvent } from 'src/interfaces/socket.interface';
 import { Server, Socket } from 'socket.io';
 import { SendMessageDto } from 'src/dto/message';
@@ -9,6 +9,8 @@ import {
   buildError,
   IValidationError,
 } from 'src/middlewares/validation.middleware';
+import redis from 'src/configs/Redis';
+import { getOnlineIdKey } from 'src/utils/redis';
 
 export const disconnect = async (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
@@ -48,5 +50,24 @@ export const validateData = async (data: SendMessageDto) => {
       'Input data validation failed',
       buildError(errors, result)
     );
+  }
+};
+
+export const handleEmitEventFriendRequest = async (
+  ownerId: string,
+  userTarget: string,
+  io: Server
+) => {
+  try {
+    const user = await getOne({
+      where: { id: ownerId },
+    });
+    const arrString = await redis.get(getOnlineIdKey(userTarget));
+    const arraySocketId = JSON.parse(arrString || '[]');
+    arraySocketId.forEach((socketId: string) => {
+      io.to(socketId).emit(ESocketEvent.GetFriendRequest, { user });
+    });
+  } catch (error) {
+    io.emit(ESocketEvent.Error, error);
   }
 };
