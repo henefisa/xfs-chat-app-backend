@@ -159,3 +159,18 @@ export const deleteConversation = async (
     next(error);
   }
 };
+
+export const getConversationsArchived = async (
+  req: RequestWithBody,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as User;
+    const conversationsArchivedAndCount =
+      await conversationService.getConversationsArchived(user.id);
+    return res.status(StatusCodes.OK).json(conversationsArchivedAndCount);
+  } catch (error) {
+    next(error);
+  }
+};
