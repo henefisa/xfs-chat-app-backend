@@ -14,7 +14,7 @@ import { getOneOrThrow } from './user.service';
 import { Message, MessageHided } from 'src/entities';
 import {
   checkConversationArchive,
-  getConversationArchived,
+  getOneConversationArchived,
 } from './conversation.service';
 import { Emotion } from 'src/entities/emotion.entity';
 import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
@@ -76,7 +76,7 @@ export const unarchive = async (
   conversationId: string,
   queryRunner: QueryRunner
 ) => {
-  const conversationArchived = await getConversationArchived({
+  const conversationArchived = await getOneConversationArchived({
     where: { conversation: Equal(conversationId) },
   });
   if (!conversationArchived || !conversationArchived.isHided) {

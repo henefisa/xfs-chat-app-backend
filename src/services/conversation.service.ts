@@ -257,7 +257,7 @@ export const archive = async (userId: string, conversationId: string) => {
   return conversationArchivedRepository.save(conversationArchived);
 };
 
-export const getConversationArchived = async (
+export const getOneConversationArchived = async (
   options: FindOneOptions<ConversationArchive>
 ) => {
   return conversationArchivedRepository.findOne(options);
@@ -302,7 +302,7 @@ export const checkConversationArchive = async (
   conversationId: string,
   userId: string
 ) => {
-  const conversationArchived = await getConversationArchived({
+  const conversationArchived = await getOneConversationArchived({
     where: { conversation: Equal(conversationId), user: Equal(userId) },
   });
 
@@ -310,4 +310,37 @@ export const checkConversationArchive = async (
     return false;
   }
   return conversationArchived;
+};
+
+export const getConversationsArchived = async (userId: string) => {
+  const query = conversationRepository.createQueryBuilder('conversation');
+  query
+    .leftJoinAndSelect('conversation.participants', 'participants')
+    .leftJoinAndSelect('participants.user', 'users')
+    .where(
+      'conversation.id IN' +
+        query
+          .subQuery()
+          .select('p.conversationId')
+          .from(Participants, 'p')
+          .where('p.userId = :userId')
+          .getQuery()
+    )
+    .andWhere(
+      'conversation.id IN' +
+        query
+          .subQuery()
+          .select('archive.conversationId')
+          .from(ConversationArchive, 'archive')
+          .where('archive.userId = :userId')
+          .andWhere('archive.isHided = true')
+          .getQuery()
+    )
+    .setParameter('userId', userId);
+
+  const [conversationsArchived, count] = await query.getManyAndCount();
+  return {
+    conversationsArchived,
+    count,
+  };
 };

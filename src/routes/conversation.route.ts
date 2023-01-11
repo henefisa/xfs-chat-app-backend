@@ -134,6 +134,28 @@ router.get(
 
 /**
  * @swagger
+ * /api/conversations/conversations-archived:
+ *  get:
+ *    summary: get conversation archived of user
+ *    tags: [Conversations]
+ *    security:
+ *          - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: successful
+ *      500:
+ *        description: Internal server error
+ */
+
+router.get(
+  '/conversations-archived',
+  requireAuthMiddleware,
+  activateMiddleware,
+  conversationController.getConversationsArchived
+);
+
+/**
+ * @swagger
  * /api/conversations/{id}:
  *  get:
  *    summary: get conversation by the id
