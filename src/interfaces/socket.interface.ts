@@ -11,5 +11,6 @@ export enum ESocketEvent {
   Online = 'ONLINE',
   GetPeerId = 'GET_PEER_ID',
   JoinRoomCall = 'JOIN_ROOM_CALL',
+  LeaveRoomCall = 'LEAVE_ROOM_CALL',
   GetFriendRequest = 'GET_FRIEND_REQUEST',
 }
