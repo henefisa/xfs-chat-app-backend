@@ -9,6 +9,7 @@ import redis from './Redis';
 import { getRoomToCall } from 'src/utils/redis';
 import createConnection from 'src/services/transaction.service';
 import { NotFoundException } from 'src/exceptions';
+import { ENotificationType } from 'src/interfaces/notification.interface';
 
 config();
 
@@ -105,6 +106,14 @@ export class ServerSocket {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
+    });
+
+    socket.on(ENotificationType.FriendRequest, ({ ownerId, userTargetId }) => {
+      socketService.handleEmitEventFriendRequest(
+        ownerId,
+        userTargetId,
+        ServerSocket.io
+      );
     });
   }
   public start() {
