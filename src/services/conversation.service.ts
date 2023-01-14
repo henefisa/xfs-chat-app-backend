@@ -250,10 +250,17 @@ export const checkCoupleConversationExists = async (members: string[]) => {
 };
 
 export const archive = async (userId: string, conversationId: string) => {
-  const conversationArchived = createObjectConversationArchived(
-    userId,
-    conversationId
+  let conversationArchived = await checkConversationArchive(
+    conversationId,
+    userId
   );
+  if (!conversationArchived) {
+    conversationArchived = createObjectConversationArchived(
+      userId,
+      conversationId
+    );
+  }
+  conversationArchived.isHided = true;
   return conversationArchivedRepository.save(conversationArchived);
 };
 
@@ -271,6 +278,7 @@ export const createObjectConversationArchived = (
   const request = {
     conversation: conversationId,
     user: userId,
+    deletedAt: null,
   };
   Object.assign(conversationArchived, request);
   return conversationArchived;

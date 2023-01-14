@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Conversation, User } from 'src/entities';
 import { BaseEntity } from 'src/shares';
 import { Column, Entity, ManyToOne } from 'typeorm';
@@ -10,14 +9,6 @@ export class ConversationArchive extends BaseEntity {
     type: 'timestamptz',
     nullable: true,
     default: null,
-    transformer: {
-      from(value) {
-        return moment(value);
-      },
-      to(value) {
-        return value;
-      },
-    },
   })
   deletedAt: string;
 
