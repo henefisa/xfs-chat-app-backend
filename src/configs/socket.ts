@@ -94,6 +94,28 @@ export class ServerSocket {
       }
     });
 
+    socket.on(ESocketEvent.Typing, async ({ conversationId, userId }) => {
+      try {
+        ServerSocket.io
+          .in(conversationId)
+          .emit(ESocketEvent.Typing, { userId });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
+    socket.on(ESocketEvent.StopTyping, ({ conversationId, userId }) => {
+      try {
+        ServerSocket.io
+          .in(conversationId)
+          .emit(ESocketEvent.StopTyping, { userId });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
     socket.on(ESocketEvent.SendMessage, async (data) => {
       const queryRunner = await createConnection();
       try {
