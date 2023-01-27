@@ -89,6 +89,14 @@ export const getOne = async (options: FindOneOptions<Conversation>) => {
   return conversationRepository.findOne(options);
 };
 
+export const getOneOrThrow = async (options: FindOneOptions<Conversation>) => {
+  const conversation = await conversationRepository.findOne(options);
+  if (!conversation) {
+    throw new NotFoundException('conversation');
+  }
+  return conversation;
+};
+
 export const getConversationsOfUser = async (
   userId: string,
   dto?: GetConversationDto,
