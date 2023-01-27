@@ -12,7 +12,8 @@ export class ConversationArchive extends BaseEntity {
     default: null,
     transformer: {
       from(value) {
-        return moment(value);
+        if (value) return moment(value);
+        return null;
       },
       to(value) {
         return value;
