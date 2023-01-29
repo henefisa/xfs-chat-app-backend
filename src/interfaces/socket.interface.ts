@@ -15,4 +15,6 @@ export enum ESocketEvent {
   GetFriendRequest = 'GET_FRIEND_REQUEST',
   Typing = 'TYPING',
   StopTyping = 'STOP_TYPING',
+  IncomingCall = 'INCOMING_CALL',
+  OfferToCall = 'OFFER_TO_CALL',
 }

@@ -94,6 +94,23 @@ export class ServerSocket {
       }
     });
 
+    socket.on(
+      ESocketEvent.OfferToCall,
+      async ({ ownerId, conversationId, userTargetId }) => {
+        try {
+          await socketService.OfferToCall(
+            ownerId,
+            userTargetId,
+            conversationId,
+            ServerSocket.io
+          );
+        } catch (error) {
+          console.log(error);
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
+      }
+    );
+
     socket.on(ESocketEvent.Typing, async ({ conversationId, userId }) => {
       try {
         ServerSocket.io
