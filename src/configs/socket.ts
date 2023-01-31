@@ -33,10 +33,12 @@ export class ServerSocket {
   public listeners(socket: Socket) {
     socket.on(ESocketEvent.Online, async ({ userId }) => {
       try {
-        await setOnline(userId, socket.id);
-        socket.on(ESocketEvent.Disconnect, async () => {
-          await socketService.disconnect(socket, userId);
-        });
+        if (userId !== undefined) {
+          await setOnline(userId, socket.id);
+          socket.on(ESocketEvent.Disconnect, async () => {
+            await socketService.disconnect(socket, userId);
+          });
+        }
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
