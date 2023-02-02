@@ -14,6 +14,7 @@ import { getRoomToCall } from 'src/utils/redis';
 import createConnection from 'src/services/transaction.service';
 import { NotFoundException } from 'src/exceptions';
 import { ENotificationType } from 'src/interfaces/notification.interface';
+import * as userService from 'src/services/user.service';
 
 config();
 
@@ -96,9 +97,10 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.Typing, async ({ conversationId, userId }) => {
       try {
-        ServerSocket.io
-          .in(conversationId)
-          .emit(ESocketEvent.Typing, { userId });
+        const user = userService.getOneOrThrow({
+          where: { id: userId },
+        });
+        ServerSocket.io.in(conversationId).emit(ESocketEvent.Typing, { user });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
@@ -107,9 +109,12 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.StopTyping, ({ conversationId, userId }) => {
       try {
+        const user = userService.getOneOrThrow({
+          where: { id: userId },
+        });
         ServerSocket.io
           .in(conversationId)
-          .emit(ESocketEvent.StopTyping, { userId });
+          .emit(ESocketEvent.StopTyping, { user });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
