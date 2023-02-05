@@ -119,8 +119,9 @@ export class ServerSocket {
         const user = await userService.getOneOrThrow({
           where: { id: userId },
         });
-        console.log(user);
-        ServerSocket.io.in(conversationId).emit(ESocketEvent.Typing, { user });
+        ServerSocket.io
+          .in(conversationId)
+          .emit(ESocketEvent.Typing, { user, conversationId });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
@@ -134,7 +135,7 @@ export class ServerSocket {
         });
         ServerSocket.io
           .in(conversationId)
-          .emit(ESocketEvent.StopTyping, { user });
+          .emit(ESocketEvent.StopTyping, { user, conversationId });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
