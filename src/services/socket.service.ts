@@ -12,6 +12,7 @@ import {
 import redis from 'src/configs/Redis';
 import { getOnlineIdKey } from 'src/utils/redis';
 import * as conversationService from 'src/services/conversation.service';
+import { getListOnlineKeyOfUser } from './redis.service';
 
 export const disconnect = async (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
@@ -55,16 +56,20 @@ export const validateData = async (data: SendMessageDto) => {
 };
 
 export const handleEmitEventFriendRequest = async (
-  ownerId: string,
-  userTarget: string,
-  io: Server
+  io: Server,
+  userId: string,
+  userTarget?: string
 ) => {
   try {
     const user = await getOne({
-      where: { id: ownerId },
+      where: { id: userId },
     });
-    const arrString = await redis.get(getOnlineIdKey(userTarget));
-    const arraySocketId = JSON.parse(arrString || '[]');
+
+    let arraySocketId = await getListOnlineKeyOfUser(userId);
+
+    if (userTarget) {
+      arraySocketId = await getListOnlineKeyOfUser(userTarget);
+    }
     arraySocketId.forEach((socketId: string) => {
       io.to(socketId).emit(ESocketEvent.GetFriendRequest, { user });
     });
