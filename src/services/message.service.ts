@@ -10,7 +10,7 @@ import {
   hideMessageDto,
 } from 'src/dto/message';
 import { getLimitAndOffset } from 'src/shares/get-limit-and-offset';
-import { getOneOrThrow } from './user.service';
+import * as userService from 'src/services/user.service';
 import { Message, MessageHided } from 'src/entities';
 import {
   checkConversationArchive,
@@ -18,7 +18,7 @@ import {
 } from './conversation.service';
 import { Emotion } from 'src/entities/emotion.entity';
 import { ExpressFeelingDto } from 'src/dto/emotion/express-feeling.dto';
-import { NotExistException } from 'src/exceptions';
+import { NotExistException, NotFoundException } from 'src/exceptions';
 
 const emotionRepository = Database.instance
   .getDataSource('default')
@@ -43,7 +43,7 @@ export const createMessage = async (
   attachment: string,
   queryRunner?: QueryRunner
 ) => {
-  const user = await getOneOrThrow({ where: { id: sender } });
+  const user = await userService.getOneOrThrow({ where: { id: sender } });
   const message = new Message();
 
   const request = {
@@ -111,6 +111,16 @@ export const hideMessage = async (dto: hideMessageDto, id: string) => {
   Object.assign(hideMessage, request);
 
   return messageHidedRepository.save(hideMessage);
+};
+
+export const getOneOrThrow = async (options: FindOneOptions<Message>) => {
+  const message = await messageRepository.findOne(options);
+
+  if (!message) {
+    throw new NotFoundException('message');
+  }
+
+  return message;
 };
 
 export const getMessages = async (

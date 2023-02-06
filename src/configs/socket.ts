@@ -15,6 +15,7 @@ import createConnection from 'src/services/transaction.service';
 import { NotFoundException } from 'src/exceptions';
 import { ENotificationType } from 'src/interfaces/notification.interface';
 import * as userService from 'src/services/user.service';
+import * as messageReadService from 'src/services/message-read.service';
 
 config();
 
@@ -136,6 +137,28 @@ export class ServerSocket {
         ServerSocket.io
           .in(conversationId)
           .emit(ESocketEvent.StopTyping, { user, conversationId });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
+    socket.on(ESocketEvent.ReadMessage, async ({ conversationId, userId }) => {
+      try {
+        await messageReadService.createMessageRead({ conversationId, userId });
+      } catch (error) {
+        console.log(error);
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
+    socket.on(ESocketEvent.GetReadMessage, async ({ conversationId }) => {
+      try {
+        const messageReads =
+          await messageReadService.getMessageReadsByMessageId(conversationId);
+        ServerSocket.io
+          .in(conversationId)
+          .emit(ESocketEvent.GetReadMessage, { messageReads });
       } catch (error) {
         console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);

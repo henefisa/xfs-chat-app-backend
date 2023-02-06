@@ -4,3 +4,4 @@ export * from './message.entity';
 export * from './participants.entity';
 export * from './user-friend.entity';
 export * from './user.entity';
+export * from './message-read.entity';
