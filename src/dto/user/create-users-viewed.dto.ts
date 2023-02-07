@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 import { IsNotBlank } from 'src/decorators';
 
-export class CreateMessageReadDto {
+export class CreateUserViewedDto {
   @IsString()
   @IsNotBlank()
   conversationId: string;

@@ -18,5 +18,5 @@ export enum ESocketEvent {
   IncomingCall = 'INCOMING_CALL',
   OfferToCall = 'OFFER_TO_CALL',
   ReadMessage = 'READ_MESSAGE',
-  GetReadMessage = 'GET_READ_MESSAGE',
+  GetUsersViewed = 'GET_USERS_VIEWED',
 }

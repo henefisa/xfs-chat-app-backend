@@ -3,4 +3,4 @@ export * from './delete-messages.dto';
 export * from './hide-message.dto';
 export * from './send-message.dto';
 export * from './count-message.dto';
-export * from './create-message-read.dto';
+export * from '../user/create-users-viewed.dto';
