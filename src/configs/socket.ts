@@ -181,10 +181,13 @@ export class ServerSocket {
 
     socket.on(ENotificationType.FriendRequest, ({ ownerId, userTargetId }) => {
       socketService.handleEmitEventFriendRequest(
+        ServerSocket.io,
         ownerId,
-        userTargetId,
-        ServerSocket.io
+        userTargetId
       );
+    });
+    socket.on(ENotificationType.CancelOrAcceptFriendRequest, ({ userId }) => {
+      socketService.handleEmitEventFriendRequest(ServerSocket.io, userId);
     });
   }
   public start() {
