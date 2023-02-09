@@ -2,8 +2,8 @@ import { Conversation, User } from 'src/entities';
 import { BaseEntity } from 'src/shares';
 import { Entity, ManyToOne } from 'typeorm';
 
-@Entity('users_viewed')
-export class UsersViewed extends BaseEntity {
+@Entity('conversation_readers')
+export class ConversationReader extends BaseEntity {
   @ManyToOne(() => Conversation)
   conversation: Conversation;
 

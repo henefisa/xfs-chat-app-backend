@@ -15,7 +15,7 @@ import createConnection from 'src/services/transaction.service';
 import { NotFoundException } from 'src/exceptions';
 import { ENotificationType } from 'src/interfaces/notification.interface';
 import * as userService from 'src/services/user.service';
-import * as usersViewedService from 'src/services/users-viewed.service';
+import * as usersViewedService from 'src/services/conversation-reader.service';
 
 config();
 
@@ -138,25 +138,31 @@ export class ServerSocket {
 
     socket.on(ESocketEvent.ReadMessage, async ({ conversationId, userId }) => {
       try {
-        await usersViewedService.createUsersViewed({ conversationId, userId });
+        await usersViewedService.updateConversationReader({
+          conversationId,
+          userId,
+        });
       } catch (error) {
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
 
-    socket.on(ESocketEvent.GetUsersViewed, async ({ conversationId }) => {
-      try {
-        const usersViewed =
-          await usersViewedService.getUsersViewedByConversationId(
-            conversationId
-          );
-        ServerSocket.io
-          .in(conversationId)
-          .emit(ESocketEvent.GetUsersViewed, { usersViewed });
-      } catch (error) {
-        ServerSocket.io.emit(ESocketEvent.Error, error);
+    socket.on(
+      ESocketEvent.GetConversationReader,
+      async ({ conversationId }) => {
+        try {
+          const conversationReaders =
+            await usersViewedService.getConversationReaderByConversationId(
+              conversationId
+            );
+          ServerSocket.io
+            .in(conversationId)
+            .emit(ESocketEvent.GetConversationReader, { conversationReaders });
+        } catch (error) {
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
       }
-    });
+    );
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       const queryRunner = await createConnection();
