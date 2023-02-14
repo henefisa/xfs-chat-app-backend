@@ -15,6 +15,7 @@ import createConnection from 'src/services/transaction.service';
 import { NotFoundException } from 'src/exceptions';
 import { ENotificationType } from 'src/interfaces/notification.interface';
 import * as userService from 'src/services/user.service';
+import * as usersViewedService from 'src/services/conversation-reader.service';
 import { OfferToCallDto } from 'src/dto/socket';
 
 config();
@@ -42,7 +43,6 @@ export class ServerSocket {
           });
         }
       } catch (error) {
-        console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
@@ -59,7 +59,6 @@ export class ServerSocket {
             .in(id)
             .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
         } catch (error) {
-          console.log(error);
           ServerSocket.io.emit(ESocketEvent.Error, error);
         }
       }
@@ -78,7 +77,6 @@ export class ServerSocket {
             .in(id)
             .emit(ESocketEvent.GetPeerId, { allPeerIdOfRoom });
         } catch (error) {
-          console.log(error);
           ServerSocket.io.emit(ESocketEvent.Error, error);
         }
       }
@@ -93,7 +91,6 @@ export class ServerSocket {
           ServerSocket.io
         );
       } catch (error) {
-        console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
@@ -149,7 +146,6 @@ export class ServerSocket {
           .in(conversationId)
           .emit(ESocketEvent.Typing, { user, conversationId });
       } catch (error) {
-        console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
@@ -163,10 +159,37 @@ export class ServerSocket {
           .in(conversationId)
           .emit(ESocketEvent.StopTyping, { user, conversationId });
       } catch (error) {
-        console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });
+
+    socket.on(ESocketEvent.ReadMessage, async ({ conversationId, userId }) => {
+      try {
+        await usersViewedService.updateConversationReader({
+          conversationId,
+          userId,
+        });
+      } catch (error) {
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
+    socket.on(
+      ESocketEvent.GetConversationReader,
+      async ({ conversationId }) => {
+        try {
+          const conversationReaders =
+            await usersViewedService.getConversationReaderByConversationId(
+              conversationId
+            );
+          ServerSocket.io
+            .in(conversationId)
+            .emit(ESocketEvent.GetConversationReader, { conversationReaders });
+        } catch (error) {
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
+      }
+    );
 
     socket.on(ESocketEvent.SendMessage, async (data) => {
       const queryRunner = await createConnection();
@@ -188,7 +211,6 @@ export class ServerSocket {
           .in(data.conversationId)
           .emit(ESocketEvent.GetMessage, { user, message });
       } catch (error) {
-        console.log(error);
         await queryRunner.rollbackTransaction();
         ServerSocket.io.emit(ESocketEvent.Error, error);
       } finally {
@@ -200,7 +222,6 @@ export class ServerSocket {
       try {
         socketService.unsubscribe(room, socket, ServerSocket.io);
       } catch (error) {
-        console.log(error);
         ServerSocket.io.emit(ESocketEvent.Error, error);
       }
     });

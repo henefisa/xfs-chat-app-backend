@@ -17,6 +17,8 @@ export enum ESocketEvent {
   StopTyping = 'STOP_TYPING',
   IncomingCall = 'INCOMING_CALL',
   OfferToCall = 'OFFER_TO_CALL',
+  ReadMessage = 'READ_MESSAGE',
+  GetConversationReader = 'GET_CONVERSATION_READERS',
   AcceptCall = 'ACCEPT_CALL',
   DenyCall = 'DENY_CALL',
 }
