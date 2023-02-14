@@ -16,6 +16,7 @@ import { NotFoundException } from 'src/exceptions';
 import { ENotificationType } from 'src/interfaces/notification.interface';
 import * as userService from 'src/services/user.service';
 import * as usersViewedService from 'src/services/conversation-reader.service';
+import { OfferToCallDto } from 'src/dto/socket';
 
 config();
 
@@ -94,16 +95,42 @@ export class ServerSocket {
       }
     });
 
+    socket.on(ESocketEvent.OfferToCall, async (dto: OfferToCallDto) => {
+      try {
+        await socketService.OfferToCall(dto, socket, ServerSocket.io);
+      } catch (error) {
+        ServerSocket.io.emit(ESocketEvent.Error, error);
+      }
+    });
+
     socket.on(
-      ESocketEvent.OfferToCall,
-      async ({ ownerId, conversationId, userTargetId }) => {
+      ESocketEvent.AcceptCall,
+      async ({ ownerId, conversationId, socketIdOfUserOffer }) => {
         try {
-          await socketService.OfferToCall(
-            ownerId,
-            userTargetId,
-            conversationId,
-            ServerSocket.io
-          );
+          const user = await userService.getOneOrThrow({
+            where: { id: ownerId },
+          });
+
+          ServerSocket.io
+            .to(socketIdOfUserOffer)
+            .emit(ESocketEvent.AcceptCall, { user, conversationId });
+        } catch (error) {
+          ServerSocket.io.emit(ESocketEvent.Error, error);
+        }
+      }
+    );
+
+    socket.on(
+      ESocketEvent.DenyCall,
+      async ({ ownerId, conversationId, socketIdOfUserOffer }) => {
+        try {
+          const user = await userService.getOneOrThrow({
+            where: { id: ownerId },
+          });
+
+          ServerSocket.io
+            .to(socketIdOfUserOffer)
+            .emit(ESocketEvent.DenyCall, { user, conversationId });
         } catch (error) {
           ServerSocket.io.emit(ESocketEvent.Error, error);
         }
@@ -201,10 +228,13 @@ export class ServerSocket {
 
     socket.on(ENotificationType.FriendRequest, ({ ownerId, userTargetId }) => {
       socketService.handleEmitEventFriendRequest(
+        ServerSocket.io,
         ownerId,
-        userTargetId,
-        ServerSocket.io
+        userTargetId
       );
+    });
+    socket.on(ENotificationType.CancelOrAcceptFriendRequest, ({ userId }) => {
+      socketService.handleEmitEventFriendRequest(ServerSocket.io, userId);
     });
   }
   public start() {

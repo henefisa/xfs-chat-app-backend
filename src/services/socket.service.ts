@@ -9,9 +9,9 @@ import {
   buildError,
   IValidationError,
 } from 'src/middlewares/validation.middleware';
-import redis from 'src/configs/Redis';
-import { getOnlineIdKey } from 'src/utils/redis';
 import * as conversationService from 'src/services/conversation.service';
+import { getListOnlineKeyOfUser } from './redis.service';
+import { OfferToCallDto } from 'src/dto/socket';
 
 export const disconnect = async (socket: Socket, user: string) => {
   console.info('user disconect ' + socket.id);
@@ -55,16 +55,20 @@ export const validateData = async (data: SendMessageDto) => {
 };
 
 export const handleEmitEventFriendRequest = async (
-  ownerId: string,
-  userTarget: string,
-  io: Server
+  io: Server,
+  userId: string,
+  userTarget?: string
 ) => {
   try {
     const user = await getOne({
-      where: { id: ownerId },
+      where: { id: userId },
     });
-    const arrString = await redis.get(getOnlineIdKey(userTarget));
-    const arraySocketId = JSON.parse(arrString || '[]');
+
+    let arraySocketId = await getListOnlineKeyOfUser(userId);
+
+    if (userTarget) {
+      arraySocketId = await getListOnlineKeyOfUser(userTarget);
+    }
     arraySocketId.forEach((socketId: string) => {
       io.to(socketId).emit(ESocketEvent.GetFriendRequest, { user });
     });
@@ -74,22 +78,25 @@ export const handleEmitEventFriendRequest = async (
 };
 
 export const OfferToCall = async (
-  ownerId: string,
-  userTargetId: string,
-  conversationId: string,
+  dto: OfferToCallDto,
+  socket: Socket,
   io: Server
 ) => {
   try {
     const user = await getOneOrThrow({
-      where: { id: ownerId },
+      where: { id: dto.ownerId },
     });
     const conversation = await conversationService.getOneOrThrow({
-      where: { id: conversationId },
+      where: { id: dto.conversationId },
     });
-    const OnlineSocketIds = await redis.get(getOnlineIdKey(userTargetId));
-    const SocketIds = JSON.parse(OnlineSocketIds || '[]');
-    SocketIds.forEach((socketId: string) => {
-      io.to(socketId).emit(ESocketEvent.IncomingCall, { user, conversation });
+    const SocketIds = await getListOnlineKeyOfUser(dto.userTargetId);
+    SocketIds.forEach((socketIdOfUserTarget: string) => {
+      const socketIdOfOwner = socket.id;
+      io.to(socketIdOfUserTarget).emit(ESocketEvent.IncomingCall, {
+        user,
+        conversation,
+        socketIdOfOwner,
+      });
     });
   } catch (error) {
     io.emit(ESocketEvent.Error, error);

@@ -19,4 +19,6 @@ export enum ESocketEvent {
   OfferToCall = 'OFFER_TO_CALL',
   ReadMessage = 'READ_MESSAGE',
   GetConversationReader = 'GET_CONVERSATION_READERS',
+  AcceptCall = 'ACCEPT_CALL',
+  DenyCall = 'DENY_CALL',
 }

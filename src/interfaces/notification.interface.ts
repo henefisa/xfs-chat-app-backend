@@ -3,7 +3,7 @@ import { GetOptions } from 'src/shares/get-options';
 
 export enum ENotificationType {
   FriendRequest = 'FRIEND_REQUEST',
-  FriendApprove = 'FRIEND_APPROVE',
+  CancelOrAcceptFriendRequest = 'CANCEL_OR_ACCEPT_FRIEND_REQUEST',
   WarningBan = 'WARNING_BAN',
   Banned = 'BANNED',
   Unbanned = 'UNBANNED',
